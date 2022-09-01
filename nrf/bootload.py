@@ -28,18 +28,19 @@ def bootload_nrf(port: str, binary: str, use_random_padding: bool = False) -> No
     if use_random_padding:
         data += random.randbytes(BINARY_SIZE - len(data))
     else:
-        data += b"\0" * (BINARY_SIZE - len(data))
+        data += bytes(BINARY_SIZE - len(data))
 
     # Transfer the data to the nRF board.
     # nrf_serial.write(b"transfersram\n")
     # logging.info(nrf_serial.read_until())
 
     # Send the binary data over UART.
-    nrf_serial.write(data)
+    num_bytes_written = nrf_serial.write(data)
+    logging.info("Wrote %d bytes.", num_bytes_written)
     logging.info(nrf_serial.read_until())
 
     # Execute the 3-wire bus bootloader on the nRF board.
-    nrf_serial.write(b"boot3wb\n")
+    # nrf_serial.write(b"boot3wb\n")
     logging.info(nrf_serial.read_until())
 
 def main(argv):
