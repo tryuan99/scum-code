@@ -3,7 +3,7 @@
 from absl import logging
 import random
 
-from utils import serial_interface
+from utils.serial import serial_interface
 
 # Baud rate of the nRF board.
 NRF_BAUDRATE = 250000

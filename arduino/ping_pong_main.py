@@ -1,7 +1,7 @@
 from absl import app, flags, logging
 import time
 
-from utils import serial_interface
+from utils.serial import serial_interface
 
 FLAGS = flags.FLAGS
 

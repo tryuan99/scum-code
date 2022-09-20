@@ -6,7 +6,7 @@ py_binary(
     name = "ping_pong_main",
     srcs = ["ping_pong_main.py"],
     deps = [
-        "//utils:serial_interface",
+        "//utils/serial:serial_interface",
         requirement("absl-py"),
     ],
 )

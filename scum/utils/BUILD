@@ -6,7 +6,7 @@ py_library(
     name = "nrf_bootloader",
     srcs = ["nrf_bootloader.py"],
     deps = [
-        "//utils:serial_interface",
+        "//utils/serial:serial_interface",
         requirement("absl-py"),
     ],
 )
