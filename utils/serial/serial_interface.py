@@ -15,20 +15,22 @@ import time
 SERIAL_PACKET_SIZE = 32
 
 # The timeout between consecutive packet writes.
-SERIAL_PACKET_WRITE_TIMEOUT = 0.005 # seconds
+SERIAL_PACKET_WRITE_TIMEOUT = 0.005  # seconds
 
 # The timeout in seconds after opening the serial port.
 # This value is dongle-dependent.
-SERIAL_OPEN_TIMEOUT = 2 # seconds
+SERIAL_OPEN_TIMEOUT = 2  # seconds
 
 # The timeout in seconds for a read from the serial port.
-SERIAL_READ_TIMEOUT = 5 # seconds
+SERIAL_READ_TIMEOUT = 5  # seconds
 
 # The timeout in seconds for a write to the serial port.
-SERIAL_WRITE_TIMEOUT = 2 # seconds
+SERIAL_WRITE_TIMEOUT = 2  # seconds
+
 
 class SerialInterface:
     """Interface to a serial port."""
+
     def __init__(self, port: str, baudrate: int, verbose: bool = False):
         # Open the serial port.
         self.serial = serial.Serial(
@@ -38,7 +40,8 @@ class SerialInterface:
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS,
             timeout=SERIAL_READ_TIMEOUT,
-            write_timeout=SERIAL_WRITE_TIMEOUT)
+            write_timeout=SERIAL_WRITE_TIMEOUT,
+        )
         time.sleep(SERIAL_OPEN_TIMEOUT)
 
         self.verbose = verbose
@@ -54,7 +57,9 @@ class SerialInterface:
         num_bytes_written = 0
         while num_bytes_written < len(data):
             num_bytes_to_write = min(SERIAL_PACKET_SIZE, len(data) - num_bytes_written)
-            num_bytes_sent = self.serial.write(data[num_bytes_written:num_bytes_written + num_bytes_to_write])
+            num_bytes_sent = self.serial.write(
+                data[num_bytes_written : num_bytes_written + num_bytes_to_write]
+            )
             if self.verbose:
                 logging.info("Wrote %d bytes to the serial port.", num_bytes_sent)
             num_bytes_written += num_bytes_sent

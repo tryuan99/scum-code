@@ -11,8 +11,10 @@ NRF_BAUDRATE = 250000
 # Binary size in bytes to be flashed onto SCuM.
 SCUM_BINARY_SIZE = 64 * 1024
 
+
 class NrfBootloader:
     """SCuM bootloader using the nRF board."""
+
     def __init__(self, port: str):
         # Open the serial port to the nRF board.
         self.serial = serial_interface.SerialInterface(port, NRF_BAUDRATE)

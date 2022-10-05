@@ -4,8 +4,10 @@ from absl import logging
 
 from utils.serial import serial_interface
 
+
 class SerialMonitor:
     """Serial monitor to log data received by the serial port."""
+
     def __init__(self, port: str, baudrate: int):
         # Open the serial port.
         self.serial = serial_interface.SerialInterface(port, baudrate)
