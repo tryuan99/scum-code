@@ -1,0 +1,56 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_binary(
+    name = "adc_averaging_main",
+    srcs = ["adc_averaging_main.py"],
+    data = ["//analysis/scum/adc/nitrate_sensor/data:adc_nitrate_sensor_data"],
+    deps = [
+        "//analysis/scum/adc:adc_config",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+    ],
+)
+
+py_binary(
+    name = "adc_sampling_main",
+    srcs = ["adc_sampling_main.py"],
+    data = ["//analysis/scum/adc/nitrate_sensor/data:adc_nitrate_sensor_sampling_data"],
+    deps = [
+        "//analysis/scum/adc:adc_config",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+    ],
+)
+
+py_binary(
+    name = "adc_stairstep_main",
+    srcs = ["adc_stairstep_main.py"],
+    data = ["//analysis/scum/adc/nitrate_sensor/data:adc_nitrate_sensor_data"],
+    deps = [
+        "//analysis/scum/adc:adc_config",
+        "//utils/regression:linear_regression",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+    ],
+)
+
+py_binary(
+    name = "adc_variations_main",
+    srcs = ["adc_variations_main.py"],
+    data = ["//analysis/scum/adc/nitrate_sensor/data:adc_nitrate_sensor_data"],
+    deps = [
+        "//analysis/scum/adc:adc_config",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+    ],
+)
