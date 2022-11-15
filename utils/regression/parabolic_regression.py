@@ -1,4 +1,7 @@
-"""The parabolic regression class performs a parabolic interpolation on the given data."""
+"""The parabolic regression class performs a parabolic interpolation on the given data.
+
+y = ax^2 + bx + c
+"""
 
 import numpy as np
 from typing import Any, Tuple

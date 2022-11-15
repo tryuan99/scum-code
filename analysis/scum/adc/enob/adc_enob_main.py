@@ -117,7 +117,7 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
         """Calculates how well the given signal frequency and phase correlate with the ADC data.
 
         Args:
-            x: Two-dimensiona vector consisting of the signal frequency and phase.
+            x: Two-dimensional vector consisting of the signal frequency and phase.
 
         Returns:
             The negative correlation between the given signal and the ADC data.

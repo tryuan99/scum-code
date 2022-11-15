@@ -5,6 +5,7 @@ import pandas as pd
 import re
 
 from analysis.scum.adc.adc_config import ADC_CONFIGS, AdcConfig
+from utils.regression.exponential_regression import ExponentialRegression
 
 FLAGS = flags.FLAGS
 
@@ -57,8 +58,17 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
         )
         df_iteration = df[start_index:end_index]
         data = df_iteration[adc_output_column]
+        iteration = df_iteration[iteration_column].unique()[0]
         time_axis_iteration = time_axis[start_index:end_index]
         plt.plot(time_axis_iteration, data)
+
+        # Perform an exponential regression to find the time constant.
+        exponential_regression = ExponentialRegression(
+            time_axis_iteration, adc_config.lsb2volt(data)
+        )
+        logging.info(
+            "Iteration %d: tau = %f", iteration, exponential_regression.time_constant
+        )
     secax = ax.secondary_yaxis(
         "right", functions=(adc_config.lsb2volt, adc_config.volt2lsb)
     )

@@ -1,4 +1,7 @@
-"""The linear regression class performs a linear regression on the given data."""
+"""The linear regression class performs a linear regression on the given data.
+
+y = mx + b
+"""
 
 import numpy as np
 from typing import Any, Tuple

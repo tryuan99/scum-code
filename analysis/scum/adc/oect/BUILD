@@ -8,10 +8,12 @@ py_binary(
     data = ["//analysis/scum/adc/oect/data:adc_oect_data"],
     deps = [
         "//analysis/scum/adc:adc_config",
+        "//utils/regression:exponential_regression",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
         requirement("pandas"),
         requirement("regex"),
+        requirement("scipy"),
     ],
 )
