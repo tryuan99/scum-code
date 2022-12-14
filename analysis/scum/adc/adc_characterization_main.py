@@ -36,22 +36,32 @@ def plot_adc_characterization(data: str, adc_config: AdcConfig) -> None:
         min(df_by_input.groups.keys()), max(df_by_input.groups.keys()), 100
     )
     fig, ax = plt.subplots(figsize=(12, 8))
-    plt.errorbar(
-        means.index,
-        np.squeeze(means.values),
-        yerr=np.squeeze(errors.values),
-        label="ADC output [LSB]",
+    jump_indices = np.concatenate(
+        ([0], np.where(np.diff(np.squeeze(means.values)) < 0)[0] + 1, [len(means)])
     )
-    plt.plot(
+    for jump_index in range(1, len(jump_indices)):
+        error_bar = plt.errorbar(
+            means.index[jump_indices[jump_index - 1] : jump_indices[jump_index]],
+            np.squeeze(means.values)[
+                jump_indices[jump_index - 1] : jump_indices[jump_index]
+            ],
+            yerr=np.squeeze(errors.values)[
+                jump_indices[jump_index - 1] : jump_indices[jump_index]
+            ],
+            color="C0",
+            label="ADC output [LSB]",
+        )
+    (ideal_line,) = plt.plot(
         input_range,
         input_range / adc_config.ldo_output * (2 ** NUM_ADC_BITS - 1),
         "--",
+        color="C1",
         label="Ideal ADC output [LSB]",
     )
     ax.set_title("Mean of the ADC output vs. ideal ADC output")
     ax.set_xlabel("Input voltage [V]")
     ax.set_ylabel("ADC output [LSB]")
-    plt.legend()
+    plt.legend(handles=[error_bar, ideal_line])
     plt.show()
 
     # Plot the means and standard deviations of the ADC output for each input.

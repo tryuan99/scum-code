@@ -5,7 +5,7 @@ from typing import Dict
 
 FLAGS = flags.FLAGS
 
-# ENOB in LSBs at various input sinusoid frequencies in Hz.
+# ENOB in bits at various input sinusoid frequencies in Hz.
 ENOB_VS_FREQUENCY = {
     1: 4.6268,
     2: 4.6132,
@@ -25,13 +25,13 @@ def plot_adc_enob_vs_frequency(data: Dict[int, float]) -> None:
     """Plots the ADC ENOB as a function of frequency.
 
     Args:
-        data: Dictionary from frequency in Hz to ENOB in LSBs.
+        data: Dictionary from frequency in Hz to ENOB in bits.
     """
     # Plot the ENOB as a function of frequency.
     fig, ax = plt.subplots(figsize=(12, 8))
     plt.semilogx(data.keys(), data.values())
     ax.set_xlabel("Input sinusoid frequency [Hz]")
-    ax.set_ylabel("ENOB [LSB]")
+    ax.set_ylabel("ENOB [bits]")
     ax.set_title("ENOB vs. input sinusoid frequency")
     plt.show()
 
