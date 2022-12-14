@@ -34,7 +34,7 @@ def plot_adc_averaging(data: str, adc_config: AdcConfig) -> None:
             longest_sequence_index + 1
         ]
     ]
-    concentration = averaging_data[concentration_column].unique()[0]
+    (concentration,) = averaging_data[concentration_column].unique()
     logging.info("Number of ADC samples: %d", len(averaging_data))
     logging.info("Concentration: %f M", concentration)
 

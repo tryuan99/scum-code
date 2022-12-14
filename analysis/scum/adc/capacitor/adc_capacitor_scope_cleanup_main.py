@@ -29,14 +29,18 @@ def cleanup_scope_data(
     """
     # Open the scope data file.
     df = pd.read_csv(
-        data, header=None, names=("Time [s]", "Capacitor voltage [V]", "GPIO [V]"),
+        data,
+        header=None,
+        names=("Time [s]", "Capacitor voltage [V]", "GPIO [V]"),
     )
     time_column, capacitor_column, gpio_column = df.columns
     df = df[df[time_column] >= 0].reset_index(drop=True)
 
     # Open the scope data file without SCuM.
     df_without_scum = pd.read_csv(
-        data_without_scum, header=None, names=("Time [s]", "Capacitor voltage [V]"),
+        data_without_scum,
+        header=None,
+        names=("Time [s]", "Capacitor voltage [V]"),
     )
     time_column_without_scum, capacitor_column_without_scum = df_without_scum.columns
     df_without_scum = df_without_scum[
@@ -46,7 +50,7 @@ def cleanup_scope_data(
     thresholded_gpio_data = (gpio_data > GPIO_HIGH_THRESHOLD).astype(int)
 
     num_samples_offset = int(scope_sampling_rate * ADC_TO_GPIO_OFFSET)
-    positive_edge_indices = np.where(np.diff(thresholded_gpio_data) > 0.5)[0]
+    (positive_edge_indices,) = np.where(np.diff(thresholded_gpio_data) > 0.5)
     positive_edge_indices = positive_edge_indices[
         positive_edge_indices > num_samples_offset
     ]

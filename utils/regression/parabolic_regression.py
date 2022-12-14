@@ -27,7 +27,7 @@ class ParabolicRegression:
         Returns:
             The y-values corresponding to the x-values.
         """
-        return self.a * x ** 2 + self.b * x + self.c
+        return self.a * x**2 + self.b * x + self.c
 
     @staticmethod
     def _perform_parabolic_regression(
@@ -42,6 +42,6 @@ class ParabolicRegression:
         Returns:
             (a, b, c), where ax^2 + bx + c are the coefficients of the parabola.
         """
-        A = np.vstack([x ** 2, x, np.ones(len(x))]).T
+        A = np.vstack([x**2, x, np.ones(len(x))]).T
         result = np.linalg.lstsq(A, y, rcond=None)[0]
         return np.squeeze(result)

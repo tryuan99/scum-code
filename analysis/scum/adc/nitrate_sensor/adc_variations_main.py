@@ -32,7 +32,7 @@ def plot_adc_variations(data: List[str], adc_config: AdcConfig) -> None:
                 cutoff_indices[cutoff_index],
             )
             df_concentration = df[start_index:end_index]
-            concentration = df_concentration[concentration_column].unique()[0]
+            (concentration,) = df_concentration[concentration_column].unique()
             adc_data = df_concentration[adc_output_column]
             label = (
                 f"{concentration} M"

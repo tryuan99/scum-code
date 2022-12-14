@@ -33,7 +33,7 @@ def plot_adc_stairstep(data: str, adc_config: AdcConfig) -> None:
             cutoff_indices[cutoff_index],
         )
         df_concentration = df[start_index:end_index]
-        concentration = df_concentration[concentration_column].unique()[0]
+        (concentration,) = df_concentration[concentration_column].unique()
         data = df_concentration[adc_output_column]
         logging.info(
             "%f M: mean = %f, stddev = %f", concentration, data.mean(), data.std()

@@ -69,7 +69,7 @@ def plot_adc_samples_with_scope(
             np.std(noise),
         )
         noise_rms = np.sqrt(np.mean((noise - np.mean(noise)) ** 2))
-        enob = np.log2(2 ** 9 / np.sqrt(12) / noise_rms)
+        enob = np.log2(2**9 / np.sqrt(12) / noise_rms)
         averaging_enob.append(enob)
         logging.info(
             "Averaging over %d samples: noise = %f LSB, ENOB = %f bits",

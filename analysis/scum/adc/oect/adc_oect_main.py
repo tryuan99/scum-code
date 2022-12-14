@@ -58,7 +58,7 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
         )
         df_iteration = df[start_index:end_index]
         data = df_iteration[adc_output_column]
-        iteration = df_iteration[iteration_column].unique()[0]
+        (iteration,) = df_iteration[iteration_column].unique()
         time_axis_iteration = time_axis[start_index:end_index]
         plt.plot(time_axis_iteration, data)
 

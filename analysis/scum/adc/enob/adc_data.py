@@ -29,7 +29,7 @@ class AdcData:
             index: Index of the ADC sample.
             msb: Value of the 9th bit.
         """
-        return msb * 2 ** 8 + self.samples[index]
+        return msb * 2**8 + self.samples[index]
 
     @staticmethod
     def _get_disambiguation_cost_msb_9(
@@ -83,5 +83,5 @@ class AdcData:
 
         current_msb = np.argmin(running_costs[-1, :, 0])
         for i in range(self.num_samples - 1, -1, -1):
-            self.samples[i] += current_msb * 2 ** 8
+            self.samples[i] += current_msb * 2**8
             current_msb = running_costs[i, current_msb, 1]

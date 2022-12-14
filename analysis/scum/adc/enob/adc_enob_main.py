@@ -163,7 +163,7 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
         "Noise: mean = %f, standard deviation = %f", np.mean(noise), np.std(noise)
     )
     noise_rms = np.sqrt(np.mean((noise - np.mean(noise)) ** 2))
-    enob = np.log2(2 ** 9 / np.sqrt(12) / noise_rms)
+    enob = np.log2(2**9 / np.sqrt(12) / noise_rms)
     logging.info("Noise = %f LSB, ENOB = %f bits", noise_rms, enob)
 
 

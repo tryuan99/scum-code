@@ -53,7 +53,7 @@ def plot_adc_characterization(data: str, adc_config: AdcConfig) -> None:
         )
     (ideal_line,) = plt.plot(
         input_range,
-        input_range / adc_config.ldo_output * (2 ** NUM_ADC_BITS - 1),
+        input_range / adc_config.ldo_output * (2**NUM_ADC_BITS - 1),
         "--",
         color="C1",
         label="Ideal ADC output [LSB]",
@@ -102,7 +102,7 @@ def plot_adc_characterization_sensor(data: str, adc_config: AdcConfig) -> None:
     # Perform a linear regression on the ADC output as a function of the input.
     linear_regression = LinearRegression(list(df_by_input.groups.keys()), means)
     logging.info(
-        "Ideal ADC: m = %f, b = 0", 1 / adc_config.ldo_output * (2 ** NUM_ADC_BITS - 1)
+        "Ideal ADC: m = %f, b = 0", 1 / adc_config.ldo_output * (2**NUM_ADC_BITS - 1)
     )
     logging.info(
         "SCuM ADC: m = %f, b = %f, residuals = %f",
@@ -124,7 +124,7 @@ def plot_adc_characterization_sensor(data: str, adc_config: AdcConfig) -> None:
     )
     plt.plot(
         input_range,
-        input_range / adc_config.ldo_output * (2 ** NUM_ADC_BITS - 1),
+        input_range / adc_config.ldo_output * (2**NUM_ADC_BITS - 1),
         "--",
         label="Ideal ADC output [LSB]",
     )

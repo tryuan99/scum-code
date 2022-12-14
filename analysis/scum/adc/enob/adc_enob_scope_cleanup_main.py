@@ -27,7 +27,7 @@ def cleanup_scope_data(data: str, output: str, scope_sampling_rate: int) -> None
 
     gpio_data = df[gpio_column].to_numpy()
     thresholded_gpio_data = (gpio_data > GPIO_HIGH_THRESHOLD).astype(int)
-    positive_edge_indices = np.where(np.diff(thresholded_gpio_data) > 0.5)[0]
+    (positive_edge_indices,) = np.where(np.diff(thresholded_gpio_data) > 0.5)
     positive_edge_data = df.loc[
         positive_edge_indices - int(scope_sampling_rate * ADC_TO_GPIO_OFFSET)
     ]

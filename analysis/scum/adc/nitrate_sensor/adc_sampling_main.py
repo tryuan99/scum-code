@@ -32,7 +32,7 @@ def plot_adc_sampling(data: str, adc_config: AdcConfig) -> None:
             cutoff_indices[cutoff_index],
         )
         df_adc_sampling_rate = df[start_index:end_index]
-        adc_sampling_rate = df_adc_sampling_rate[adc_sampling_rate_column].unique()[0]
+        (adc_sampling_rate,) = df_adc_sampling_rate[adc_sampling_rate_column].unique()
         data = df_adc_sampling_rate[adc_output_column]
         data.reset_index()[adc_output_column].plot.line(ax=ax)
     ax.set_title("ADC output over time")
