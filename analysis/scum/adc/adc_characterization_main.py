@@ -32,22 +32,20 @@ def plot_adc_characterization(data: str, adc_config: AdcConfig) -> None:
     errors = df_by_input.std()
 
     # Plot the means compared to an ideal ADC.
-    input_range = np.linspace(
-        min(df_by_input.groups.keys()), max(df_by_input.groups.keys()), 100
-    )
+    input_range = np.linspace(min(df_by_input.groups.keys()),
+                              max(df_by_input.groups.keys()), 100)
     fig, ax = plt.subplots(figsize=(12, 8))
     jump_indices = np.concatenate(
-        ([0], np.where(np.diff(np.squeeze(means.values)) < 0)[0] + 1, [len(means)])
-    )
+        ([0], np.where(np.diff(np.squeeze(means.values)) < 0)[0] + 1,
+         [len(means)]))
     for jump_index in range(1, len(jump_indices)):
         error_bar = plt.errorbar(
-            means.index[jump_indices[jump_index - 1] : jump_indices[jump_index]],
-            np.squeeze(means.values)[
-                jump_indices[jump_index - 1] : jump_indices[jump_index]
-            ],
-            yerr=np.squeeze(errors.values)[
-                jump_indices[jump_index - 1] : jump_indices[jump_index]
-            ],
+            means.index[jump_indices[jump_index - 1]:jump_indices[jump_index]],
+            np.squeeze(means.values)[jump_indices[jump_index -
+                                                  1]:jump_indices[jump_index]],
+            yerr=np.squeeze(
+                errors.values)[jump_indices[jump_index -
+                                            1]:jump_indices[jump_index]],
             color="C0",
             label="ADC output [LSB]",
         )
@@ -92,7 +90,8 @@ def plot_adc_characterization_sensor(data: str, adc_config: AdcConfig) -> None:
     """
     # Open the ADC characterization data file.
     df = pd.read_csv(data, comment="#")
-    df_by_input = df[df[df.columns[0]] <= SENSOR_INPUT_MAX].groupby(df.columns[0])
+    df_by_input = df[df[df.columns[0]] <= SENSOR_INPUT_MAX].groupby(
+        df.columns[0])
     logging.info(df_by_input.describe())
 
     # Calculate the means and standard deviations of the ADC output for each input.
@@ -101,9 +100,8 @@ def plot_adc_characterization_sensor(data: str, adc_config: AdcConfig) -> None:
 
     # Perform a linear regression on the ADC output as a function of the input.
     linear_regression = LinearRegression(list(df_by_input.groups.keys()), means)
-    logging.info(
-        "Ideal ADC: m = %f, b = 0", 1 / adc_config.ldo_output * (2**NUM_ADC_BITS - 1)
-    )
+    logging.info("Ideal ADC: m = %f, b = 0",
+                 1 / adc_config.ldo_output * (2**NUM_ADC_BITS - 1))
     logging.info(
         "SCuM ADC: m = %f, b = %f, residuals = %f",
         linear_regression.m,
@@ -112,9 +110,8 @@ def plot_adc_characterization_sensor(data: str, adc_config: AdcConfig) -> None:
     )
 
     # Plot the means with a linear regression and an ideal ADC.
-    input_range = np.linspace(
-        min(df_by_input.groups.keys()), max(df_by_input.groups.keys()), 100
-    )
+    input_range = np.linspace(min(df_by_input.groups.keys()),
+                              max(df_by_input.groups.keys()), 100)
     fig, ax = plt.subplots(figsize=(12, 8))
     plt.errorbar(
         means.index,
@@ -166,9 +163,9 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string(
-        "data", "analysis/scum/adc/data/adc_characterization_data.csv", "Data filename."
-    )
+    flags.DEFINE_string("data",
+                        "analysis/scum/adc/data/adc_characterization_data.csv",
+                        "Data filename.")
     flags.DEFINE_enum("board", "l35", ADC_CONFIGS.keys(), "SCuM board.")
 
     app.run(main)

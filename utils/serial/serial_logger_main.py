@@ -11,14 +11,14 @@ DEFAULT_BAUDRATE = 19200
 def main(argv):
     assert len(argv) == 1
 
-    logger = serial_logger.SerialLogger(
-        FLAGS.port, FLAGS.baudrate, FLAGS.output_file, FLAGS.log_to_stderr
-    )
+    logger = serial_logger.SerialLogger(FLAGS.port, FLAGS.baudrate,
+                                        FLAGS.output_file, FLAGS.log_to_stderr)
     logger.run()
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string("port", "/dev/cu.usbserial-A10M1IFE", "Serial port to log.")
+    flags.DEFINE_string("port", "/dev/cu.usbserial-A10M1IFE",
+                        "Serial port to log.")
     flags.DEFINE_integer("baudrate", DEFAULT_BAUDRATE, "Serial port baud rate.")
     flags.DEFINE_string("output_file", None, "Output file to log the data to.")
     flags.DEFINE_boolean(

@@ -24,8 +24,8 @@ def plot_adc_variations(data: List[str], adc_config: AdcConfig) -> None:
         concentration_column, adc_output_column = df.columns
 
         cutoff_indices = np.concatenate(
-            ([0], np.where(np.diff(df[concentration_column]) != 0)[0] + 1, [len(df)])
-        )
+            ([0], np.where(np.diff(df[concentration_column]) != 0)[0] + 1,
+             [len(df)]))
         for cutoff_index in range(1, len(cutoff_indices)):
             start_index, end_index = (
                 cutoff_indices[cutoff_index - 1],
@@ -34,21 +34,17 @@ def plot_adc_variations(data: List[str], adc_config: AdcConfig) -> None:
             df_concentration = df[start_index:end_index]
             (concentration,) = df_concentration[concentration_column].unique()
             adc_data = df_concentration[adc_output_column]
-            label = (
-                f"{concentration} M"
-                if len(data) == 1
-                else f"{filename}: {concentration} M"
-            )
+            label = (f"{concentration} M"
+                     if len(data) == 1 else f"{filename}: {concentration} M")
             if len(data) == 1:
                 adc_data.reset_index()[adc_output_column].plot.line(ax=ax)
             else:
                 adc_data.reset_index()[adc_output_column].plot.line(
-                    ax=ax, color=f"C{file_index}"
-                )
+                    ax=ax, color=f"C{file_index}")
 
-    secax = ax.secondary_yaxis(
-        "right", functions=(adc_config.lsb2volt, adc_config.volt2lsb)
-    )
+    secax = ax.secondary_yaxis("right",
+                               functions=(adc_config.lsb2volt,
+                                          adc_config.volt2lsb))
     ax.set_title("ADC output variations")
     ax.set_xlabel("ADC sample")
     ax.set_ylabel("ADC output [LSB]")

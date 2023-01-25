@@ -31,8 +31,7 @@ class ParabolicRegression:
 
     @staticmethod
     def _perform_parabolic_regression(
-        x: np.ndarray, y: np.ndarray
-    ) -> Tuple[float, float, float]:
+            x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float]:
         """Performs a parabolic regression.
 
         Args:

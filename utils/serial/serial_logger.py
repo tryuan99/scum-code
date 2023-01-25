@@ -8,7 +8,8 @@ from utils.serial import serial_interface
 class SerialLogger:
     """Serial logger to log data received by the serial port."""
 
-    def __init__(self, port: str, baudrate: int, output_file: str, log_to_stderr: bool):
+    def __init__(self, port: str, baudrate: int, output_file: str,
+                 log_to_stderr: bool):
         # Open the serial port.
         self.serial = serial_interface.SerialInterface(port, baudrate)
         self.output_file = output_file

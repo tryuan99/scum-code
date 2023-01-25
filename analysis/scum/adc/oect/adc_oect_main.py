@@ -49,8 +49,7 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
     time_axis = np.linspace(0, collection_time, len(df))
     fig, ax = plt.subplots(figsize=(12, 8))
     cutoff_indices = np.concatenate(
-        ([0], np.where(np.diff(df[iteration_column]) != 0)[0] + 1, [len(df)])
-    )
+        ([0], np.where(np.diff(df[iteration_column]) != 0)[0] + 1, [len(df)]))
     for cutoff_index in range(1, len(cutoff_indices)):
         start_index, end_index = (
             cutoff_indices[cutoff_index - 1],
@@ -64,14 +63,12 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
 
         # Perform an exponential regression to find the time constant.
         exponential_regression = ExponentialRegression(
-            time_axis_iteration, adc_config.lsb2volt(data)
-        )
-        logging.info(
-            "Iteration %d: tau = %f", iteration, exponential_regression.time_constant
-        )
-    secax = ax.secondary_yaxis(
-        "right", functions=(adc_config.lsb2volt, adc_config.volt2lsb)
-    )
+            time_axis_iteration, adc_config.lsb2volt(data))
+        logging.info("Iteration %d: tau = %f", iteration,
+                     exponential_regression.time_constant)
+    secax = ax.secondary_yaxis("right",
+                               functions=(adc_config.lsb2volt,
+                                          adc_config.volt2lsb))
     ax.set_title("ADC output over time")
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("ADC output [LSB]")
@@ -85,9 +82,8 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string(
-        "data", "analysis/scum/adc/oect/data/dd_oect_1.csv", "Data filename."
-    )
+    flags.DEFINE_string("data", "analysis/scum/adc/oect/data/dd_oect_1.csv",
+                        "Data filename.")
     flags.DEFINE_enum("board", "l35", ADC_CONFIGS.keys(), "SCuM board.")
 
     app.run(main)

@@ -35,9 +35,8 @@ class LinearRegression:
         return self.m * x + self.b
 
     @staticmethod
-    def _perform_linear_regression(
-        x: np.ndarray, y: np.ndarray
-    ) -> Tuple[float, float, float]:
+    def _perform_linear_regression(x: np.ndarray,
+                                   y: np.ndarray) -> Tuple[float, float, float]:
         """Performs a linear regression.
 
         Args:

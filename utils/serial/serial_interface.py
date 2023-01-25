@@ -56,12 +56,13 @@ class SerialInterface:
             return
         num_bytes_written = 0
         while num_bytes_written < len(data):
-            num_bytes_to_write = min(SERIAL_PACKET_SIZE, len(data) - num_bytes_written)
+            num_bytes_to_write = min(SERIAL_PACKET_SIZE,
+                                     len(data) - num_bytes_written)
             num_bytes_sent = self.serial.write(
-                data[num_bytes_written : num_bytes_written + num_bytes_to_write]
-            )
+                data[num_bytes_written:num_bytes_written + num_bytes_to_write])
             if self.verbose:
-                logging.info("Wrote %d bytes to the serial port.", num_bytes_sent)
+                logging.info("Wrote %d bytes to the serial port.",
+                             num_bytes_sent)
             num_bytes_written += num_bytes_sent
             time.sleep(SERIAL_PACKET_WRITE_TIMEOUT)
 

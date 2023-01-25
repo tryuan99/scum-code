@@ -25,8 +25,8 @@ def plot_adc_stairstep(data: str, adc_config: AdcConfig) -> None:
     # Plot the stairstep line as the ADC output changes with each sample.
     fig, ax = plt.subplots(figsize=(12, 8))
     cutoff_indices = np.concatenate(
-        ([0], np.where(np.diff(df[concentration_column]) != 0)[0] + 1, [len(df)])
-    )
+        ([0], np.where(np.diff(df[concentration_column]) != 0)[0] + 1,
+         [len(df)]))
     for cutoff_index in range(1, len(cutoff_indices)):
         start_index, end_index = (
             cutoff_indices[cutoff_index - 1],
@@ -35,13 +35,12 @@ def plot_adc_stairstep(data: str, adc_config: AdcConfig) -> None:
         df_concentration = df[start_index:end_index]
         (concentration,) = df_concentration[concentration_column].unique()
         data = df_concentration[adc_output_column]
-        logging.info(
-            "%f M: mean = %f, stddev = %f", concentration, data.mean(), data.std()
-        )
+        logging.info("%f M: mean = %f, stddev = %f", concentration, data.mean(),
+                     data.std())
         data.plot.line(ax=ax)
-    secax = ax.secondary_yaxis(
-        "right", functions=(adc_config.lsb2volt, adc_config.volt2lsb)
-    )
+    secax = ax.secondary_yaxis("right",
+                               functions=(adc_config.lsb2volt,
+                                          adc_config.volt2lsb))
     ax.set_title("ADC output over time")
     ax.set_xlabel("ADC sample")
     ax.set_ylabel("ADC output [LSB]")
@@ -94,9 +93,9 @@ def plot_adc_means_stddevs(data: str, adc_config: AdcConfig) -> None:
         label="Linear regression",
     )
     ax.set_xscale("log")
-    secax = ax.secondary_yaxis(
-        "right", functions=(adc_config.lsb2volt, adc_config.volt2lsb)
-    )
+    secax = ax.secondary_yaxis("right",
+                               functions=(adc_config.lsb2volt,
+                                          adc_config.volt2lsb))
     ax.set_title("Mean and standard deviation of the ADC output")
     ax.set_xlabel("Nitrate concentration [M]")
     ax.set_ylabel("ADC output [LSB]")

@@ -24,15 +24,16 @@ def plot_adc_sampling(data: str, adc_config: AdcConfig) -> None:
     # Plot the ADC output over time at different ADC sampling rates.
     fig, ax = plt.subplots(figsize=(12, 8))
     cutoff_indices = np.concatenate(
-        ([0], np.where(np.diff(df[adc_sampling_rate_column]) != 0)[0] + 1, [len(df)])
-    )
+        ([0], np.where(np.diff(df[adc_sampling_rate_column]) != 0)[0] + 1,
+         [len(df)]))
     for cutoff_index in range(1, len(cutoff_indices)):
         start_index, end_index = (
             cutoff_indices[cutoff_index - 1],
             cutoff_indices[cutoff_index],
         )
         df_adc_sampling_rate = df[start_index:end_index]
-        (adc_sampling_rate,) = df_adc_sampling_rate[adc_sampling_rate_column].unique()
+        (adc_sampling_rate,
+        ) = df_adc_sampling_rate[adc_sampling_rate_column].unique()
         data = df_adc_sampling_rate[adc_output_column]
         data.reset_index()[adc_output_column].plot.line(ax=ax)
     ax.set_title("ADC output over time")

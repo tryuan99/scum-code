@@ -24,18 +24,17 @@ class VoltageLogger:
             f"cDAQ1Mod4/{channel}",
             terminal_config=nidaqmx.constants.TerminalConfiguration.RSE,
         )
-        self.task.timing.cfg_samp_clk_timing(
-            rate=sampling_rate, samps_per_chan=int(time_to_sample * sampling_rate)
-        )
+        self.task.timing.cfg_samp_clk_timing(rate=sampling_rate,
+                                             samps_per_chan=int(time_to_sample *
+                                                                sampling_rate))
         self.output_file = output_file
         self.log_to_stderr = log_to_stderr
 
     def run(self) -> None:
         """Logs the voltage data from the analog input channels."""
         with open(self.output_file, "w") as f:
-            data = self.task.read(
-                number_of_samples_per_channel=nidaqmx.constants.READ_ALL_AVAILABLE
-            )
+            data = self.task.read(number_of_samples_per_channel=nidaqmx.
+                                  constants.READ_ALL_AVAILABLE)
             if len(data) == 0:
                 return
             if isinstance(data[0], list):

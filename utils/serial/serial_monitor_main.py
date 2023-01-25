@@ -16,7 +16,8 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string("port", "/dev/cu.usbserial-A10M1IFE", "Serial port to log.")
+    flags.DEFINE_string("port", "/dev/cu.usbserial-A10M1IFE",
+                        "Serial port to log.")
     flags.DEFINE_integer("baudrate", DEFAULT_BAUDRATE, "Serial port baud rate.")
 
     app.run(main)

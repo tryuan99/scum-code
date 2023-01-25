@@ -38,8 +38,7 @@ class ExponentialRegression:
 
     @staticmethod
     def _perform_exponential_regression(
-        x: np.ndarray, y: np.ndarray
-    ) -> Tuple[float, float, float]:
+            x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float]:
         """Performs an exponential regression.
 
         Args:
@@ -74,7 +73,6 @@ class ExponentialRegression:
             options={"maxiter": 10000},
         )
         if not optimization_results.success:
-            logging.warning(
-                "Optimization failed with message: %s", optimization_results.message
-            )
+            logging.warning("Optimization failed with message: %s",
+                            optimization_results.message)
         return optimization_results.x

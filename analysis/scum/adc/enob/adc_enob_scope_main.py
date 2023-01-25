@@ -13,9 +13,8 @@ NUM_SAMPLES_TO_AVERAGE = np.arange(1, 1001)
 NUM_SAMPLES_TO_AVERAGE_AND_PLOT = [1, 10, 100, 1000]
 
 
-def plot_adc_samples_with_scope(
-    data: str, scope_data: str, adc_config: AdcConfig
-) -> None:
+def plot_adc_samples_with_scope(data: str, scope_data: str,
+                                adc_config: AdcConfig) -> None:
     """Plots the ADC samples over time.
 
     Args:
@@ -35,14 +34,14 @@ def plot_adc_samples_with_scope(
 
     # Plot the ADC samples and the reference sinusoid.
     reference_sinusoid_lsbs = (
-        adc_config.amplitude_lsbs
-        / adc_config.amplitude_volts
-        * (scope_df[sinusoid_column] - adc_config.offset_volts)
-        + adc_config.offset_lsbs
-    )
+        adc_config.amplitude_lsbs / adc_config.amplitude_volts *
+        (scope_df[sinusoid_column] - adc_config.offset_volts) +
+        adc_config.offset_lsbs)
     fig, ax = plt.subplots(figsize=(8, 4))
     plt.plot(scope_df[time_column], adc_data.samples, label="ADC samples")
-    plt.plot(scope_df[time_column], reference_sinusoid_lsbs, label="Reference sinusoid")
+    plt.plot(scope_df[time_column],
+             reference_sinusoid_lsbs,
+             label="Reference sinusoid")
     ax.set_title("ADC samples over time")
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("ADC output [LSB]")
@@ -51,24 +50,25 @@ def plot_adc_samples_with_scope(
 
     # Calculate the noise after averaging over ADC samples.
     fig, ax = plt.subplots(figsize=(8, 4))
-    plt.plot(scope_df[time_column], reference_sinusoid_lsbs, label="Reference sinusoid")
+    plt.plot(scope_df[time_column],
+             reference_sinusoid_lsbs,
+             label="Reference sinusoid")
     averaging_enob = []
     for num_samples_to_average in NUM_SAMPLES_TO_AVERAGE:
-        averaging_filter = np.ones(num_samples_to_average) / num_samples_to_average
-        adc_samples = np.convolve(adc_data.samples, averaging_filter, mode="same")[
-            num_samples_to_average:-num_samples_to_average
-        ]
-        noise = (
-            adc_samples
-            - reference_sinusoid_lsbs[num_samples_to_average:-num_samples_to_average]
-        )
+        averaging_filter = np.ones(
+            num_samples_to_average) / num_samples_to_average
+        adc_samples = np.convolve(
+            adc_data.samples, averaging_filter,
+            mode="same")[num_samples_to_average:-num_samples_to_average]
+        noise = (adc_samples - reference_sinusoid_lsbs[
+            num_samples_to_average:-num_samples_to_average])
         logging.info(
             "Averaging over %d samples: noise: mean = %f, standard deviation = %f",
             num_samples_to_average,
             np.mean(noise),
             np.std(noise),
         )
-        noise_rms = np.sqrt(np.mean((noise - np.mean(noise)) ** 2))
+        noise_rms = np.sqrt(np.mean((noise - np.mean(noise))**2))
         enob = np.log2(2**9 / np.sqrt(12) / noise_rms)
         averaging_enob.append(enob)
         logging.info(
@@ -81,7 +81,8 @@ def plot_adc_samples_with_scope(
         # Plot the averaged ADC samples.
         if num_samples_to_average in NUM_SAMPLES_TO_AVERAGE_AND_PLOT:
             plt.plot(
-                scope_df[time_column][num_samples_to_average:-num_samples_to_average],
+                scope_df[time_column]
+                [num_samples_to_average:-num_samples_to_average],
                 adc_samples,
                 label=f"Averaging over {num_samples_to_average} samples",
             )
@@ -107,7 +108,8 @@ def plot_adc_samples_with_scope(
 
 def main(argv):
     assert len(argv) == 1
-    plot_adc_samples_with_scope(FLAGS.data, FLAGS.scope_data, ADC_CONFIGS[FLAGS.board])
+    plot_adc_samples_with_scope(FLAGS.data, FLAGS.scope_data,
+                                ADC_CONFIGS[FLAGS.board])
 
 
 if __name__ == "__main__":

@@ -32,9 +32,9 @@ class AdcData:
         return msb * 2**8 + self.samples[index]
 
     @staticmethod
-    def _get_disambiguation_cost_msb_9(
-        previous_sample: int, current_sample: int, msb_switch: bool
-    ) -> int:
+    def _get_disambiguation_cost_msb_9(previous_sample: int,
+                                       current_sample: int,
+                                       msb_switch: bool) -> int:
         """Returns the cost of disambiguating the 9th bit of the new sample
         given the old sample and whether the MSB switched.
 
@@ -45,9 +45,8 @@ class AdcData:
                         current ADC samples.
         """
         MSB_SWITCH_PENALTY = 20
-        return (
-            np.abs(current_sample - previous_sample) + MSB_SWITCH_PENALTY * msb_switch
-        )
+        return (np.abs(current_sample - previous_sample) +
+                MSB_SWITCH_PENALTY * msb_switch)
 
     def disambiguate_msb_9(self) -> None:
         """Disambiguates the 9th bit from the ADC data.
@@ -65,7 +64,8 @@ class AdcData:
         # sample).
         # Note that we allow the MSB bit to be 2 only because of possible
         # overflow over 511.
-        running_costs = np.zeros((self.num_samples, 3, 2), dtype=self.samples.dtype)
+        running_costs = np.zeros((self.num_samples, 3, 2),
+                                 dtype=self.samples.dtype)
         for i in range(1, self.num_samples):
             for j in range(3):
                 new_costs = [
@@ -73,11 +73,11 @@ class AdcData:
                         self._get_sample_msb_9(i - 1, msb),
                         self._get_sample_msb_9(i, j),
                         j != msb,
-                    )
-                    for msb in range(3)
+                    ) for msb in range(3)
                 ]
                 running_costs[i, j] = (
-                    running_costs[i - 1, np.argmin(new_costs), 0] + np.min(new_costs),
+                    running_costs[i - 1, np.argmin(new_costs), 0] +
+                    np.min(new_costs),
                     np.argmin(new_costs),
                 )
 

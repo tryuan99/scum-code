@@ -72,11 +72,9 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
         Returns:
             Sinusoid corresponding to the given frequency and phase.
         """
-        return (
-            adc_config.amplitude_lsbs
-            * np.cos(2 * np.pi * frequency * adc_data.time_axis + phase)
-            + adc_config.offset_lsbs
-        )
+        return (adc_config.amplitude_lsbs *
+                np.cos(2 * np.pi * frequency * adc_data.time_axis + phase) +
+                adc_config.offset_lsbs)
 
     # Use the inverse FFT to find the sinusoid.
     signal_fft = np.zeros(adc_sample_fft.shape, dtype=adc_sample_fft.dtype)
@@ -89,27 +87,23 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
     signal_fft_parabola_indices = np.array([-1, 0, 1]) + signal_fft_bin
     # TODO(titan): Handle wraparound.
     signal_fft_magnitude_parabola = ParabolicRegression(
-        signal_fft_parabola_indices, np.abs(adc_sample_fft[signal_fft_parabola_indices])
-    )
+        signal_fft_parabola_indices,
+        np.abs(adc_sample_fft[signal_fft_parabola_indices]))
     signal_fft_interpolated_bin = signal_fft_magnitude_parabola.peak()[0]
-    signal_frequency = (
-        signal_fft_interpolated_bin
-        * adc_config.max_sampling_rate
-        / adc_data.num_samples
-    )
+    signal_frequency = (signal_fft_interpolated_bin *
+                        adc_config.max_sampling_rate / adc_data.num_samples)
     # Linearly interpolate the signal phase.
-    signal_fft_neighboring_bins = np.array(
-        [
-            int(np.floor(signal_fft_interpolated_bin)),
-            int(np.ceil(signal_fft_interpolated_bin)),
-        ]
-    )
+    signal_fft_neighboring_bins = np.array([
+        int(np.floor(signal_fft_interpolated_bin)),
+        int(np.ceil(signal_fft_interpolated_bin)),
+    ])
     signal_fft_phase_line = LinearRegression(
         signal_fft_neighboring_bins,
         np.angle(adc_sample_fft)[signal_fft_neighboring_bins],
     )
     signal_phase = signal_fft_phase_line.evaluate(signal_fft_interpolated_bin)
-    logging.info("Signal frequency = %f, phase = %f", signal_frequency, signal_phase)
+    logging.info("Signal frequency = %f, phase = %f", signal_frequency,
+                 signal_phase)
     signal_fixed_amplitude = construct_signal(signal_frequency, signal_phase)
 
     # Use an optimizer to find the optimal frequency and phase of the sinusoid.
@@ -125,13 +119,12 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
         return -np.inner(adc_data.samples, construct_signal(*x))
 
     optimization_results = scipy.optimize.minimize(
-        cost, np.array([signal_frequency, signal_phase]), method="Nelder-Mead"
-    )
+        cost, np.array([signal_frequency, signal_phase]), method="Nelder-Mead")
     if not optimization_results.success:
-        logging.warning(
-            "Optimization failed with message: %s", optimization_results.message
-        )
-    logging.info("Optimized signal frequency = %f, phase = %f", *optimization_results.x)
+        logging.warning("Optimization failed with message: %s",
+                        optimization_results.message)
+    logging.info("Optimized signal frequency = %f, phase = %f",
+                 *optimization_results.x)
     signal_optimized = construct_signal(*optimization_results.x)
 
     fig, ax = plt.subplots(figsize=(12, 8))
@@ -144,7 +137,8 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
     plt.plot(
         adc_data.time_axis,
         signal_fixed_amplitude,
-        label="Reconstructed sinusoid with fixed amplitude and frequency and phase interpolation",
+        label=
+        "Reconstructed sinusoid with fixed amplitude and frequency and phase interpolation",
     )
     plt.plot(
         adc_data.time_axis,
@@ -159,10 +153,9 @@ def plot_adc_samples(data: str, adc_config: AdcConfig) -> None:
 
     # Calculate the noise.
     noise = adc_data.samples - signal_optimized
-    logging.info(
-        "Noise: mean = %f, standard deviation = %f", np.mean(noise), np.std(noise)
-    )
-    noise_rms = np.sqrt(np.mean((noise - np.mean(noise)) ** 2))
+    logging.info("Noise: mean = %f, standard deviation = %f", np.mean(noise),
+                 np.std(noise))
+    noise_rms = np.sqrt(np.mean((noise - np.mean(noise))**2))
     enob = np.log2(2**9 / np.sqrt(12) / noise_rms)
     logging.info("Noise = %f LSB, ENOB = %f bits", noise_rms, enob)
 
@@ -173,9 +166,9 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string(
-        "data", "analysis/scum/adc/enob/data/adc_data_100hz.csv", "Data filename."
-    )
+    flags.DEFINE_string("data",
+                        "analysis/scum/adc/enob/data/adc_data_100hz.csv",
+                        "Data filename.")
     flags.DEFINE_enum("board", "l35", ADC_CONFIGS.keys(), "SCuM board.")
 
     app.run(main)

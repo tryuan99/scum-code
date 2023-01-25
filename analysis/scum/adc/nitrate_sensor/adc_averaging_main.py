@@ -26,14 +26,11 @@ def plot_adc_averaging(data: str, adc_config: AdcConfig) -> None:
     logging.info(df_by_input.describe())
 
     cutoff_indices = np.concatenate(
-        ([0], np.where(np.diff(df[concentration_column]) != 0)[0] + 1, [len(df)])
-    )
+        ([0], np.where(np.diff(df[concentration_column]) != 0)[0] + 1,
+         [len(df)]))
     longest_sequence_index = np.argmax(np.diff(cutoff_indices))
-    averaging_data = df[
-        cutoff_indices[longest_sequence_index] : cutoff_indices[
-            longest_sequence_index + 1
-        ]
-    ]
+    averaging_data = df[cutoff_indices[longest_sequence_index]:cutoff_indices[
+        longest_sequence_index + 1]]
     (concentration,) = averaging_data[concentration_column].unique()
     logging.info("Number of ADC samples: %d", len(averaging_data))
     logging.info("Concentration: %f M", concentration)
@@ -42,12 +39,12 @@ def plot_adc_averaging(data: str, adc_config: AdcConfig) -> None:
     fig, ax = plt.subplots(figsize=(12, 8))
     averaging_stddev = []
     for num_samples_to_average in NUM_SAMPLES_TO_AVERAGE:
-        averaging_data_slice = averaging_data[adc_output_column][
-            : (len(averaging_data) // num_samples_to_average) * num_samples_to_average
-        ].values
-        averaged_data = np.mean(
-            averaging_data_slice.reshape(-1, num_samples_to_average), axis=1
-        )
+        averaging_data_slice = averaging_data[adc_output_column][:(
+            len(averaging_data) //
+            num_samples_to_average) * num_samples_to_average].values
+        averaged_data = np.mean(averaging_data_slice.reshape(
+            -1, num_samples_to_average),
+                                axis=1)
 
         # Calculate the standard deviation after averaging.
         averaged_stddev = np.std(averaged_data)
@@ -64,9 +61,9 @@ def plot_adc_averaging(data: str, adc_config: AdcConfig) -> None:
                 averaged_data,
                 label=f"Averaging over {num_samples_to_average} samples",
             )
-    secax = ax.secondary_yaxis(
-        "right", functions=(adc_config.lsb2volt, adc_config.volt2lsb)
-    )
+    secax = ax.secondary_yaxis("right",
+                               functions=(adc_config.lsb2volt,
+                                          adc_config.volt2lsb))
     ax.set_title(f"Averaging over ADC samples at {concentration} M")
     ax.set_xlabel("Averaged ADC sample")
     ax.set_ylabel("ADC output [LSB]")
@@ -78,9 +75,9 @@ def plot_adc_averaging(data: str, adc_config: AdcConfig) -> None:
     fig, ax = plt.subplots(figsize=(12, 8))
     plt.plot(NUM_SAMPLES_TO_AVERAGE, averaging_stddev)
     plt.axhline(y=adc_config.volt2lsb_stddev(0.001), linestyle="--")
-    secax = ax.secondary_yaxis(
-        "right", functions=(adc_config.lsb2volt_stddev, adc_config.volt2lsb_stddev)
-    )
+    secax = ax.secondary_yaxis("right",
+                               functions=(adc_config.lsb2volt_stddev,
+                                          adc_config.volt2lsb_stddev))
     ax.set_title(
         f"Standard deviation after averaging over ADC samples at {concentration} M"
     )
