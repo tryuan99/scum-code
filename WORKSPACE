@@ -4,6 +4,10 @@ workspace(name = "scum")
 load("//third_party:workspace.bzl", "load_third_party_workspaces")
 load_third_party_workspaces()
 
+# Load Python repositories.
+load("@rules_python//python:repositories.bzl", "py_repositories")
+py_repositories()
+
 # Register the Python toolchain.
 load("//tools:python.bzl", "register_python_toolchain")
 register_python_toolchain()
