@@ -1,0 +1,46 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "live_plotter",
+    srcs = ["live_plotter.py"],
+    deps = [
+        requirement("matplotlib"),
+        requirement("numpy"),
+    ],
+)
+
+py_library(
+    name = "dummy_live_plotter",
+    srcs = ["dummy_live_plotter.py"],
+    deps = [":live_plotter"],
+)
+
+py_binary(
+    name = "dummy_live_plotter_main",
+    srcs = ["dummy_live_plotter_main.py"],
+    deps = [
+        ":dummy_live_plotter",
+        requirement("absl-py"),
+    ],
+)
+
+py_library(
+    name = "serial_live_plotter",
+    srcs = ["serial_live_plotter.py"],
+    deps = [
+        ":live_plotter",
+        "//utils/serial:serial_interface",
+        requirement("absl-py"),
+    ],
+)
+
+py_binary(
+    name = "adc_data_live_plotter_main",
+    srcs = ["adc_data_live_plotter_main.py"],
+    deps = [
+        ":serial_live_plotter",
+        requirement("absl-py"),
+    ],
+)
