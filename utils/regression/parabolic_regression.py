@@ -4,7 +4,7 @@ y = ax^2 + bx + c
 """
 
 import numpy as np
-from typing import Any, Tuple
+from typing import Any
 
 
 class ParabolicRegression:
@@ -13,7 +13,7 @@ class ParabolicRegression:
     def __init__(self, x: np.ndarray, y: np.ndarray):
         self.a, self.b, self.c = self._perform_parabolic_regression(x, y)
 
-    def peak(self) -> Tuple[float, float]:
+    def peak(self) -> tuple[float, float]:
         """Returns the x and y-values of the vertex of the parabola."""
         peak_x = -self.b / (2 * self.a)
         return peak_x, self.evaluate(peak_x)

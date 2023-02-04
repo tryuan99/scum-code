@@ -2,14 +2,13 @@ from absl import app, flags
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from typing import List
 
 from analysis.scum.adc.adc_config import ADC_CONFIGS, AdcConfig
 
 FLAGS = flags.FLAGS
 
 
-def plot_adc_variations(data: List[str], adc_config: AdcConfig) -> None:
+def plot_adc_variations(data: list[str], adc_config: AdcConfig) -> None:
     """Plots the ADC output variations over time at different concentrations.
 
     Args:

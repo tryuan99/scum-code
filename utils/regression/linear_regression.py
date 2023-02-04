@@ -4,7 +4,7 @@ y = mx + b
 """
 
 import numpy as np
-from typing import Any, Tuple
+from typing import Any
 
 
 class LinearRegression:
@@ -36,7 +36,7 @@ class LinearRegression:
 
     @staticmethod
     def _perform_linear_regression(x: np.ndarray,
-                                   y: np.ndarray) -> Tuple[float, float, float]:
+                                   y: np.ndarray) -> tuple[float, float, float]:
         """Performs a linear regression.
 
         Args:

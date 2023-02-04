@@ -6,7 +6,7 @@ y = ae^(-1/tau * x) + b
 from absl import logging
 import numpy as np
 import scipy.optimize
-from typing import Any, Tuple
+from typing import Any
 
 
 class ExponentialRegression:
@@ -38,7 +38,7 @@ class ExponentialRegression:
 
     @staticmethod
     def _perform_exponential_regression(
-            x: np.ndarray, y: np.ndarray) -> Tuple[float, float, float]:
+            x: np.ndarray, y: np.ndarray) -> tuple[float, float, float]:
         """Performs an exponential regression.
 
         Args:

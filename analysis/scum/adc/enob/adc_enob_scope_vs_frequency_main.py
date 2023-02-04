@@ -1,7 +1,6 @@
 from absl import app, flags, logging
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import Dict
 
 FLAGS = flags.FLAGS
 
@@ -21,7 +20,7 @@ ENOB_VS_FREQUENCY = {
 }
 
 
-def plot_adc_enob_vs_frequency(data: Dict[int, float]) -> None:
+def plot_adc_enob_vs_frequency(data: dict[int, float]) -> None:
     """Plots the ADC ENOB as a function of frequency.
 
     Args:
