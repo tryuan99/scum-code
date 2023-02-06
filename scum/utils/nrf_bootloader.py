@@ -1,7 +1,8 @@
 """The nRF bootloader flashes a binary onto SCuM and boots it using the 3-wire bus."""
 
-from absl import logging
 import random
+
+from absl import logging
 
 from utils.serial import serial_interface
 

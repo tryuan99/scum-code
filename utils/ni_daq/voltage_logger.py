@@ -3,8 +3,8 @@
 NI 9205 is a voltage input module.
 """
 
-from absl import logging
 import nidaqmx
+from absl import logging
 
 
 class VoltageLogger:

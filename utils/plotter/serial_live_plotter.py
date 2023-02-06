@@ -1,9 +1,11 @@
 """The serial live plotter is used to plot live data from a serial port."""
 
-from absl import logging
-from utils.serial import serial_interface
-from utils.plotter.live_plotter import ContinuousLivePlotter
 from collections.abc import Callable
+
+from absl import logging
+
+from utils.plotter.live_plotter import ContinuousLivePlotter
+from utils.serial import serial_interface
 
 
 class SerialLivePlotter(ContinuousLivePlotter):

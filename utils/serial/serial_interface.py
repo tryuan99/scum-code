@@ -6,9 +6,10 @@ serial open timeout of 2 seconds is required. For an Apple USB-C dongle, the
 serial packet size cannot exceed 96 bytes, and no serial open timeout is needed.
 """
 
-from absl import logging
-import serial
 import time
+
+import serial
+from absl import logging
 
 # The maximum size in bytes of each packet to be written to the serial port.
 # This value is dongle-dependent.

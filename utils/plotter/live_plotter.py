@@ -1,11 +1,12 @@
 """The live plotter is used to plot live data as it is being streamed."""
 
+import time
 from abc import ABC, abstractmethod
+from threading import Lock, Thread
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation, artist
-from threading import Lock, Thread
-import time
 
 # Default animation interval in milliseconds.
 DEFAULT_ANIMATION_INTERVAL = 100  # milliseconds

@@ -3,8 +3,9 @@
 y = ax^2 + bx + c
 """
 
-import numpy as np
 from typing import Any
+
+import numpy as np
 
 
 class ParabolicRegression:

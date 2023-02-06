@@ -3,10 +3,11 @@
 y = ae^(-1/tau * x) + b
 """
 
-from absl import logging
+from typing import Any
+
 import numpy as np
 import scipy.optimize
-from typing import Any
+from absl import logging
 
 
 class ExponentialRegression:

@@ -1,5 +1,6 @@
-from absl import app, flags, logging
 import time
+
+from absl import app, flags, logging
 
 from utils.serial import serial_interface
 

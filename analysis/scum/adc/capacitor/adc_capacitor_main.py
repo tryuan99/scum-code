@@ -1,8 +1,8 @@
-from absl import app, flags, logging
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from absl import app, flags, logging
 
 from utils.regression.linear_regression import LinearRegression
 

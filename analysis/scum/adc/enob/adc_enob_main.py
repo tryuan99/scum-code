@@ -1,8 +1,8 @@
-from absl import app, flags, logging
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.optimize
+from absl import app, flags, logging
 
 from analysis.scum.adc.adc_config import ADC_CONFIGS, AdcConfig
 from analysis.scum.adc.enob.adc_data import AdcData

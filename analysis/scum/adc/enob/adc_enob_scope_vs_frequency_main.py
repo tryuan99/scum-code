@@ -1,6 +1,6 @@
-from absl import app, flags, logging
 import matplotlib.pyplot as plt
 import numpy as np
+from absl import app, flags, logging
 
 FLAGS = flags.FLAGS
 
