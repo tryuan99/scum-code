@@ -37,7 +37,7 @@ def plot_adc_samples_with_scope(data: str, scope_data: str,
         adc_config.amplitude_lsbs / adc_config.amplitude_volts *
         (scope_df[sinusoid_column] - adc_config.offset_volts) +
         adc_config.offset_lsbs)
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(12, 8))
     plt.plot(scope_df[time_column], adc_data.samples, label="ADC samples")
     plt.plot(scope_df[time_column],
              reference_sinusoid_lsbs,
@@ -49,7 +49,7 @@ def plot_adc_samples_with_scope(data: str, scope_data: str,
     plt.show()
 
     # Calculate the noise after averaging over ADC samples.
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(12, 8))
     plt.plot(scope_df[time_column],
              reference_sinusoid_lsbs,
              label="Reference sinusoid")
@@ -98,7 +98,7 @@ def plot_adc_samples_with_scope(data: str, scope_data: str,
         NUM_SAMPLES_TO_AVERAGE[np.argmax(averaging_enob)],
         np.max(averaging_enob),
     )
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(12, 8))
     plt.plot(NUM_SAMPLES_TO_AVERAGE, averaging_enob)
     ax.set_title(f"ENOB after averaging over ADC samples")
     ax.set_xlabel("Number of ADC samples to average over")
