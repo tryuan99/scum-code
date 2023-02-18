@@ -49,7 +49,7 @@ def plot_adc_stairstep(data: str, adc_config: AdcConfig) -> None:
 
 
 def plot_adc_means_stddevs(data: str, adc_config: AdcConfig) -> None:
-    """Plots the ADC output means and standard deviations at each nitrate concentration.
+    """Plots the ADC output means and standard deviations at each concentration.
 
     Args:
         data: Data filename.
@@ -97,7 +97,7 @@ def plot_adc_means_stddevs(data: str, adc_config: AdcConfig) -> None:
                                functions=(adc_config.lsb2volt,
                                           adc_config.volt2lsb))
     ax.set_title("Mean and standard deviation of the ADC output")
-    ax.set_xlabel("Nitrate concentration [M]")
+    ax.set_xlabel("Concentration [M]")
     ax.set_ylabel("ADC output [LSB]")
     secax.set_ylabel("ADC output [V]")
     plt.legend()
@@ -113,7 +113,7 @@ def main(argv):
 if __name__ == "__main__":
     flags.DEFINE_string(
         "data",
-        "analysis/scum/adc/nitrate_sensor/data/adc_data_vi_1.csv",
+        "analysis/scum/adc/sensor/data/adc_data_nitrate_vi_1.csv",
         "Data filename.",
     )
     flags.DEFINE_enum("board", "l35", ADC_CONFIGS.keys(), "SCuM board.")
