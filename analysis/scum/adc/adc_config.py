@@ -84,4 +84,5 @@ class AdcConfig:
 
 ADC_CONFIGS = {
     "l35": AdcConfig(1.393, 744.2, 46.34, 40, 511, 0, 0.62),
+    "m2": AdcConfig(1.329, 773.68, 110.3, 111, 511, 0, 0.51),
 }

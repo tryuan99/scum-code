@@ -163,9 +163,9 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string("data",
-                        "analysis/scum/adc/data/adc_characterization_data.csv",
-                        "Data filename.")
+    flags.DEFINE_string(
+        "data", "analysis/scum/adc/data/adc_characterization_data_l35.csv",
+        "Data filename.")
     flags.DEFINE_enum("board", "l35", ADC_CONFIGS.keys(), "SCuM board.")
 
     app.run(main)
