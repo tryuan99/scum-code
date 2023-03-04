@@ -1,0 +1,36 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "jlink_interface",
+    srcs = ["jlink_interface.py"],
+    deps = [requirement("absl-py")],
+)
+
+py_binary(
+    name = "jlink_interface_main",
+    srcs = ["jlink_interface_main.py"],
+    deps = [
+        ":jlink_interface",
+        requirement("absl-py"),
+    ],
+)
+
+py_library(
+    name = "jlink_programmer",
+    srcs = ["jlink_programmer.py"],
+    deps = [
+        ":jlink_interface",
+        requirement("absl-py"),
+    ],
+)
+
+py_binary(
+    name = "jlink_programmer_main",
+    srcs = ["jlink_programmer_main.py"],
+    deps = [
+        ":jlink_programmer",
+        requirement("absl-py"),
+    ],
+)
