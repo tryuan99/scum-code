@@ -5,7 +5,8 @@ import subprocess
 from absl import logging
 
 # The JLink command to interface with a J-Link device.
-JLINK_COMMAND = "JLinkExe -Device cc2538sf53 -Speed 4000 -If JTAG -JTAGConf \"-1,-1\" -AutoConnect 1 -ExitOnError 1"
+JLINK_COMMAND = ("JLinkExe -Device cc2538sf53 -Speed 4000 -If JTAG -JTAGConf "
+                 "\"-1,-1\" -AutoConnect 1 -ExitOnError 1")
 
 
 class JLinkInterface:

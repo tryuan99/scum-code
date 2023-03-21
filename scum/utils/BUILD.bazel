@@ -1,4 +1,5 @@
 load("@pip_deps//:requirements.bzl", "requirement")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -18,4 +19,12 @@ py_binary(
         ":nrf_bootloader",
         requirement("absl-py"),
     ],
+)
+
+pkg_tar(
+    name = "nrf_bootloader_main_tar_pkg",
+    extension = ".tar.gz",
+    include_runfiles = True,
+    srcs = [":nrf_bootloader_main"],
+    strip_prefix = "/scum/utils/",
 )

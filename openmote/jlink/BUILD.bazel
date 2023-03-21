@@ -1,4 +1,5 @@
 load("@pip_deps//:requirements.bzl", "requirement")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,6 +18,14 @@ py_binary(
     ],
 )
 
+pkg_tar(
+    name = "jlink_interface_main_tar_pkg",
+    extension = ".tar.gz",
+    include_runfiles = True,
+    srcs = [":jlink_interface_main"],
+    strip_prefix = "/openmote/jlink/",
+)
+
 py_library(
     name = "jlink_programmer",
     srcs = ["jlink_programmer.py"],
@@ -33,4 +42,12 @@ py_binary(
         ":jlink_programmer",
         requirement("absl-py"),
     ],
+)
+
+pkg_tar(
+    name = "jlink_programmer_main_tar_pkg",
+    extension = ".tar.gz",
+    include_runfiles = True,
+    srcs = [":jlink_programmer_main"],
+    strip_prefix = "/openmote/jlink/",
 )

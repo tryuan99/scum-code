@@ -4,6 +4,10 @@ workspace(name = "scum")
 load("//third_party:workspace.bzl", "load_third_party_workspaces")
 load_third_party_workspaces()
 
+# Load package rules dependencies.
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+rules_pkg_dependencies()
+
 # Load Python repositories.
 load("@rules_python//python:repositories.bzl", "py_repositories")
 py_repositories()

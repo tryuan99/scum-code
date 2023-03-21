@@ -1,4 +1,5 @@
 load("@pip_deps//:requirements.bzl", "requirement")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -29,6 +30,14 @@ py_binary(
     ],
 )
 
+pkg_tar(
+    name = "serial_logger_main_tar_pkg",
+    extension = ".tar.gz",
+    include_runfiles = True,
+    srcs = [":serial_logger_main"],
+    strip_prefix = "/utils/serial/",
+)
+
 py_library(
     name = "serial_monitor",
     srcs = ["serial_monitor.py"],
@@ -45,4 +54,12 @@ py_binary(
         ":serial_monitor",
         requirement("absl-py"),
     ],
+)
+
+pkg_tar(
+    name = "serial_monitor_main_tar_pkg",
+    extension = ".tar.gz",
+    include_runfiles = True,
+    srcs = [":serial_monitor_main"],
+    strip_prefix = "/utils/serial/",
 )
