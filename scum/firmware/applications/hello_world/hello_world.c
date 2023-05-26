@@ -1,7 +1,7 @@
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 
 void uart_rx_isr(void) {}
 void adc_isr(void) {}
@@ -17,12 +17,13 @@ void optical_32_isr(void) {}
 void optical_sfd_isr(void) {}
 
 int main(void) {
-    uint32_t i = 0;
+  uint32_t i = 0;
 
-    printf("Initializing...\n");
+  printf("Initializing...\n");
 
-    while (true) {
-        printf("Hello World!\n");
-        for (i = 0; i < 1000000; ++i);
-    }
+  while (true) {
+    printf("Hello World!\n");
+    for (i = 0; i < 1000000; ++i)
+      ;
+  }
 }

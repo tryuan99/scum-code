@@ -1,5 +1,5 @@
     .syntax     unified
-    .arch       armv6s-m
+    .arch       armv6-m
 
     .section    .stack, "w"
     .balign     16
