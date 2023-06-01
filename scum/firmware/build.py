@@ -25,6 +25,12 @@ from absl import app, flags, logging
 
 FLAGS = flags.FLAGS
 
+
+def _is_windows():
+    """Returns true if running on Windows."""
+    return os.name == "nt"
+
+
 # Current path.
 PATH = Path(__file__).parent
 
@@ -42,7 +48,7 @@ OUTPUT_DIR = "bin"
 SCATTER_FILE = "scum_linker.sct"
 
 # Toolchain configuration.
-WINE = "wine64"
+WINE = "" if _is_windows() else "wine64"
 CC = "ARM/ARMCC/bin/armcc.exe"
 CC_FLAGS = (
     "--c99",
