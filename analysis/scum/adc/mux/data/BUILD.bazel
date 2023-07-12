@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "adc_mux_data",
+    srcs = glob(["adc_mux_data_*.csv"]),
+)
