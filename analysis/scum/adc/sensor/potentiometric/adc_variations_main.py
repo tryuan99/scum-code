@@ -60,8 +60,8 @@ if __name__ == "__main__":
     flags.DEFINE_list(
         "data",
         [
-            "analysis/scum/adc/sensor/data/adc_data_nitrate_vi_1.csv",
-            "analysis/scum/adc/sensor/data/adc_data_nitrate_vi_2.csv",
+            "analysis/scum/adc/sensor/potentiometric/data/adc_data_nitrate_vi_1.csv",
+            "analysis/scum/adc/sensor/potentiometric/data/adc_data_nitrate_vi_2.csv",
         ],
         "Data filenames.",
     )

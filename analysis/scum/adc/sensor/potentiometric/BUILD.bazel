@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 py_binary(
     name = "adc_averaging_main",
     srcs = ["adc_averaging_main.py"],
-    data = ["//analysis/scum/adc/sensor/data:adc_sensor_data"],
+    data = ["//analysis/scum/adc/sensor/potentiometric/data:adc_potentiometric_sensor_data"],
     deps = [
         "//analysis/scum/adc:adc_config",
         requirement("absl-py"),
@@ -18,7 +18,7 @@ py_binary(
 py_binary(
     name = "adc_sampling_main",
     srcs = ["adc_sampling_main.py"],
-    data = ["//analysis/scum/adc/sensor/data:adc_sensor_sampling_data"],
+    data = ["//analysis/scum/adc/sensor/potentiometric/data:adc_potentiometric_sensor_sampling_data"],
     deps = [
         "//analysis/scum/adc:adc_config",
         requirement("absl-py"),
@@ -31,7 +31,7 @@ py_binary(
 py_binary(
     name = "adc_stairstep_main",
     srcs = ["adc_stairstep_main.py"],
-    data = ["//analysis/scum/adc/sensor/data:adc_sensor_data"],
+    data = ["//analysis/scum/adc/sensor/potentiometric/data:adc_potentiometric_sensor_data"],
     deps = [
         "//analysis/scum/adc:adc_config",
         "//utils/regression:linear_regression",
@@ -45,7 +45,7 @@ py_binary(
 py_binary(
     name = "adc_variations_main",
     srcs = ["adc_variations_main.py"],
-    data = ["//analysis/scum/adc/sensor/data:adc_sensor_data"],
+    data = ["//analysis/scum/adc/sensor/potentiometric/data:adc_potentiometric_sensor_data"],
     deps = [
         "//analysis/scum/adc:adc_config",
         requirement("absl-py"),

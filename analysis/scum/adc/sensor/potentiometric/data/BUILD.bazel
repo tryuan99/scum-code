@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "adc_sensor_data",
+    name = "adc_potentiometric_sensor_data",
     srcs = [
         "adc_data_ammonium_0217_i.csv",
         "adc_data_ammonium_0217_ii.csv",
@@ -15,7 +15,7 @@ filegroup(
 )
 
 filegroup(
-    name = "adc_sensor_sampling_data",
+    name = "adc_potentiometric_sensor_sampling_data",
     srcs = [
         "adc_data_nitrate_vi_1_sampling.csv",
         "adc_data_nitrate_vi_2_sampling.csv",

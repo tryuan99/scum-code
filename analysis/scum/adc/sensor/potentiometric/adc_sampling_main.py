@@ -83,7 +83,7 @@ def main(argv):
 if __name__ == "__main__":
     flags.DEFINE_string(
         "data",
-        "analysis/scum/adc/sensor/data/adc_data_nitrate_vi_1_sampling.csv",
+        "analysis/scum/adc/sensor/potentiometric/data/adc_data_nitrate_vi_1_sampling.csv",
         "Data filename.",
     )
     flags.DEFINE_enum("board", "l35", ADC_CONFIGS.keys(), "SCuM board.")
