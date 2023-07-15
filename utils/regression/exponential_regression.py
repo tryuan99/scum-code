@@ -1,6 +1,6 @@
 """The exponential regression class performs a exponential regression on the given data.
 
-y = ae^(-1/tau * x) + b
+y = a * exp(-x/tau) + b
 """
 
 from typing import Any
@@ -47,7 +47,8 @@ class ExponentialRegression:
             y: y-values of the data.
 
         Returns:
-            (a, tau, b), where y = ae^(-1/tau * x) + b are the coefficients of the exponential.
+            (a, tau, b), where y = a * exp(-x/tau) + b are the coefficients of
+            the exponential.
         """
         A = np.vstack([x, np.ones(len(x))]).T
         result = np.squeeze(np.linalg.lstsq(A, np.log(y), rcond=None)[0])

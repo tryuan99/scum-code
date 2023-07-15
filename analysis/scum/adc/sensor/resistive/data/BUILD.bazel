@@ -1,0 +1,17 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "adc_resistive_data",
+    srcs = [
+        "adc_data_resistor_10M_1.csv",
+        "adc_data_resistor_10M_2.csv",
+        "adc_data_thermistor_3a_1.csv",
+        "adc_data_thermistor_3a_2.csv",
+        "adc_data_thermistor_3a_3.csv",
+        "adc_data_thermistor_3a_4.csv",
+        "adc_data_thermistor_3b_1.csv",
+        "adc_data_thermistor_3b_2.csv",
+        "adc_data_thermistor_3b_3.csv",
+        "adc_data_thermistor_3b_4.csv",
+    ],
+)
