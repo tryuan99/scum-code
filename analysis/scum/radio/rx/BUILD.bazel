@@ -1,0 +1,16 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_binary(
+    name = "rx_if_main",
+    srcs = ["rx_if_main.py"],
+    data = ["//analysis/scum/radio/rx/data:rx_if_data"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+        requirement("scipy"),
+    ],
+)

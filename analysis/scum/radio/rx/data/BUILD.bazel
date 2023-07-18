@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "rx_if_data",
+    srcs = ["rx_if_data.csv"],
+)
