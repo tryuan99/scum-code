@@ -5,7 +5,8 @@ import scipy.signal
 from absl import app, flags, logging
 
 from utils.regression.exponential_regression import ExponentialRegression
-from utils.regression.linear_regression import LinearRegression
+from utils.regression.linear_regression import (LinearRegression,
+                                                WeightedLinearRegression)
 
 FLAGS = flags.FLAGS
 
@@ -106,6 +107,18 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     logging.info("tau = %f", tau_linear)
     logging.info("C = %g, R = %g", capacitance, tau_linear / capacitance)
 
+    # # Perform a weighted least squares using an exponentially increasing model
+    # # for the variance of each ADC sample.
+    # # The base was empirically determined to be around 1.005.
+    # weights = (1.005**(-adc_output.index)).values
+    # weighted_linear_regression = WeightedLinearRegression(
+    #     t, np.log(adc_data), weights)
+    # tau_weighted_linear = -1 / weighted_linear_regression.slope
+    # logging.info("Weighted linear regression:")
+    # logging.info("tau = %f", tau_weighted_linear)
+    # logging.info("C = %g, R = %g", capacitance,
+    #              tau_weighted_linear / capacitance)
+
     # Plot the transient ADC data in linear and log space.
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
     adc_output.plot(ax=ax1)
@@ -115,6 +128,9 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     ax1.plot(adc_output.index,
              np.exp(linear_regression.evaluate(t)) + min_adc_output,
              label="Linear fit")
+    # ax1.plot(adc_output.index,
+    #          np.exp(weighted_linear_regression.evaluate(t)),
+    #          label="Weighted linear fit")
     ax1.set_title("Transient ADC output in linear space")
     ax1.set_xlabel("ADC sample")
     ax1.set_ylabel("ADC output [LSB]")
@@ -127,6 +143,9 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     ax2.plot(adc_output.index,
              np.log(np.exp(linear_regression.evaluate(t)) + min_adc_output),
              label="Linear fit")
+    # ax2.plot(adc_output.index,
+    #          np.log(weighted_linear_regression.evaluate(t)),
+    #          label="Weighted linear fit")
     ax2.set_title("Transient ADC output in log space")
     ax2.set_xlabel("ADC sample")
     ax2.set_ylabel("Log ADC output [bits]")
