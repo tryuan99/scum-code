@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scipy.signal
 from absl import app, flags, logging
 
 from utils.regression.exponential_regression import ExponentialRegression
+from utils.regression.linear_regression import LinearRegression
 
 FLAGS = flags.FLAGS
 
@@ -38,6 +40,27 @@ def _rectify_transient_adc_data(data: pd.Series) -> None:
             data[i] += correction
 
 
+def _filter_adc_data(data: np.ndarray,
+                     sampling_rate: float,
+                     cutoff_frequency: float = 10) -> np.ndarray:
+    """Filters the noise from the ADC data.
+
+    Args:
+        data: ADC data.
+        sampling_rate: Sampling rate in Hz.
+        cutoff_frequency: Cutoff frequency in Hz.
+
+    Returns:
+        The filtered ADC data.
+    """
+    # Use a Butterworth filter.
+    butter = scipy.signal.butter(3,
+                                 cutoff_frequency,
+                                 fs=sampling_rate,
+                                 output="sos")
+    return scipy.signal.sosfiltfilt(butter, data)
+
+
 def plot_transient_adc_data(data: str, sampling_rate: float,
                             capacitance: float) -> None:
     """Plots the transient ADC data.
@@ -56,12 +79,32 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     adc_output = df[adc_output_column]
     _rectify_transient_adc_data(adc_output)
 
+    # Find the index at 3tau.
+    # Find the ADC output corresponding to 0 V by averaging the last ten ADC samples.
+    min_adc_output = np.mean(adc_output[-10:])
+    max_adc_output = np.max(adc_output)
+    # At 3tau, the exponential has decayed by 95%.
+    three_tau_index = np.argmax(adc_output < min_adc_output + 0.05 *
+                                (max_adc_output - min_adc_output))
+
     # Perform an exponential regression.
     t = adc_output.index / sampling_rate
-    exponential_regression = ExponentialRegression(t, adc_output.values)
-    logging.info("tau = %f", exponential_regression.time_constant)
-    logging.info("C = %g, R = %g", capacitance,
-                 exponential_regression.time_constant / capacitance)
+    adc_data = adc_output.values
+    exponential_regression = ExponentialRegression(t[:three_tau_index],
+                                                   adc_data[:three_tau_index])
+    tau_exponential = exponential_regression.time_constant
+    logging.info("Exponential regression:")
+    logging.info("tau = %f", tau_exponential)
+    logging.info("C = %g, R = %g", capacitance, tau_exponential / capacitance)
+
+    # Perform a linear regression in log space.
+    linear_regression = LinearRegression(
+        t[:three_tau_index],
+        np.log(adc_data[:three_tau_index] - min_adc_output))
+    tau_linear = -1 / linear_regression.slope
+    logging.info("Linear regression:")
+    logging.info("tau = %f", tau_linear)
+    logging.info("C = %g, R = %g", capacitance, tau_linear / capacitance)
 
     # Plot the transient ADC data in linear and log space.
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
@@ -69,6 +112,9 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     ax1.plot(adc_output.index,
              exponential_regression.evaluate(t),
              label="Exponential fit")
+    ax1.plot(adc_output.index,
+             np.exp(linear_regression.evaluate(t)) + min_adc_output,
+             label="Linear fit")
     ax1.set_title("Transient ADC output in linear space")
     ax1.set_xlabel("ADC sample")
     ax1.set_ylabel("ADC output [LSB]")
@@ -78,6 +124,9 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     ax2.plot(adc_output.index,
              np.log(exponential_regression.evaluate(t)),
              label="Exponential fit")
+    ax2.plot(adc_output.index,
+             np.log(np.exp(linear_regression.evaluate(t)) + min_adc_output),
+             label="Linear fit")
     ax2.set_title("Transient ADC output in log space")
     ax2.set_xlabel("ADC sample")
     ax2.set_ylabel("Log ADC output [bits]")

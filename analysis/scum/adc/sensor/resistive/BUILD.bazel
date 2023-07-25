@@ -8,9 +8,11 @@ py_binary(
     data = ["//analysis/scum/adc/sensor/resistive/data:adc_resistive_data"],
     deps = [
         "//utils/regression:exponential_regression",
+        "//utils/regression:linear_regression",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
         requirement("pandas"),
+        requirement("scipy"),
     ],
 )
