@@ -1,65 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scipy.signal
 from absl import app, flags, logging
 
-from utils.regression.exponential_regression import ExponentialRegression
-from utils.regression.linear_regression import (LinearRegression,
-                                                WeightedLinearRegression)
+from analysis.scum.adc.sensor.resistive.adc_data import ExponentialAdcData
 
 FLAGS = flags.FLAGS
-
-# Number of bits in an ADC sample.
-NUM_ADC_SAMPLE_BITS = 10
-
-# Maximum difference in LSBs between consecutive ADC samples.
-MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES = 64  # LSBs
-
-
-def _rectify_transient_adc_data(data: pd.Series) -> None:
-    """Rectifies the transient ADC data.
-
-    This function assumes a decaying exponential and fixes any discontinuities
-    in the ADC data caused by the stuck MSB.
-
-    Args:
-        data: ADC data column.
-    """
-    # Correct the ADC samples by the value of the MSB.
-    correction = 2**(NUM_ADC_SAMPLE_BITS - 1)
-
-    # Fix any discontinuities caused by the MSB bit.
-    diffs = np.squeeze(
-        np.argwhere(
-            np.abs(np.diff(data)) > MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES))
-    data[:np.min(diffs)] += correction
-
-    # Debounce the ADC data at the discontinuities.
-    for i in range(np.min(diffs), np.max(diffs) + 1):
-        if data[i] - data[i - 1] < -MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES:
-            data[i] += correction
-
-
-def _filter_adc_data(data: np.ndarray,
-                     sampling_rate: float,
-                     cutoff_frequency: float = 10) -> np.ndarray:
-    """Filters the noise from the ADC data.
-
-    Args:
-        data: ADC data.
-        sampling_rate: Sampling rate in Hz.
-        cutoff_frequency: Cutoff frequency in Hz.
-
-    Returns:
-        The filtered ADC data.
-    """
-    # Use a Butterworth filter.
-    butter = scipy.signal.butter(3,
-                                 cutoff_frequency,
-                                 fs=sampling_rate,
-                                 output="sos")
-    return scipy.signal.sosfiltfilt(butter, data)
 
 
 def plot_transient_adc_data(data: str, sampling_rate: float,
@@ -76,86 +22,131 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     (adc_output_column,) = df.columns
     logging.info(df.describe())
 
-    # Rectify the ADC data.
     adc_output = df[adc_output_column]
-    _rectify_transient_adc_data(adc_output)
-
-    # Find the index at 3tau.
-    # Find the ADC output corresponding to 0 V by averaging the last ten ADC samples.
-    min_adc_output = np.mean(adc_output[-10:])
-    max_adc_output = np.max(adc_output)
-    # At 3tau, the exponential has decayed by 95%.
-    three_tau_index = np.argmax(adc_output < min_adc_output + 0.05 *
-                                (max_adc_output - min_adc_output))
+    adc_data = ExponentialAdcData(adc_output, sampling_rate)
+    adc_data.disambiguate_msb_9()
 
     # Perform an exponential regression.
-    t = adc_output.index / sampling_rate
-    adc_data = adc_output.values
-    exponential_regression = ExponentialRegression(t[:three_tau_index],
-                                                   adc_data[:three_tau_index])
+    exponential_regression = adc_data.perform_exponential_regression()
     tau_exponential = exponential_regression.time_constant
     logging.info("Exponential regression:")
     logging.info("tau = %f", tau_exponential)
     logging.info("C = %g, R = %g", capacitance, tau_exponential / capacitance)
 
     # Perform a linear regression in log space.
-    linear_regression = LinearRegression(
-        t[:three_tau_index],
-        np.log(adc_data[:three_tau_index] - min_adc_output))
+    linear_regression = adc_data.perform_linear_regression()
     tau_linear = -1 / linear_regression.slope
     logging.info("Linear regression:")
     logging.info("tau = %f", tau_linear)
     logging.info("C = %g, R = %g", capacitance, tau_linear / capacitance)
 
-    # # Perform a weighted least squares using an exponentially increasing model
-    # # for the variance of each ADC sample.
-    # # The base was empirically determined to be around 1.005.
-    # weights = (1.005**(-adc_output.index)).values
-    # weighted_linear_regression = WeightedLinearRegression(
-    #     t, np.log(adc_data), weights)
-    # tau_weighted_linear = -1 / weighted_linear_regression.slope
-    # logging.info("Weighted linear regression:")
-    # logging.info("tau = %f", tau_weighted_linear)
-    # logging.info("C = %g, R = %g", capacitance,
-    #              tau_weighted_linear / capacitance)
+    # Perform a weighted linear regression in log space.
+    weighted_linear_regression = adc_data.perform_weighted_linear_regression()
+    tau_weighted_linear = -1 / weighted_linear_regression.slope
+    logging.info("Weighted linear regression:")
+    logging.info("tau = %f", tau_weighted_linear)
+    logging.info("C = %g, R = %g", capacitance,
+                 tau_weighted_linear / capacitance)
 
     # Plot the transient ADC data in linear and log space.
+    t = adc_data.t_axis
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
-    adc_output.plot(ax=ax1)
+    ax1.plot(adc_output.index, adc_data.samples, label="ADC data")
     ax1.plot(adc_output.index,
              exponential_regression.evaluate(t),
              label="Exponential fit")
     ax1.plot(adc_output.index,
-             np.exp(linear_regression.evaluate(t)) + min_adc_output,
+             np.exp(linear_regression.evaluate(t)) + adc_data.min_adc_output,
              label="Linear fit")
-    # ax1.plot(adc_output.index,
-    #          np.exp(weighted_linear_regression.evaluate(t)),
-    #          label="Weighted linear fit")
+    ax1.plot(adc_output.index,
+             np.exp(weighted_linear_regression.evaluate(t)) +
+             adc_data.min_adc_output,
+             label="Weighted linear fit")
     ax1.set_title("Transient ADC output in linear space")
-    ax1.set_xlabel("ADC sample")
     ax1.set_ylabel("ADC output [LSB]")
     ax1.legend()
 
-    np.log(adc_output).plot(ax=ax2)
     ax2.plot(adc_output.index,
-             np.log(exponential_regression.evaluate(t)),
-             label="Exponential fit")
+             np.log(adc_data.samples - adc_data.min_adc_output),
+             label="Log ADC data minus offset")
+    ax2.plot(
+        adc_output.index,
+        np.log(exponential_regression.evaluate(t) - adc_data.min_adc_output),
+        label="Exponential fit")
     ax2.plot(adc_output.index,
-             np.log(np.exp(linear_regression.evaluate(t)) + min_adc_output),
+             linear_regression.evaluate(t),
              label="Linear fit")
-    # ax2.plot(adc_output.index,
-    #          np.log(weighted_linear_regression.evaluate(t)),
-    #          label="Weighted linear fit")
-    ax2.set_title("Transient ADC output in log space")
+    ax2.plot(adc_output.index,
+             weighted_linear_regression.evaluate(t),
+             label="Weighted linear fit")
+    ax2.set_title("Transient ADC output in log space minus offset")
     ax2.set_xlabel("ADC sample")
-    ax2.set_ylabel("Log ADC output [bits]")
+    ax2.set_ylabel("Log ADC output minus offset [bits]")
     ax2.legend()
     plt.show()
 
 
+def plot_multiple_transient_adc_data(data: str, sampling_rate: float,
+                                     capacitance: float) -> None:
+    """Plots multiple transient ADC data.
+
+    Args:
+        data: Data filename.
+        sampling_rate: Sampling rate in Hz.
+        capacitance: Fixed capacitance in F.
+    """
+    # Open the ADC data file.
+    df = pd.read_csv(data, comment="#")
+    (
+        iteration_column,
+        adc_output_column,
+    ) = df.columns
+    logging.info(df.describe())
+
+    tau_exponential = []
+    tau_linear = []
+    tau_weighted_linear = []
+    fig, ax = plt.subplots(figsize=(12, 8))
+    iterations = df.groupby(iteration_column)
+    for _, group in iterations:
+        adc_data = ExponentialAdcData(group[adc_output_column], sampling_rate)
+        adc_data.disambiguate_msb_9()
+
+        # Plot the ADC data.
+        plt.plot(group.reset_index().index, adc_data.samples)
+
+        # Estimate tau using an exponential regression, a linear regression in
+        # log space, and a weighted linear regression in log space.
+        exponential_regression = adc_data.perform_exponential_regression()
+        tau_exponential.append(exponential_regression.time_constant)
+        linear_regression = adc_data.perform_linear_regression()
+        tau_linear.append(-1 / linear_regression.slope)
+        weighted_linear_regression = adc_data.perform_weighted_linear_regression(
+        )
+        tau_weighted_linear.append(-1 / weighted_linear_regression.slope)
+    ax.set_title("Transient ADC output")
+    ax.set_xlabel("ADC samples")
+    ax.set_ylabel("ADC output [LSB]")
+    plt.show()
+
+    # Calculate the mean and standard deviation of the estimated taus.
+    logging.info("Num iterations: %d", len(iterations))
+    logging.info("Exponential regression: mean tau = %f, stddev = %f",
+                 np.mean(tau_exponential), np.std(tau_exponential))
+    logging.info("Linear regression: mean tau = %f, stddev = %f",
+                 np.mean(tau_linear), np.std(tau_linear))
+    logging.info("Weighted linear regression: mean tau = %f, stddev = %f",
+                 np.mean(tau_weighted_linear), np.std(tau_weighted_linear))
+
+
 def main(argv):
     assert len(argv) == 1
-    plot_transient_adc_data(FLAGS.data, FLAGS.sampling_rate, FLAGS.capacitance)
+    if FLAGS.multiple:
+        plot_multiple_transient_adc_data(FLAGS.data, FLAGS.sampling_rate,
+                                         FLAGS.capacitance)
+    else:
+        plot_transient_adc_data(FLAGS.data, FLAGS.sampling_rate,
+                                FLAGS.capacitance)
 
 
 if __name__ == "__main__":
@@ -165,5 +156,7 @@ if __name__ == "__main__":
         "Data filename.")
     flags.DEFINE_float("sampling_rate", 100, "Sampling rate in Hz.")
     flags.DEFINE_float("capacitance", 50e-9, "Fixed capacitance in F.")
+    flags.DEFINE_bool("multiple", False,
+                      "If true, process multiple transients simultaneously.")
 
     app.run(main)

@@ -2,17 +2,37 @@ load("@pip_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
+py_library(
+    name = "adc_data",
+    srcs = ["adc_data.py"],
+    deps = [
+        "//utils/regression:exponential_regression",
+        "//utils/regression:linear_regression",
+        requirement("numpy"),
+        requirement("scipy"),
+    ],
+)
+
+py_binary(
+    name = "adc_transient_analysis_main",
+    srcs = ["adc_transient_analysis_main.py"],
+    deps = [
+        ":adc_data",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+    ],
+)
+
 py_binary(
     name = "adc_transient_main",
     srcs = ["adc_transient_main.py"],
     data = ["//analysis/scum/adc/sensor/resistive/data:adc_resistive_data"],
     deps = [
-        "//utils/regression:exponential_regression",
-        "//utils/regression:linear_regression",
+        ":adc_data",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
         requirement("pandas"),
-        requirement("scipy"),
     ],
 )
