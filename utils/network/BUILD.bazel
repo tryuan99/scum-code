@@ -1,0 +1,22 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "s1p_viewer",
+    srcs = ["s1p_viewer.py"],
+    deps = [
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("scikit-rf"),
+    ],
+)
+
+py_binary(
+    name = "s1p_viewer_main",
+    srcs = ["s1p_viewer_main.py"],
+    deps = [
+        ":s1p_viewer",
+        requirement("absl-py"),
+    ],
+)
