@@ -1,0 +1,2 @@
+# Workaround for spaces in the filenames. See https://github.com/bazelbuild/bazel/issues/4327.
+build --experimental_inprocess_symlink_creation

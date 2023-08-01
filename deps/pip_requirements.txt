@@ -220,6 +220,7 @@ numpy==1.23.5 \
     #   contourpy
     #   matplotlib
     #   pandas
+    #   scikit-rf
     #   scipy
 packaging==21.3 \
     --hash=sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb \
@@ -253,7 +254,9 @@ pandas==1.5.3 \
     --hash=sha256:dfd681c5dc216037e0b0a2c821f5ed99ba9f03ebcf119c7dac0e9a7b960b9ec9 \
     --hash=sha256:e474390e60ed609cec869b0da796ad94f420bb057d86784191eefc62b65819ae \
     --hash=sha256:f76d097d12c82a535fda9dfe5e8dd4127952b45fea9b0276cb30cca5ea313fbc
-    # via -r deps/pip_requirements.in
+    # via
+    #   -r deps/pip_requirements.in
+    #   scikit-rf
 pillow==9.3.0 \
     --hash=sha256:03150abd92771742d4a8cd6f2fa6246d847dcd2e332a18d0c15cc75bf6703040 \
     --hash=sha256:073adb2ae23431d3b9bcbcff3fe698b62ed47211d0716b067385538a1b0f28b8 \
@@ -428,6 +431,10 @@ regex==2022.7.9 \
     --hash=sha256:f8a2fd2f62a77536e4e3193303bec380df40d99e253b1c8f9b6eafa07eaeff67 \
     --hash=sha256:fbdf4fc6adf38fab1091c579ece3fe9f493bd0f1cfc3d2c76d2e52461ca4f8a9
     # via -r deps/pip_requirements.in
+scikit-rf==0.28.0 \
+    --hash=sha256:4edf7ce4b02ea11000ee649533ccb269662ae251f765202fba48a6fd1120e9b5 \
+    --hash=sha256:a34bb1f7d5e46eb358bcbc582a2d012639f2322c23fe00104b1df69f594d0948
+    # via -r deps/pip_requirements.in
 scipy==1.10.0 \
     --hash=sha256:0490dc499fe23e4be35b8b6dd1e60a4a34f0c4adb30ac671e6332446b3cbbb5a \
     --hash=sha256:0ab2a58064836632e2cec31ca197d3695c86b066bc4818052b3f5381bfd2a728 \
@@ -450,7 +457,9 @@ scipy==1.10.0 \
     --hash=sha256:b901b423c91281a974f6cd1c36f5c6c523e665b5a6d5e80fcb2334e14670eefd \
     --hash=sha256:c8b3cbc636a87a89b770c6afc999baa6bcbb01691b5ccbbc1b1791c7c0a07540 \
     --hash=sha256:e096b062d2efdea57f972d232358cb068413dc54eec4f24158bcbb5cb8bddfd8
-    # via -r deps/pip_requirements.in
+    # via
+    #   -r deps/pip_requirements.in
+    #   scikit-rf
 six==1.16.0 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
     --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
