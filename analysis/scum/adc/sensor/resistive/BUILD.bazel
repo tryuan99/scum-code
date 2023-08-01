@@ -29,6 +29,7 @@ py_binary(
     srcs = ["adc_transient_example_main.py"],
     deps = [
         ":adc_data",
+        "//utils/regression:linear_regression",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),

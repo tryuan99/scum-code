@@ -4,11 +4,15 @@ from absl import app, flags, logging
 
 from analysis.scum.adc.sensor.resistive.adc_data import (
     EXPONENTIAL_SCALING_FACTOR, SIGMA, ExponentialAdcData)
+from utils.regression.linear_regression import WeightedLinearRegression
 
 FLAGS = flags.FLAGS
 
 # Offset of the decaying exponential.
 EXPONENTIAL_OFFSET = 127
+
+# Number of standard deviations to plot for distributions.
+NUM_STDDEVS_TO_PLOT = 5
 
 
 def _generate_transient_adc_data(tau: float,
@@ -36,6 +40,60 @@ def _generate_transient_adc_data(tau: float,
 
     # Round the ADC samples to the nearest integer.
     return np.round(exponential + noise)
+
+
+def _analyze_weighted_linear_regression(
+        weighted_linear_regression: WeightedLinearRegression) -> None:
+    """Analyzes the noise of the weighted linear regression.
+
+    Args:
+        weighted_linear_regression: Weighted linear regression.
+    """
+    logging.info("Weighted linear regression:")
+
+    # Plot the distribution of the slope of the weighted linear regression.
+    # The slope is 1/time constant.
+    slope_mean = np.abs(weighted_linear_regression.slope)
+    slope_stddev = np.sqrt(weighted_linear_regression.slope_variance)
+    logging.info("Slope: mean = %f, stddev = %f", slope_mean, slope_stddev)
+
+    fig, ax = plt.subplots(figsize=(12, 8))
+    x = np.linspace(slope_mean - NUM_STDDEVS_TO_PLOT * slope_stddev,
+                    slope_mean + NUM_STDDEVS_TO_PLOT * slope_stddev, 10000)
+    slope_pdf = 1 / (np.sqrt(2 * np.pi) * slope_stddev) * np.exp(
+        -1 / 2 * (x - slope_mean)**2 / slope_stddev**2)
+    plt.plot(x, slope_pdf, label=f"Mean={slope_mean}, stddev={slope_stddev}")
+    ax.set_title("Distribution of the slope (1 / time constant)")
+    ax.set_xlabel("Slope")
+    ax.set_ylabel("Probability density")
+    plt.legend()
+    plt.show()
+
+    # Plot the distribution of the time constant of the weighted linear regression.
+    tau_mean = 1 / slope_mean
+    tau_variance = weighted_linear_regression.slope_variance / slope_mean**4
+    tau_stddev = np.sqrt(tau_variance)
+    logging.info("Time constant: mean = %f, stddev = %f", tau_mean, tau_stddev)
+
+    fig, ax = plt.subplots(figsize=(12, 8))
+    x, step = np.linspace(tau_mean - NUM_STDDEVS_TO_PLOT * tau_stddev,
+                          tau_mean + NUM_STDDEVS_TO_PLOT * tau_stddev,
+                          10000,
+                          retstep=True)
+    tau_pdf = 1 / (np.sqrt(2 * np.pi) * slope_stddev) * np.exp(
+        -1 / 2 * (1 / x - slope_mean)**2 / slope_stddev**2)
+    tau_pdf /= np.sum(tau_pdf) * step
+    plt.plot(x, tau_pdf, label=f"Mean={tau_mean}, stddev={tau_stddev}")
+    tau_pdf_approximated = 1 / (np.sqrt(2 * np.pi) * tau_stddev) * np.exp(
+        -1 / 2 * (x - tau_mean)**2 / tau_stddev**2)
+    plt.plot(x,
+             tau_pdf_approximated,
+             label=f"Mean={tau_mean}, stddev={tau_stddev} (approximated)")
+    ax.set_title("Distribution of the time constant")
+    ax.set_xlabel("Time constant")
+    ax.set_ylabel("Probability density")
+    plt.legend()
+    plt.show()
 
 
 def plot_example_transient_adc_data(tau: float, sampling_rate: float) -> None:
@@ -66,7 +124,7 @@ def plot_example_transient_adc_data(tau: float, sampling_rate: float) -> None:
     # Plot the transient ADC data in linear and log space.
     n = np.arange(len(adc_output))
     t = adc_data.t_axis
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
     ax1.plot(n, adc_data.samples, label="ADC data")
     ax1.plot(n, exponential_regression.evaluate(t), label="Exponential fit")
     ax1.plot(n,
@@ -96,6 +154,9 @@ def plot_example_transient_adc_data(tau: float, sampling_rate: float) -> None:
     ax2.set_ylabel("Log ADC output minus offset [bits]")
     ax2.legend()
     plt.show()
+
+    # Analyze the weighted linear regression.
+    _analyze_weighted_linear_regression(weighted_linear_regression)
 
 
 def main(argv):

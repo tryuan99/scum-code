@@ -28,7 +28,7 @@ def plot_sample_distribution() -> None:
         # Approximate the pdf.
         stddev = SIGMA * np.exp(tau) / EXPONENTIAL_SCALING_FACTOR
         pdf_approximated = 1 / (np.sqrt(2 * np.pi) * stddev) * np.exp(
-            -x**2 / (2 * stddev**2))
+            -1 / 2 * x**2 / stddev**2)
         plt.plot(x,
                  pdf_approximated,
                  "--",

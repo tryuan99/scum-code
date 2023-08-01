@@ -16,12 +16,12 @@ class LinearRegression:
 
     @property
     def slope(self) -> float:
-        """Returns the slope."""
+        """Slope of the linear regression."""
         return self.m
 
     @property
     def y_intercept(self) -> float:
-        """Returns the y-intercept."""
+        """y-intercept of the linear regression."""
         return self.b
 
     def evaluate(self, x: Any) -> Any:
@@ -57,8 +57,38 @@ class WeightedLinearRegression(LinearRegression):
     """Performs a linear regression with weighted least squares."""
 
     def __init__(self, x: np.ndarray, y: np.ndarray, weights: np.ndarray):
+        self.x = np.copy(x)
+        self.y = np.copy(y)
+        self.weights = np.copy(weights)
+        assert np.all(self.weights >= 0)
         self.m, self.b, self.residuals = self._perform_weighted_linear_regression(
-            x, y, weights)
+            self.x, self.y, self.weights)
+
+    @property
+    def x_mean(self):
+        """Weighted mean of the x-values."""
+        return np.sum(self.weights * self.x) / np.sum(self.weights)
+
+    @property
+    def y_mean(self):
+        """Weighted mean of the y-values."""
+        return np.sum(self.weights * self.y) / np.sum(self.weights)
+
+    @property
+    def slope_variance(self) -> float:
+        """Variance of the slope of the linear regression.
+
+        This function assumes that the weights are equal to 1/sample variance.
+        """
+        return 1 / np.sum(self.weights * (self.x - self.x_mean)**2)
+
+    @property
+    def y_intercept_variance(self) -> float:
+        """Variance of the y-intercept of the linear regression.
+
+        This function assumes that the weights are equal to 1/sample variance.
+        """
+        return 1 / np.sum(self.weights) + self.slope_variance * self.x_mean**2
 
     @staticmethod
     def _perform_weighted_linear_regression(
