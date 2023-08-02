@@ -35,6 +35,7 @@ def plot_adc_variations(data: list[str], adc_config: AdcConfig) -> None:
             adc_data = df_concentration[adc_output_column]
             label = (f"{concentration} M"
                      if len(data) == 1 else f"{filename}: {concentration} M")
+            print(concentration, np.std(adc_data))
             if len(data) == 1:
                 adc_data.reset_index()[adc_output_column].plot.line(ax=ax)
             else:
