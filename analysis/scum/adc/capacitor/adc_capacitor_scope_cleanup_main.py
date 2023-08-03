@@ -43,15 +43,15 @@ def cleanup_scope_data(
         names=("Time [s]", "Capacitor voltage [V]"),
     )
     time_column_without_scum, capacitor_column_without_scum = df_without_scum.columns
-    df_without_scum = df_without_scum[
-        df_without_scum[time_column_without_scum] >= 0].reset_index(drop=True)
+    df_without_scum = df_without_scum[df_without_scum[time_column_without_scum]
+                                      >= 0].reset_index(drop=True)
     gpio_data = df[gpio_column].to_numpy()
     thresholded_gpio_data = (gpio_data > GPIO_HIGH_THRESHOLD).astype(int)
 
     num_samples_offset = int(scope_sampling_rate * ADC_TO_GPIO_OFFSET)
     (positive_edge_indices,) = np.where(np.diff(thresholded_gpio_data) > 0.5)
-    positive_edge_indices = positive_edge_indices[
-        positive_edge_indices > num_samples_offset]
+    positive_edge_indices = positive_edge_indices[positive_edge_indices >
+                                                  num_samples_offset]
     positive_edge_data = df.loc[positive_edge_indices - num_samples_offset]
     positive_edge_data.to_csv(output, index=False)
     positive_edge_data_without_scum = df_without_scum.loc[positive_edge_indices
