@@ -131,6 +131,15 @@ class ExponentialAdcData:
             np.log(self.samples[:three_tau_index] - self.min_adc_output),
             weights[:three_tau_index])
 
+    def estimate_tau(self) -> float:
+        """Estimates the time constant based on the three tau index.
+
+        Returns:
+            The estimated time constant.
+        """
+        three_tau_index = self._estimate_three_tau_index()
+        return three_tau_index / 3 / self.sampling_rate
+
     def _estimate_three_tau_index(self) -> int:
         """Estimates the index at 3tau.
 

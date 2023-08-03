@@ -105,6 +105,7 @@ def plot_example_transient_adc_data(tau: float, sampling_rate: float) -> None:
     """
     adc_output = _generate_transient_adc_data(tau, sampling_rate)
     adc_data = ExponentialAdcData(adc_output, sampling_rate)
+    logging.info("Estimated tau: tau = %f", adc_data.estimate_tau())
 
     # Perform an exponential regression.
     exponential_regression = adc_data.perform_exponential_regression()

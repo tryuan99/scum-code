@@ -25,6 +25,7 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     adc_output = df[adc_output_column]
     adc_data = ExponentialAdcData(adc_output, sampling_rate)
     adc_data.disambiguate_msb_9()
+    logging.info("Estimated tau: tau = %f", adc_data.estimate_tau())
 
     # Perform an exponential regression.
     exponential_regression = adc_data.perform_exponential_regression()
