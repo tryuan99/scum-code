@@ -49,6 +49,14 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     logging.info("C = %g, R = %g", capacitance,
                  tau_weighted_linear / capacitance)
 
+    # Perform a polynomial regression.
+    polynomial_regression = adc_data.perform_polynomial_regression()
+    tau_polynomial = -polynomial_regression.coefficients[
+        0] / polynomial_regression.coefficients[1]
+    logging.info("Polynomial regression:")
+    logging.info("tau = %f", tau_polynomial)
+    logging.info("C = %g, R = %g", capacitance, tau_polynomial / capacitance)
+
     # Plot the transient ADC data in linear and log space.
     t = adc_data.t_axis
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
@@ -63,6 +71,9 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
              np.exp(weighted_linear_regression.evaluate(t)) +
              adc_data.min_adc_output,
              label="Weighted linear fit")
+    ax1.plot(adc_output.index,
+             polynomial_regression.evaluate(t) + adc_data.min_adc_output,
+             label="Polynomial fit")
     ax1.set_title("Transient ADC output in linear space")
     ax1.set_ylabel("ADC output [LSB]")
     ax1.legend()
@@ -80,6 +91,9 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     ax2.plot(adc_output.index,
              weighted_linear_regression.evaluate(t),
              label="Weighted linear fit")
+    ax2.plot(adc_output.index,
+             np.log(polynomial_regression.evaluate(t)),
+             label="Polynomial fit")
     ax2.set_title("Transient ADC output in log space minus offset")
     ax2.set_xlabel("ADC sample")
     ax2.set_ylabel("Log ADC output minus offset [bits]")

@@ -47,9 +47,9 @@ class LinearRegression:
         Returns:
             (m, b, residuals), where m is the slope and b is the y-intercept.
         """
-        A = np.vstack([x, np.ones(len(x))]).T
+        A = (x**np.arange(2)[:, np.newaxis]).T
         result, residuals = np.linalg.lstsq(A, y, rcond=None)[:2]
-        m, b = np.squeeze(result)
+        b, m = np.squeeze(result)
         return m, b, residuals[0] if len(residuals) > 0 else 0
 
 
@@ -104,11 +104,11 @@ class WeightedLinearRegression(LinearRegression):
         Returns:
             (m, b, residuals), where m is the slope and b is the y-intercept.
         """
-        A = np.vstack([x, np.ones(len(x))]).T
+        A = (x**np.arange(2)[:, np.newaxis]).T
         W = np.sqrt(np.diag(weights))
         A_weighted = np.multiply(A, weights[:, np.newaxis])
         y_weighted = np.multiply(weights, y)
         result, residuals = np.linalg.lstsq(A_weighted, y_weighted,
                                             rcond=None)[:2]
-        m, b = np.squeeze(result)
+        b, m = np.squeeze(result)
         return m, b, residuals[0] if len(residuals) > 0 else 0

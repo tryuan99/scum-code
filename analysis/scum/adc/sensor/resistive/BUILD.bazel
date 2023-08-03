@@ -8,6 +8,7 @@ py_library(
     deps = [
         "//utils/regression:exponential_regression",
         "//utils/regression:linear_regression",
+        "//utils/regression:polynomial_regression",
         requirement("numpy"),
         requirement("scipy"),
     ],

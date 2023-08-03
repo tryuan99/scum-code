@@ -6,6 +6,7 @@ import scipy.signal
 from utils.regression.exponential_regression import ExponentialRegression
 from utils.regression.linear_regression import (LinearRegression,
                                                 WeightedLinearRegression)
+from utils.regression.polynomial_regression import PolynomialRegression
 
 # Number of bits in an ADC sample.
 NUM_ADC_SAMPLE_BITS = 10
@@ -130,6 +131,22 @@ class ExponentialAdcData:
             t[:three_tau_index],
             np.log(self.samples[:three_tau_index] - self.min_adc_output),
             weights[:three_tau_index])
+
+    def perform_polynomial_regression(self,
+                                      degree: int = 5) -> PolynomialRegression:
+        """Performs a polynomial regression on the ADC data.
+
+        Args:
+            degree: Polynomial degree.
+
+        Returns:
+            The polynomial regression.
+        """
+        t = self.t_axis
+        three_tau_index = self._estimate_three_tau_index()
+        return PolynomialRegression(
+            t[:three_tau_index],
+            self.samples[:three_tau_index] - self.min_adc_output, degree)
 
     def estimate_tau(self) -> float:
         """Estimates the time constant based on the three tau index.

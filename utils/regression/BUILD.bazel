@@ -23,3 +23,9 @@ py_library(
     srcs = ["parabolic_regression.py"],
     deps = [requirement("numpy")],
 )
+
+py_library(
+    name = "polynomial_regression",
+    srcs = ["polynomial_regression.py"],
+    deps = [requirement("numpy")],
+)
