@@ -1,0 +1,10 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "tuning_codes_data",
+    srcs = [
+        "tuning_codes_1.csv",
+        "tuning_codes_2.csv",
+        "tuning_codes_3.csv",
+    ],
+)

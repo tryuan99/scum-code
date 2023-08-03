@@ -1,0 +1,22 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "tuning_code",
+    srcs = ["tuning_code.py"],
+    deps = [requirement("numpy")],
+)
+
+py_binary(
+    name = "tuning_codes_main",
+    srcs = ["tuning_codes_main.py"],
+    data = ["//analysis/scum/radio/tuning/data:tuning_codes_data"],
+    deps = [
+        ":tuning_code",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+    ],
+)
