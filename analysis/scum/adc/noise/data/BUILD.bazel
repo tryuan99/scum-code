@@ -1,0 +1,9 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "adc_noise_data",
+    srcs = [
+        "adc_noise_data_1.csv",
+        "adc_noise_data_2.csv",
+    ],
+)

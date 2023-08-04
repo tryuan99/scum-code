@@ -1,0 +1,16 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_binary(
+    name = "adc_noise_main",
+    srcs = ["adc_noise_main.py"],
+    data = ["//analysis/scum/adc/noise/data:adc_noise_data"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+        requirement("scipy"),
+    ],
+)
