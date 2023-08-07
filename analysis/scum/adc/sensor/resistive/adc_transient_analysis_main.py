@@ -51,7 +51,7 @@ def plot_log_noise_distribution() -> None:
             -(EXPONENTIAL_SCALING_FACTOR**2 * np.exp(-2 * tau) *
               (np.exp(x) - 1)**2) /
             (2 * SIGMA**2)) * EXPONENTIAL_SCALING_FACTOR * np.exp(x - tau)
-        pdf_plot = plt.plot(x, pdf, label=f"tau={tau}")
+        pdf_plot = plt.plot(x, pdf, label=f"t={tau}tau")
 
         # Approximate the pdf.
         stddev = SIGMA * np.exp(tau) / EXPONENTIAL_SCALING_FACTOR
@@ -61,7 +61,7 @@ def plot_log_noise_distribution() -> None:
                  pdf_approximated,
                  "--",
                  c=pdf_plot[0].get_color(),
-                 label=f"tau={tau} (approximated)")
+                 label=f"t={tau}tau (approximated)")
     ax.set_title("Probability density of the noise of the log ADC samples")
     ax.set_xlabel("Noise value [bits]")
     ax.set_ylabel("Probability density")
@@ -82,7 +82,7 @@ def plot_log_noise_distribution() -> None:
         stddev = SIGMA * np.exp(tau) / EXPONENTIAL_SCALING_FACTOR
         pdf_approximated = 1 / (np.sqrt(2 * np.pi) * stddev) * np.exp(
             -1 / 2 * x**2 / stddev**2)
-        plt.plot(x, pdf_approximated - pdf, label=f"tau={tau}")
+        plt.plot(x, pdf_approximated - pdf, label=f"t={tau}tau")
     ax.set_title(
         "Approximation error of the probability density of the noise of the log ADC samples"
     )
