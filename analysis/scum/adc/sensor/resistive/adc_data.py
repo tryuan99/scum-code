@@ -103,6 +103,16 @@ class ExponentialAdcData:
         return ExponentialRegression(t[:three_tau_index],
                                      self.samples[:three_tau_index])
 
+    def get_linear_regression_samples(self) -> np.ndarray:
+        """Gets the pre-processed ADC samples for linear regressions.
+
+        Any vertical offset is removed, and the natural logarithm is applied.
+
+        Returns:
+            The pre-processed ADC samples.
+        """
+        return np.log(self.samples - self.min_adc_output)
+
     def perform_linear_regression(self) -> LinearRegression:
         """Performs a linear regression on the ADC data in log space.
 
@@ -113,7 +123,7 @@ class ExponentialAdcData:
         three_tau_index = self._estimate_three_tau_index()
         return LinearRegression(
             t[:three_tau_index],
-            np.log(self.samples[:three_tau_index] - self.min_adc_output))
+            self.get_linear_regression_samples()[:three_tau_index])
 
     def perform_weighted_linear_regression(self) -> WeightedLinearRegression:
         """Performs a weighted linear regression on the ADC data in log space.
@@ -132,7 +142,7 @@ class ExponentialAdcData:
         weights = 1 / variances
         return WeightedLinearRegression(
             t[:three_tau_index],
-            np.log(self.samples[:three_tau_index] - self.min_adc_output),
+            self.get_linear_regression_samples()[:three_tau_index],
             weights[:three_tau_index])
 
     def perform_polynomial_regression(self,

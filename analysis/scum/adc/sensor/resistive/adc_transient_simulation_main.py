@@ -15,7 +15,7 @@ EXPONENTIAL_OFFSET = 127
 NUM_STDDEVS_TO_PLOT = 5
 
 # Time constants to simulate.
-TAUS = np.arange(1, 51) * 0.5
+TAUS = np.arange(0.5, 21, 0.5)
 
 # Number of simulations per time constant.
 NUM_SIMULATIONS_PER_TAU = 100
@@ -199,7 +199,7 @@ def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
         len(TAUS)), np.zeros(len(TAUS))
     slope_means_linear, slope_stddevs_linear = np.zeros(len(TAUS)), np.zeros(
         len(TAUS))
-    slope_means_weighted_linear, slope_stddevs_weighted_linear, slope_stddevs_weighted_linear_exact = np.zeros(
+    slope_means_weighted_linear, slope_stddevs_weighted_linear, slope_stddevs_weighted_linear_theoretical = np.zeros(
         len(TAUS)), np.zeros(len(TAUS)), np.zeros(len(TAUS))
     slope_means_polynomial, slope_stddevs_polynomial = np.zeros(
         len(TAUS)), np.zeros(len(TAUS))
@@ -247,7 +247,7 @@ def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
             tau_estimates_weighted_linear)
         tau_stddevs_weighted_linear[tau_index] = np.std(
             tau_estimates_weighted_linear)
-        slope_stddevs_weighted_linear_exact[tau_index] = np.mean(
+        slope_stddevs_weighted_linear_theoretical[tau_index] = np.mean(
             slope_estimates_stddevs_weighted_linear)
         tau_means_polynomial[tau_index] = np.mean(tau_estimates_polynomial)
         tau_stddevs_polynomial[tau_index] = np.std(tau_estimates_polynomial)
@@ -301,10 +301,10 @@ def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
     plt.plot(1 / TAUS,
              np.sqrt(8 * SIGMA**2 /
                      (EXPONENTIAL_SCALING_FACTOR**2 * sampling_rate * TAUS**3)),
-             label="Theoretical (approximated)")
+             label="Approximated")
     plt.plot(1 / TAUS,
-             slope_stddevs_weighted_linear_exact,
-             label="Thereotical (exact)")
+             slope_stddevs_weighted_linear_theoretical,
+             label="Theoretical")
     ax.set_title(
         "Standard deviation of the estimated slope with a weighted linear regression"
     )
@@ -342,7 +342,7 @@ def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
     plt.plot(TAUS,
              np.sqrt(8 * SIGMA**2 * TAUS /
                      (EXPONENTIAL_SCALING_FACTOR**2 * sampling_rate)),
-             label="Theoretical (approximated)")
+             label="Approximated")
     ax.set_title(
         "Standard deviation of the estimated time constant with a weighted linear regression"
     )
