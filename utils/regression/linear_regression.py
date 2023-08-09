@@ -105,9 +105,9 @@ class WeightedLinearRegression(LinearRegression):
             (m, b, residuals), where m is the slope and b is the y-intercept.
         """
         A = (x**np.arange(2)[:, np.newaxis]).T
-        W = np.sqrt(np.diag(weights))
-        A_weighted = np.multiply(A, weights[:, np.newaxis])
-        y_weighted = np.multiply(weights, y)
+        W = np.sqrt(weights)
+        A_weighted = A * W[:, np.newaxis]
+        y_weighted = y * W
         result, residuals = np.linalg.lstsq(A_weighted, y_weighted,
                                             rcond=None)[:2]
         b, m = np.squeeze(result)

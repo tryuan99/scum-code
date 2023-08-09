@@ -26,8 +26,8 @@ py_binary(
 )
 
 py_binary(
-    name = "adc_transient_example_main",
-    srcs = ["adc_transient_example_main.py"],
+    name = "adc_transient_simulation_main",
+    srcs = ["adc_transient_simulation_main.py"],
     deps = [
         ":adc_data",
         "//utils/regression:linear_regression",

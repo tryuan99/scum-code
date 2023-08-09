@@ -34,13 +34,17 @@ class ExponentialAdcData:
     def __init__(self, samples: np.ndarray, sampling_rate: float):
         assert samples.ndim == 1, "ADC data must be one-dimensional."
         self.samples = np.copy(samples)
-        self.num_samples = len(self.samples)
         self.sampling_rate = sampling_rate
+
+    @property
+    def num_samples(self) -> int:
+        """Number of samples."""
+        return len(self.samples)
 
     @property
     def t_axis(self) -> np.ndarray:
         """Time axis in seconds."""
-        return np.arange(len(self.samples)) / self.sampling_rate
+        return np.arange(self.num_samples) / self.sampling_rate
 
     @property
     def min_adc_output(self) -> float:
@@ -122,10 +126,9 @@ class ExponentialAdcData:
         """
         t = self.t_axis
         three_tau_index = self._estimate_three_tau_index()
-        variances = (
-            SIGMA *
-            np.exp(np.arange(len(self.samples)) /
-                   (three_tau_index / 3)) / EXPONENTIAL_SCALING_FACTOR)**2
+        exponential_scaling_factor = self.samples[0] - self.min_adc_output
+        variances = (SIGMA / exponential_scaling_factor *
+                     np.exp(t / self.estimate_tau()))**2
         weights = 1 / variances
         return WeightedLinearRegression(
             t[:three_tau_index],
