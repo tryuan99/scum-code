@@ -11,6 +11,26 @@ FLAGS = flags.FLAGS
 # Tuning code column.
 TUNING_CODE_COLUMN = "Tuning code"
 
+# TX/RX label.
+TX_LABEL = "TX"
+RX_LABEL = "RX"
+
+
+def _tuning_code_formatter(x: int, position: float) -> str:
+    """Formats the tuning code tick labels.
+
+    Args:
+        x: Tick value.
+        position: Position.
+
+    Returns:
+        The string containing the coarse, mid, and fine codes.
+    """
+    tuning_code = TuningCode.tuning_code_to_coarse_mid_fine(int(np.abs(x)))
+    if x < 0:
+        return f"-{tuning_code}"
+    return f"{tuning_code}"
+
 
 def plot_tuning_codes(data: str) -> None:
     """Plots the TX and RX tuning codes by 802.15.4 channel.
@@ -26,7 +46,7 @@ def plot_tuning_codes(data: str) -> None:
     logging.info(df.describe())
 
     # Plot the TX and RX tuning codes.
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(12, 8))
     for index, (tx_rx, tx_rx_group) in enumerate(df.groupby(tx_rx_column)):
         tx_rx_group.plot.scatter(TUNING_CODE_COLUMN,
                                  channel_column,
@@ -35,21 +55,22 @@ def plot_tuning_codes(data: str) -> None:
                                  label=tx_rx,
                                  legend=True)
     ax.set_title("TX and RX tuning codes")
+    ax.xaxis.set_major_formatter(FuncFormatter(_tuning_code_formatter))
+    plt.show()
 
-    # Format the tuning code tick labels.
-    def tuning_code_formatter(x: int, position: float) -> str:
-        """Formats the tuning code tick labels.
-
-        Args:
-            x: Tick value.
-            position: Position.
-
-        Returns:
-            The string containing the coarse, mid, and fine codes.
-        """
-        return str(TuningCode.tuning_code_to_coarse_mid_fine(int(x)))
-
-    ax.xaxis.set_major_formatter(FuncFormatter(tuning_code_formatter))
+    # Plot the difference between the TX and RX tuning codes.
+    fig, ax = plt.subplots(figsize=(12, 8))
+    for (channel, channel_group) in df.groupby(channel_column):
+        tx = channel_group.groupby(tx_rx_column).get_group(TX_LABEL)
+        rx = channel_group.groupby(tx_rx_column).get_group(RX_LABEL)
+        tx_rx_differences = (tx[TUNING_CODE_COLUMN].to_numpy()[:, None] -
+                             rx[TUNING_CODE_COLUMN].to_numpy()).flatten()
+        plt.scatter(np.full(tx_rx_differences.shape, channel),
+                    tx_rx_differences)
+    ax.set_title("Difference between TX and RX tuning codes")
+    ax.set_xlabel("Channel")
+    ax.set_ylabel("TX - RX difference")
+    ax.yaxis.set_major_formatter(FuncFormatter(_tuning_code_formatter))
     plt.show()
 
 
