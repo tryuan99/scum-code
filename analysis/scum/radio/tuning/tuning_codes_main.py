@@ -16,7 +16,7 @@ TX_LABEL = "TX"
 RX_LABEL = "RX"
 
 
-def _tuning_code_formatter(x: int, position: float) -> str:
+def _tuning_code_formatter(x: float, position: float) -> str:
     """Formats the tuning code tick labels.
 
     Args:

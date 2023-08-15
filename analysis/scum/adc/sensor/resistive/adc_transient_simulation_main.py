@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from absl import app, flags, logging
+from matplotlib.ticker import FuncFormatter
 
 from analysis.scum.adc.sensor.resistive.adc_data import (
     EXPONENTIAL_SCALING_FACTOR, SIGMA, ExponentialAdcData)
-from utils.regression.linear_regression import WeightedLinearRegression
+from utils.regression.linear_regression import (LinearRegression,
+                                                WeightedLinearRegression)
 
 FLAGS = flags.FLAGS
 
@@ -13,6 +15,9 @@ EXPONENTIAL_OFFSET = 127
 
 # Number of standard deviations to plot for distributions.
 NUM_STDDEVS_TO_PLOT = 5
+
+# Number of samples for which to calculate the residuals.
+NUM_SAMPLES_PER_RESIDUALS = 5
 
 # Time constants to simulate.
 TAUS = np.arange(0.5, 21, 0.5)
@@ -105,6 +110,97 @@ def _analyze_weighted_linear_regression(
     plt.show()
 
 
+# Bin axis formatter.
+def _bin_axis_formatter(x: float, position: float) -> str:
+    """Formats the bin tick labels.
+
+    Args:
+        x: Tick value.
+        position: Position.
+
+    Returns:
+        The string corresponding to the bin.
+    """
+    return (f"[{int(x) * NUM_SAMPLES_PER_RESIDUALS}, "
+            f"{int(x + 1)*NUM_SAMPLES_PER_RESIDUALS})")
+
+
+def _compare_linear_regressions_sse(
+        linear_regression: LinearRegression,
+        weighted_linear_regression: WeightedLinearRegression,
+        adc_data: ExponentialAdcData) -> None:
+    """Compares the sum of squared errors between the linear regression and the
+    weighted linear regression.
+
+    Args:
+        linear_regression: Linear regression.
+        weighted_linear_regression: Weighted linear regression.
+        adc_data: ADC samples.
+    """
+    t = adc_data.t_axis
+    y = adc_data.samples
+    y_predicted_linear = np.exp(
+        linear_regression.evaluate(t)) + adc_data.min_adc_output
+    y_predicted_weighted_linear = np.exp(
+        weighted_linear_regression.evaluate(t)) + adc_data.min_adc_output
+    residuals_linear = np.linalg.norm(y - y_predicted_linear)**2
+    residuals_weighted_linear = np.linalg.norm(y -
+                                               y_predicted_weighted_linear)**2
+    logging.info("Residuals: linear: %f, weighted linear: %f", residuals_linear,
+                 residuals_weighted_linear)
+
+    # Calculate the binned residuals.
+    bin_indices = np.arange(len(y) // NUM_SAMPLES_PER_RESIDUALS)
+    residuals_bins_linear = np.zeros(len(bin_indices))
+    residuals_bins_weighted_linear = np.zeros(len(bin_indices))
+    for bin_index in bin_indices:
+        residuals_bin_linear = np.linalg.norm(
+            y[bin_index * NUM_SAMPLES_PER_RESIDUALS:(bin_index + 1) *
+              NUM_SAMPLES_PER_RESIDUALS] -
+            y_predicted_linear[bin_index * NUM_SAMPLES_PER_RESIDUALS:
+                               (bin_index + 1) * NUM_SAMPLES_PER_RESIDUALS])**2
+        residuals_bin_weighted_linear = np.linalg.norm(
+            y[bin_index * NUM_SAMPLES_PER_RESIDUALS:(bin_index + 1) *
+              NUM_SAMPLES_PER_RESIDUALS] -
+            y_predicted_weighted_linear[bin_index * NUM_SAMPLES_PER_RESIDUALS:
+                                        (bin_index + 1) *
+                                        NUM_SAMPLES_PER_RESIDUALS])**2
+        residuals_bins_linear[bin_index] = residuals_bin_linear
+        residuals_bins_weighted_linear[
+            bin_index] = residuals_bin_weighted_linear
+
+    # Plot the binned residuals.
+    fig, ax = plt.subplots(figsize=(12, 8))
+    plt.plot(bin_indices,
+             residuals_bins_linear,
+             label="Linear regression residuals")
+    plt.plot(bin_indices,
+             residuals_bins_weighted_linear,
+             label="Weighted linear regression residuals")
+    ax.set_title("Linear regression residuals of the binned ADC samples")
+    ax.set_xlabel("ADC sample bins")
+    ax.set_ylabel("Residuals")
+    ax.xaxis.set_major_formatter(FuncFormatter(_bin_axis_formatter))
+    plt.legend()
+    plt.show()
+
+    # Plot the difference between the binned residuals.
+    fig, ax = plt.subplots(figsize=(12, 8))
+    plt.plot(
+        bin_indices,
+        residuals_bins_linear - residuals_bins_weighted_linear,
+        label=
+        "Linear regression residuals - weighted linear regression residuals")
+    plt.axhline(y=0, linestyle="--", c="C1")
+    ax.set_title(
+        "Difference in linear regression residuals of the binned ADC samples")
+    ax.set_xlabel("ADC sample bins")
+    ax.set_ylabel("Difference in residuals")
+    ax.xaxis.set_major_formatter(FuncFormatter(_bin_axis_formatter))
+    plt.legend()
+    plt.show()
+
+
 def plot_single_transient_adc_data(tau: float, sampling_rate: float) -> None:
     """Plots a single transient ADC data.
 
@@ -187,6 +283,11 @@ def plot_single_transient_adc_data(tau: float, sampling_rate: float) -> None:
 
     # Analyze the weighted linear regression.
     _analyze_weighted_linear_regression(weighted_linear_regression)
+
+    # Compare the sum of squared errors between the linear regression and the
+    # weighted linear regression.
+    _compare_linear_regressions_sse(linear_regression,
+                                    weighted_linear_regression, adc_data)
 
 
 def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
