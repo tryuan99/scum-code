@@ -1,14 +1,28 @@
-from typing import Any
+"""The polynomial regression class performs a polynomial regression with the
+given degree on the given data.
+
+y = a0 + a1 * x + a2 * x^2 + ...
+"""
 
 import numpy as np
 
+from utils.regression.regression import Regression
 
-class PolynomialRegression:
+
+class PolynomialRegression(Regression):
     """Performs a polynomial regression."""
 
     def __init__(self, x: np.ndarray, y: np.ndarray, degree: int):
-        self.coeffs, self.residuals = self._perform_polynomial_regression(
-            x, y, degree)
+        self.degree = degree
+        self.coeffs = None  # type: np.ndarray
+        self.residuals = 0
+        super().__init__(x, y)
+
+    @property
+    def r_squared(self) -> float:
+        """Coefficient of determination."""
+        total_sum_squares = np.linalg.norm(self.y - np.mean(self.y))**2
+        return 1 - self.residuals / total_sum_squares
 
     @property
     def coefficients(self) -> float:
@@ -18,7 +32,7 @@ class PolynomialRegression:
         """
         return self.coeffs
 
-    def evaluate(self, x: Any) -> Any:
+    def evaluate(self, x: float | np.ndarray) -> float | np.ndarray:
         """Evaluates the polynomial regression at the given x-values.
 
         Args:
@@ -27,25 +41,18 @@ class PolynomialRegression:
         Returns:
             The y-values corresponding to the x-values.
         """
-        powers = np.arange(len(self.coefficients))
+        powers = np.arange(len(self.coeffs))
         powers_of_x = x**powers[:, np.newaxis]
         return np.dot(self.coeffs, powers_of_x)
 
-    @staticmethod
-    def _perform_polynomial_regression(x: np.ndarray, y: np.ndarray,
-                                       degree: int) -> tuple[np.ndarray, float]:
+    def _perform_regression(self) -> None:
         """Performs a polynomial regression.
 
-        Args:
-            x: x-values of the data.
-            y: y-values of the data.
-
-        Returns:
-            (coefficients, residuals), where coefficients are the polynomial
-            coefficients.
+        This function sets coefficients and residuals, where coefficients are
+        the polynomial coefficients.
         """
-        powers = np.arange(degree + 1)
-        A = (x**powers[:, np.newaxis]).T
-        result, residuals = np.linalg.lstsq(A, y, rcond=None)[:2]
-        coefficients = np.squeeze(result)
-        return coefficients, residuals[0] if len(residuals) > 0 else 0
+        powers = np.arange(self.degree + 1)
+        A = (self.x**powers[:, np.newaxis]).T
+        result, residuals = np.linalg.lstsq(A, self.y, rcond=None)[:2]
+        self.coeffs = np.squeeze(result)
+        self.residuals = residuals[0] if len(residuals) > 0 else 0

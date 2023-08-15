@@ -6,6 +6,7 @@ py_library(
     name = "exponential_regression",
     srcs = ["exponential_regression.py"],
     deps = [
+        ":regression",
         requirement("absl-py"),
         requirement("numpy"),
         requirement("scipy"),
@@ -15,17 +16,30 @@ py_library(
 py_library(
     name = "linear_regression",
     srcs = ["linear_regression.py"],
-    deps = [requirement("numpy")],
-)
+    deps = [
+        ":regression",
+        requirement("numpy"),
+    ],)
 
 py_library(
     name = "parabolic_regression",
     srcs = ["parabolic_regression.py"],
-    deps = [requirement("numpy")],
-)
+    deps = [
+        ":polynomial_regression",
+        requirement("numpy"),
+    ],)
 
 py_library(
     name = "polynomial_regression",
     srcs = ["polynomial_regression.py"],
+    deps = [
+        ":regression",
+        requirement("numpy"),
+    ],
+)
+
+py_library(
+    name = "regression",
+    srcs = ["regression.py"],
     deps = [requirement("numpy")],
 )

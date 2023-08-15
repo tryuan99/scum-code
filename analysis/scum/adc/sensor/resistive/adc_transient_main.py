@@ -30,22 +30,26 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     # Perform an exponential regression.
     exponential_regression = adc_data.perform_exponential_regression()
     tau_exponential = exponential_regression.time_constant
+    r_squared_exponential = exponential_regression.r_squared
     logging.info("Exponential regression:")
-    logging.info("tau = %f", tau_exponential)
+    logging.info("tau = %f, r^2 = %f", tau_exponential, r_squared_exponential)
     logging.info("C = %g, R = %g", capacitance, tau_exponential / capacitance)
 
     # Perform a linear regression in log space.
     linear_regression = adc_data.perform_linear_regression()
     tau_linear = -1 / linear_regression.slope
+    r_squared_linear = linear_regression.r_squared
     logging.info("Linear regression:")
-    logging.info("tau = %f", tau_linear)
+    logging.info("tau = %f, r^2 = %f", tau_linear, r_squared_linear)
     logging.info("C = %g, R = %g", capacitance, tau_linear / capacitance)
 
     # Perform a weighted linear regression in log space.
     weighted_linear_regression = adc_data.perform_weighted_linear_regression()
     tau_weighted_linear = -1 / weighted_linear_regression.slope
+    r_squared_weighted_linear = weighted_linear_regression.r_squared
     logging.info("Weighted linear regression:")
-    logging.info("tau = %f", tau_weighted_linear)
+    logging.info("tau = %f, r^2 = %f", tau_weighted_linear,
+                 r_squared_weighted_linear)
     logging.info("C = %g, R = %g", capacitance,
                  tau_weighted_linear / capacitance)
 
@@ -53,8 +57,9 @@ def plot_transient_adc_data(data: str, sampling_rate: float,
     polynomial_regression = adc_data.perform_polynomial_regression()
     tau_polynomial = -polynomial_regression.coefficients[
         0] / polynomial_regression.coefficients[1]
+    r_squared_polynomial = polynomial_regression.r_squared
     logging.info("Polynomial regression:")
-    logging.info("tau = %f", tau_polynomial)
+    logging.info("tau = %f, r^2 = %f", tau_polynomial, r_squared_polynomial)
     logging.info("C = %g, R = %g", capacitance, tau_polynomial / capacitance)
 
     # Plot the transient ADC data in linear and log space.

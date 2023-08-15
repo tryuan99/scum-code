@@ -3,66 +3,43 @@
 y = mx + b
 """
 
-from typing import Any
-
 import numpy as np
 
+from utils.regression.polynomial_regression import PolynomialRegression
 
-class LinearRegression:
+
+class LinearRegression(PolynomialRegression):
     """Performs a linear regression."""
 
     def __init__(self, x: np.ndarray, y: np.ndarray):
-        self.m, self.b, self.residuals = self._perform_linear_regression(x, y)
+        super().__init__(x, y, 1)
 
     @property
     def slope(self) -> float:
         """Slope of the linear regression."""
-        return self.m
+        return self.coefficients[1]
 
     @property
     def y_intercept(self) -> float:
         """y-intercept of the linear regression."""
-        return self.b
-
-    def evaluate(self, x: Any) -> Any:
-        """Evaluates the linear regression at the given x-values.
-
-        Args:
-            x: x-values.
-
-        Returns:
-            The y-values corresponding to the x-values.
-        """
-        return self.m * x + self.b
-
-    @staticmethod
-    def _perform_linear_regression(x: np.ndarray,
-                                   y: np.ndarray) -> tuple[float, float, float]:
-        """Performs a linear regression.
-
-        Args:
-            x: x-values of the data.
-            y: y-values of the data.
-
-        Returns:
-            (m, b, residuals), where m is the slope and b is the y-intercept.
-        """
-        A = (x**np.arange(2)[:, np.newaxis]).T
-        result, residuals = np.linalg.lstsq(A, y, rcond=None)[:2]
-        b, m = np.squeeze(result)
-        return m, b, residuals[0] if len(residuals) > 0 else 0
+        return self.coefficients[0]
 
 
 class WeightedLinearRegression(LinearRegression):
     """Performs a linear regression with weighted least squares."""
 
     def __init__(self, x: np.ndarray, y: np.ndarray, weights: np.ndarray):
-        self.x = np.copy(x)
-        self.y = np.copy(y)
         self.weights = np.copy(weights)
         assert np.all(self.weights >= 0)
-        self.m, self.b, self.residuals = self._perform_weighted_linear_regression(
-            self.x, self.y, self.weights)
+        super().__init__(x, y)
+
+    @property
+    def r_squared(self) -> float:
+        """Coefficient of determination."""
+        W = np.sqrt(self.weights)
+        y_weighted = self.y * W
+        total_sum_squares = np.linalg.norm(y_weighted - np.mean(y_weighted))**2
+        return 1 - self.residuals / total_sum_squares
 
     @property
     def x_mean(self):
@@ -90,25 +67,17 @@ class WeightedLinearRegression(LinearRegression):
         """
         return 1 / np.sum(self.weights) + self.slope_variance * self.x_mean**2
 
-    @staticmethod
-    def _perform_weighted_linear_regression(
-            x: np.ndarray, y: np.ndarray,
-            weights: np.ndarray) -> tuple[float, float, float]:
+    def _perform_regression(self) -> None:
         """Performs a linear regression with weighted least squares.
 
-        Args:
-            x: x-values of the data.
-            y: y-values of the data.
-            weights: Weights for each sample.
-
-        Returns:
-            (m, b, residuals), where m is the slope and b is the y-intercept.
+        This function sets m, b, and residuals, where m is the slope and b is
+        the y-intercept.
         """
-        A = (x**np.arange(2)[:, np.newaxis]).T
-        W = np.sqrt(weights)
+        A = (self.x**np.arange(2)[:, np.newaxis]).T
+        W = np.sqrt(self.weights)
         A_weighted = A * W[:, np.newaxis]
-        y_weighted = y * W
+        y_weighted = self.y * W
         result, residuals = np.linalg.lstsq(A_weighted, y_weighted,
                                             rcond=None)[:2]
-        b, m = np.squeeze(result)
-        return m, b, residuals[0] if len(residuals) > 0 else 0
+        self.coeffs = np.squeeze(result)
+        self.residuals = residuals[0] if len(residuals) > 0 else 0

@@ -1,20 +1,24 @@
-"""The exponential regression class performs a exponential regression on the given data.
+"""The exponential regression class performs a exponential regression on the
+given data.
 
 y = a * exp(-x/tau) + b
 """
-
-from typing import Any
 
 import numpy as np
 import scipy.optimize
 from absl import logging
 
+from utils.regression.regression import Regression
 
-class ExponentialRegression:
+
+class ExponentialRegression(Regression):
     """Performs an exponential regression."""
 
     def __init__(self, x: np.ndarray, y: np.ndarray):
-        self.a, self.tau, self.b = self._perform_exponential_regression(x, y)
+        self.a = 0
+        self.tau = 0
+        self.b = 0
+        super().__init__(x, y)
 
     @property
     def time_constant(self) -> float:
@@ -26,7 +30,7 @@ class ExponentialRegression:
         """Returns the offset."""
         return self.b
 
-    def evaluate(self, x: Any) -> Any:
+    def evaluate(self, x: float | np.ndarray) -> float | np.ndarray:
         """Evaluates the exponential regression at the given x-values.
 
         Args:
@@ -37,25 +41,19 @@ class ExponentialRegression:
         """
         return self.a * np.exp(-1 / self.tau * x) + self.b
 
-    @staticmethod
-    def _perform_exponential_regression(
-            x: np.ndarray, y: np.ndarray) -> tuple[float, float, float]:
+    def _perform_regression(self) -> None:
         """Performs an exponential regression.
 
-        Args:
-            x: x-values of the data.
-            y: y-values of the data.
-
-        Returns:
-            (a, tau, b), where y = a * exp(-x/tau) + b are the coefficients of
-            the exponential.
+        This function sets a, tau, and b, where y = a * exp(-x/tau) + b are the
+        coefficients of the exponential.
         """
-        A = np.vstack([x, np.ones(len(x))]).T
-        result = np.squeeze(np.linalg.lstsq(A, np.log(y), rcond=None)[0])
+        A = np.vstack([self.x, np.ones(len(self.x))]).T
+        result = np.squeeze(np.linalg.lstsq(A, np.log(self.y), rcond=None)[0])
         tau_guess, a_guess, b_guess = -1 / result[0], np.exp(result[1]), 0
 
         # Use an optimizer to find the optimal parameters of the exponential.
-        # TODO(titan): Debug why this does not quite work for increasing exponentials.
+        # TODO(titan): Debug why this does not quite work for increasing
+        # exponentials.
         def cost(params: np.ndarray):
             """Calculates how well the exponential fits the given data.
 
@@ -63,10 +61,11 @@ class ExponentialRegression:
                 params: Three-dimensional vector consisting of (a, tau, b).
 
             Returns:
-                The squared cost between the given exponential and the given data.
+                The squared cost between the given exponential and the given
+                data.
             """
             a, tau, b = params
-            return np.linalg.norm(a * np.exp(-1 / tau * x) + b - y)
+            return np.linalg.norm(a * np.exp(-1 / tau * self.x) + b - self.y)
 
         optimization_results = scipy.optimize.minimize(
             cost,
@@ -77,4 +76,4 @@ class ExponentialRegression:
         if not optimization_results.success:
             logging.warning("Optimization failed with message: %s",
                             optimization_results.message)
-        return optimization_results.x
+        self.a, self.tau, self.b = optimization_results.x

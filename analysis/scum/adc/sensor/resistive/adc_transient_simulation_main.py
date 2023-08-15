@@ -119,23 +119,31 @@ def plot_single_transient_adc_data(tau: float, sampling_rate: float) -> None:
     # Perform an exponential regression.
     exponential_regression = adc_data.perform_exponential_regression()
     tau_exponential = exponential_regression.time_constant
-    logging.info("Exponential regression: tau = %f", tau_exponential)
+    r_squared_exponential = exponential_regression.r_squared
+    logging.info("Exponential regression: tau = %f, r^2 = %f", tau_exponential,
+                 r_squared_exponential)
 
     # Perform a linear regression in log space.
     linear_regression = adc_data.perform_linear_regression()
     tau_linear = -1 / linear_regression.slope
-    logging.info("Linear regression: tau = %f", tau_linear)
+    r_squared_linear = linear_regression.r_squared
+    logging.info("Linear regression: tau = %f, r^2 = %f", tau_linear,
+                 r_squared_linear)
 
     # Perform a weighted linear regression in log space.
     weighted_linear_regression = adc_data.perform_weighted_linear_regression()
     tau_weighted_linear = -1 / weighted_linear_regression.slope
-    logging.info("Weighted linear regression: tau = %f", tau_weighted_linear)
+    r_squared_weighted_linear = weighted_linear_regression.r_squared
+    logging.info("Weighted linear regression: tau = %f, r^2 = %f",
+                 tau_weighted_linear, r_squared_weighted_linear)
 
     # Perform a polynomial regression.
     polynomial_regression = adc_data.perform_polynomial_regression()
     tau_polynomial = -polynomial_regression.coefficients[
         0] / polynomial_regression.coefficients[1]
-    logging.info("Polynomial regression: tau = %f", tau_polynomial)
+    r_squared_polynomial = polynomial_regression.r_squared
+    logging.info("Polynomial regression: tau = %f, r^2 = %f", tau_polynomial,
+                 r_squared_polynomial)
 
     # Plot the transient ADC data in linear and log space.
     n = np.arange(len(adc_output))
