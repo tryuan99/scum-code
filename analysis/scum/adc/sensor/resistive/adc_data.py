@@ -12,7 +12,7 @@ from utils.regression.polynomial_regression import PolynomialRegression
 NUM_ADC_SAMPLE_BITS = 10
 
 # Maximum difference in LSBs between consecutive ADC samples.
-MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES = 64  # LSBs
+MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES = 100  # LSBs
 
 # Number of ADC samples to average at the end to find the minimum ADC output.
 NUM_AVERAGES_FOR_MIN_ADC_OUTPUT = 10

@@ -5,7 +5,10 @@ filegroup(
     srcs = [
         "adc_data_resistor_10M_1.csv",
         "adc_data_resistor_10M_2.csv",
-        "adc_data_resistor_10M_multiple_1.csv",
+        "adc_data_resistor_10M_multiple.csv",
+        "adc_data_resistor_2_2M_multiple.csv",
+        "adc_data_resistor_4_7M_multiple.csv",
+        "adc_data_resistor_8M_multiple.csv",
         "adc_data_thermistor_3a_1.csv",
         "adc_data_thermistor_3a_2.csv",
         "adc_data_thermistor_3a_3.csv",
