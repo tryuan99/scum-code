@@ -26,6 +26,15 @@ py_binary(
 )
 
 py_binary(
+    name = "adc_transient_multiple_cleanup_main",
+    srcs = ["adc_transient_multiple_cleanup_main.py"],
+    deps = [
+        requirement("absl-py"),
+        requirement("pandas"),
+    ],
+)
+
+py_binary(
     name = "adc_transient_simulation_main",
     srcs = ["adc_transient_simulation_main.py"],
     deps = [
