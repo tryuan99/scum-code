@@ -123,12 +123,17 @@ def plot_multiple_transient_adc_data(data: str, sampling_rate: float,
     ) = df.columns
     logging.info(df.describe())
 
-    tau_exponential = []
-    tau_linear = []
-    tau_weighted_linear = []
-    fig, ax = plt.subplots(figsize=(12, 8))
     iterations = df.groupby(iteration_column)
-    for _, group in iterations:
+    tau_exponential = np.zeros(len(iterations))
+    tau_linear = np.zeros(len(iterations))
+    tau_weighted_linear = np.zeros(len(iterations))
+    tau_polynomial = np.zeros(len(iterations))
+    r_squared_exponential = np.zeros(len(iterations))
+    r_squared_linear = np.zeros(len(iterations))
+    r_squared_weighted_linear = np.zeros(len(iterations))
+    r_squared_polynomial = np.zeros(len(iterations))
+    fig, ax = plt.subplots(figsize=(12, 8))
+    for iteration_index, (_, group) in enumerate(iterations):
         adc_data = ExponentialAdcData(group[adc_output_column], sampling_rate)
         adc_data.disambiguate_msb_9()
 
@@ -138,12 +143,21 @@ def plot_multiple_transient_adc_data(data: str, sampling_rate: float,
         # Estimate tau using an exponential regression, a linear regression in
         # log space, and a weighted linear regression in log space.
         exponential_regression = adc_data.perform_exponential_regression()
-        tau_exponential.append(exponential_regression.time_constant)
+        tau_exponential[iteration_index] = exponential_regression.time_constant
+        r_squared_exponential[
+            iteration_index] = exponential_regression.r_squared
         linear_regression = adc_data.perform_linear_regression()
-        tau_linear.append(-1 / linear_regression.slope)
+        tau_linear[iteration_index] = -1 / linear_regression.slope
+        r_squared_linear = linear_regression.r_squared
         weighted_linear_regression = adc_data.perform_weighted_linear_regression(
         )
-        tau_weighted_linear.append(-1 / weighted_linear_regression.slope)
+        tau_weighted_linear[
+            iteration_index] = -1 / weighted_linear_regression.slope
+        r_squared_weighted_linear = weighted_linear_regression.r_squared
+        polynomial_regression = adc_data.perform_polynomial_regression()
+        tau_polynomial[iteration_index] = -polynomial_regression.coefficients[
+            0] / polynomial_regression.coefficients[1]
+        r_squared_polynomial[iteration_index] = polynomial_regression.r_squared
     ax.set_title("Transient ADC output")
     ax.set_xlabel("ADC samples")
     ax.set_ylabel("ADC output [LSB]")
@@ -151,12 +165,21 @@ def plot_multiple_transient_adc_data(data: str, sampling_rate: float,
 
     # Calculate the mean and standard deviation of the estimated taus.
     logging.info("Num iterations: %d", len(iterations))
-    logging.info("Exponential regression: mean tau = %f, stddev = %f",
-                 np.mean(tau_exponential), np.std(tau_exponential))
-    logging.info("Linear regression: mean tau = %f, stddev = %f",
-                 np.mean(tau_linear), np.std(tau_linear))
-    logging.info("Weighted linear regression: mean tau = %f, stddev = %f",
-                 np.mean(tau_weighted_linear), np.std(tau_weighted_linear))
+    logging.info(
+        "Exponential regression: mean tau = %f, stddev tau = %f, mean r^2 = %f",
+        np.mean(tau_exponential), np.std(tau_exponential),
+        np.mean(r_squared_exponential))
+    logging.info(
+        "Linear regression: mean tau = %f, stddev tau = %f, mean r^2 = %f",
+        np.mean(tau_linear), np.std(tau_linear), np.mean(r_squared_linear))
+    logging.info(
+        "Weighted linear regression: mean tau = %f, stddev tau = %f, mean r^2 = %f",
+        np.mean(tau_weighted_linear), np.std(tau_weighted_linear),
+        np.mean(r_squared_weighted_linear))
+    logging.info(
+        "Polynomial regression: mean tau = %f, stddev tau = %f, mean r^2 = %f",
+        np.mean(tau_polynomial), np.std(tau_polynomial),
+        np.mean(r_squared_polynomial))
 
 
 def main(argv):
