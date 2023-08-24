@@ -1,0 +1,38 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "ph_pwm_ramp_data",
+    srcs = ["ph_pwm_ramp_data.py"],
+    deps = [
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+        requirement("scipy"),
+    ],
+)
+
+py_binary(
+    name = "ph_pwm_ramp_main",
+    srcs = ["ph_pwm_ramp_main.py"],
+    data = ["//analysis/scum/adc/sensor/ph/data:ph_sensor_data"],
+    deps = [
+        ":ph_pwm_ramp_data",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+    ],
+)
+
+py_binary(
+    name = "ph_pwm_ramp_comparison_main",
+    srcs = ["ph_pwm_ramp_comparison_main.py"],
+    data = ["//analysis/scum/adc/sensor/ph/data:ph_sensor_data"],
+    deps = [
+        ":ph_pwm_ramp_data",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+    ],
+)

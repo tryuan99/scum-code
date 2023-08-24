@@ -1,0 +1,17 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "ph_sensor_data",
+    srcs = [
+        "ph4_1.csv",
+        "ph4_2.csv",
+        "ph4_3.csv",
+        "ph5_1.csv",
+        "ph5_2.csv",
+        "ph5_2a.csv",
+        "ph5_3.csv",
+        "ph7_1.csv",
+        "ph7_2.csv",
+        "ph7_3.csv",
+    ],
+)
