@@ -58,3 +58,15 @@ py_binary(
         requirement("pandas"),
     ],
 )
+
+py_binary(
+    name = "time_constants_main",
+    srcs = ["time_constants_main.py"],
+    data = ["//analysis/scum/adc/sensor/resistive/data:time_constants_data"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+    ],
+)

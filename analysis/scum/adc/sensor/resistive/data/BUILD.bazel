@@ -22,3 +22,8 @@ filegroup(
         "adc_data_thermistor_3b_multiple_2.csv",
     ],
 )
+
+filegroup(
+    name = "time_constants_data",
+    srcs = ["time_constants_resistor.csv"],
+)
