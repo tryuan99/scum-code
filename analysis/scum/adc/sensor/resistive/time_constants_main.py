@@ -5,8 +5,11 @@ from absl import app, flags, logging
 
 FLAGS = flags.FLAGS
 
-# Time constant columm name.
-TIME_CONSTANT_COLUMN = "Time constant [s]"
+# Actual time constant columm name.
+ACTUAL_TIME_CONSTANT_COLUMN = "Actual time constant [s]"
+
+# Estimated time constant columm name.
+ESTIMATED_TIME_CONSTANT_COLUMN = "Estimated time constant [s]"
 
 
 def plot_time_constants(data: str, sampling_rate: float,
@@ -27,35 +30,42 @@ def plot_time_constants(data: str, sampling_rate: float,
         time_constant_column,
         time_constant_scaling_factor_column,
     ) = df.columns
-    df[TIME_CONSTANT_COLUMN] = (df[time_constant_column] /
-                                df[time_constant_scaling_factor_column])
+    df[ACTUAL_TIME_CONSTANT_COLUMN] = df[resistance_column] * 1e6 * capacitance
+    df[ESTIMATED_TIME_CONSTANT_COLUMN] = (
+        df[time_constant_column] / df[time_constant_scaling_factor_column])
     logging.info(df.describe())
 
-    time_constant_by_resistance = df.groupby(resistance_column)
-    logging.info(time_constant_by_resistance.describe())
+    time_constants = df.groupby(ACTUAL_TIME_CONSTANT_COLUMN)
+    logging.info(time_constants.describe())
 
-    # Plot the mean time constant as a function of the resistance.
+    # Plot the mean estimated time constant.
     fig, ax = plt.subplots(figsize=(12, 8))
-    time_constant_by_resistance.mean().plot.line(y=TIME_CONSTANT_COLUMN,
-                                                 ax=ax,
-                                                 label="Measured (mean)")
-    resistances = df[resistance_column].unique()
-    ax.plot(resistances, resistances * 1e6 * capacitance, label="Ideal")
-    ax.set_title(f"Mean estimated time constant (C={capacitance * 1e9:.1f} nF)")
+    time_constants.mean().plot.line(y=ESTIMATED_TIME_CONSTANT_COLUMN,
+                                    ax=ax,
+                                    label="Estimated")
+    actual_time_constants = df[ACTUAL_TIME_CONSTANT_COLUMN].unique()
+    ax.plot(actual_time_constants, actual_time_constants, "--", label="Actual")
+    ax.set_title("Mean estimated time constant")
     ax.set_ylabel("Time constant [s]")
     plt.legend()
     plt.show()
 
-    # Plot the standard deviation of the estimated time constant as a function
-    # of the resistance.
+    # Plot the error of the mean estimated time constant.
     fig, ax = plt.subplots(figsize=(12, 8))
-    time_constant_by_resistance.std().plot.line(y=TIME_CONSTANT_COLUMN,
-                                                ax=ax,
-                                                label="Measured")
-    ax.set_title(f"Standard deviation of the estimated time constant "
-                 f"(C={capacitance * 1e9:.1f} nF)")
-    ax.set_ylabel("Standard deviation [s]")
+    ax.plot(time_constants.mean()[ESTIMATED_TIME_CONSTANT_COLUMN] -
+            time_constants.mean().index,
+            label="Estimated - actual")
+    ax.set_title("Error of the mean estimated time constant")
+    ax.set_xlabel("Actual time constant [s]")
+    ax.set_ylabel("Difference in time constant [s]")
     plt.legend()
+    plt.show()
+
+    # Plot the standard deviation of the estimated time constant.
+    fig, ax = plt.subplots(figsize=(12, 8))
+    time_constants.std().plot.line(y=ESTIMATED_TIME_CONSTANT_COLUMN, ax=ax)
+    ax.set_title("Standard deviation of the estimated time constant")
+    ax.set_ylabel("Standard deviation [s]")
     plt.show()
 
 
