@@ -20,7 +20,7 @@ NUM_STDDEVS_TO_PLOT = 5
 NUM_SAMPLES_PER_RESIDUALS = 5
 
 # Time constants to simulate.
-TAUS = np.arange(0.5, 21, 0.5)
+TAUS = np.arange(0.5, 10.5, 0.5)
 
 # Number of simulations per time constant.
 NUM_SIMULATIONS_PER_TAU = 100
@@ -28,7 +28,7 @@ NUM_SIMULATIONS_PER_TAU = 100
 
 def _generate_transient_adc_data(tau: float,
                                  sampling_rate: float,
-                                 num_taus: float = 5) -> np.ndarray:
+                                 num_taus: float = 7) -> np.ndarray:
     """Generates an exponentially decaying ADC data with the given time constant.
 
     Args:

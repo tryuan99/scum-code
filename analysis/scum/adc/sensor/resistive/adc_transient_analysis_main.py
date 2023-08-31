@@ -19,7 +19,7 @@ TAU_FACTORS = [0, 0.5, 1, 1.5, 2, 2.5, 3]
 
 def _generate_transient_adc_data(tau: float,
                                  sampling_rate: float,
-                                 num_taus: float = 5) -> np.ndarray:
+                                 num_taus: float = 7) -> np.ndarray:
     """Generates an exponentially decaying ADC data with the given time constant.
 
     Args:

@@ -15,7 +15,7 @@ NUM_ADC_SAMPLE_BITS = 10
 MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES = 100  # LSBs
 
 # Number of ADC samples to average at the end to find the minimum ADC output.
-NUM_AVERAGES_FOR_MIN_ADC_OUTPUT = 10
+NUM_AVERAGES_FOR_MIN_ADC_OUTPUT = 100
 
 # Empirically determined scaling factor of the exponential measured by SCuM.
 EXPONENTIAL_SCALING_FACTOR = 870
@@ -111,6 +111,8 @@ class ExponentialAdcData:
         Returns:
             The pre-processed ADC samples.
         """
+        # Subtracting the minimum ADC output is the main source of error
+        # between the simulation and the theory/approximations.
         return np.log(self.samples - self.min_adc_output)
 
     def perform_linear_regression(self) -> LinearRegression:
