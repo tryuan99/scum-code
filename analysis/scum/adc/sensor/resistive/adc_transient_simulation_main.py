@@ -10,6 +10,9 @@ from utils.regression.linear_regression import (LinearRegression,
 
 FLAGS = flags.FLAGS
 
+# Number of taus for which to generate ADC samples.
+NUM_TAUS = 7
+
 # Offset of the decaying exponential.
 EXPONENTIAL_OFFSET = 127
 
@@ -18,6 +21,15 @@ NUM_STDDEVS_TO_PLOT = 5
 
 # Number of samples for which to calculate the residuals.
 NUM_SAMPLES_PER_RESIDUALS = 5
+
+# Number of simulations for the PDF.
+NUM_SIMULATIONS_FOR_PDF = 50000
+
+# Step size when simulating the PDF.
+PDF_STEP = 0.0001
+
+# Maximum absolute value of the PDF sample.
+MAX_ABSOLUTE_PDF_SAMPLE = 10
 
 # Time constants to simulate.
 TAUS = np.arange(0.5, 10.5, 0.5)
@@ -28,7 +40,7 @@ NUM_SIMULATIONS_PER_TAU = 100
 
 def _generate_transient_adc_data(tau: float,
                                  sampling_rate: float,
-                                 num_taus: float = 7) -> np.ndarray:
+                                 num_taus: float = NUM_TAUS) -> np.ndarray:
     """Generates an exponentially decaying ADC data with the given time constant.
 
     Args:
@@ -73,13 +85,13 @@ def _analyze_weighted_linear_regression(
                     slope_mean + NUM_STDDEVS_TO_PLOT * slope_stddev, 10000)
     slope_pdf = 1 / (np.sqrt(2 * np.pi) * slope_stddev) * np.exp(
         -1 / 2 * (x - slope_mean)**2 / slope_stddev**2)
-    plt.plot(x,
-             slope_pdf,
-             label=f"Mean={slope_mean:.3f}, stddev={slope_stddev:.3f}")
+    ax.plot(x,
+            slope_pdf,
+            label=f"Mean={slope_mean:.3f}, stddev={slope_stddev:.3f}")
     ax.set_title("Distribution of the slope (1 / time constant)")
     ax.set_xlabel("Slope")
     ax.set_ylabel("Probability density")
-    plt.legend()
+    ax.legend()
     plt.show()
 
     # Plot the distribution of the time constant of the weighted linear regression.
@@ -96,17 +108,17 @@ def _analyze_weighted_linear_regression(
     tau_pdf = 1 / (np.sqrt(2 * np.pi) * slope_stddev) * np.exp(
         -1 / 2 * (1 / x - slope_mean)**2 / slope_stddev**2)
     tau_pdf /= np.sum(tau_pdf) * step
-    plt.plot(x, tau_pdf, label=f"Mean={tau_mean:.3f}, stddev={tau_stddev:.3f}")
+    ax.plot(x, tau_pdf, label=f"Mean={tau_mean:.3f}, stddev={tau_stddev:.3f}")
     tau_pdf_approximated = 1 / (np.sqrt(2 * np.pi) * tau_stddev) * np.exp(
         -1 / 2 * (x - tau_mean)**2 / tau_stddev**2)
-    plt.plot(
+    ax.plot(
         x,
         tau_pdf_approximated,
         label=f"Mean={tau_mean:.3f}, stddev={tau_stddev:.3f} (approximated)")
     ax.set_title("Distribution of the time constant")
     ax.set_xlabel("Time constant")
     ax.set_ylabel("Probability density")
-    plt.legend()
+    ax.legend()
     plt.show()
 
 
@@ -171,22 +183,22 @@ def _compare_linear_regressions_sse(
 
     # Plot the binned residuals.
     fig, ax = plt.subplots(figsize=(12, 8))
-    plt.plot(bin_indices,
-             residuals_bins_linear,
-             label="Linear regression residuals")
-    plt.plot(bin_indices,
-             residuals_bins_weighted_linear,
-             label="Weighted linear regression residuals")
+    ax.plot(bin_indices,
+            residuals_bins_linear,
+            label="Linear regression residuals")
+    ax.plot(bin_indices,
+            residuals_bins_weighted_linear,
+            label="Weighted linear regression residuals")
     ax.set_title("Linear regression residuals of the binned ADC samples")
     ax.set_xlabel("ADC sample bins")
     ax.set_ylabel("Residuals")
     ax.xaxis.set_major_formatter(FuncFormatter(_bin_axis_formatter))
-    plt.legend()
+    ax.legend()
     plt.show()
 
     # Plot the difference between the binned residuals.
     fig, ax = plt.subplots(figsize=(12, 8))
-    plt.plot(
+    ax.plot(
         bin_indices,
         residuals_bins_linear - residuals_bins_weighted_linear,
         label=
@@ -197,7 +209,7 @@ def _compare_linear_regressions_sse(
     ax.set_xlabel("ADC sample bins")
     ax.set_ylabel("Difference in residuals")
     ax.xaxis.set_major_formatter(FuncFormatter(_bin_axis_formatter))
-    plt.legend()
+    ax.legend()
     plt.show()
 
 
@@ -288,6 +300,84 @@ def plot_single_transient_adc_data(tau: float, sampling_rate: float) -> None:
     # weighted linear regression.
     _compare_linear_regressions_sse(linear_regression,
                                     weighted_linear_regression, adc_data)
+
+
+def plot_transient_adc_data_distribution(tau: float,
+                                         sampling_rate: float) -> None:
+    """Plots the distribution of the ADC data samples
+
+    Args:
+        tau: Time constant in seconds.
+        sampling_rate: Sampling rate in Hz.
+    """
+    adc_output_length = int(NUM_TAUS * sampling_rate * tau)
+    adc_output = np.zeros((NUM_SIMULATIONS_FOR_PDF, adc_output_length))
+    log_adc_output = np.zeros((NUM_SIMULATIONS_FOR_PDF, adc_output_length))
+    for i in range(NUM_SIMULATIONS_FOR_PDF):
+        adc_output[i] = _generate_transient_adc_data(tau, sampling_rate)
+        adc_data = ExponentialAdcData(adc_output[i], sampling_rate)
+        log_adc_output[i] = adc_data.get_linear_regression_samples()
+    t_axis = ExponentialAdcData(
+        _generate_transient_adc_data(tau, sampling_rate), sampling_rate).t_axis
+    tau_axis = t_axis / tau
+    tau_axis_indices = tau_axis < 3
+
+    # Plot the standard deviation of the ADC data.
+    adc_output_stddev = np.std(adc_output, axis=0)
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.plot(tau_axis[tau_axis_indices], adc_output_stddev[tau_axis_indices])
+    ax.set_title("Standard deviation of the ADC samples")
+    ax.set_xlabel("Time [tau]")
+    ax.set_ylabel("Standard deviation [LSB]")
+    plt.show()
+
+    # Calculate the the theoretical standard deviation of the log ADC data.
+    regression_length = int(3 * sampling_rate * tau)
+    log_adc_output_stddev_theoretical = np.zeros(regression_length)
+    for tau_index, tau in enumerate(tau_axis[tau_axis_indices]):
+        x = np.arange(-MAX_ABSOLUTE_PDF_SAMPLE, MAX_ABSOLUTE_PDF_SAMPLE,
+                      PDF_STEP)
+        pdf = 1 / (np.sqrt(2 * np.pi) * SIGMA) * np.exp(
+            -(EXPONENTIAL_SCALING_FACTOR**2 * np.exp(-2 * tau) *
+              (np.exp(x) - 1)**2) /
+            (2 * SIGMA**2)) * EXPONENTIAL_SCALING_FACTOR * np.exp(x - tau)
+        mean_pdf = np.sum(x * pdf * PDF_STEP)
+        mean_pdf_squared = np.sum(x**2 * pdf * PDF_STEP)
+        variance_pdf = mean_pdf_squared - mean_pdf**2
+        log_adc_output_stddev_theoretical[tau_index] = np.sqrt(variance_pdf)
+
+    # Plot the standard deviation of the log ADC data and its differences.
+    log_adc_output_stddev = np.std(log_adc_output, axis=0)
+    log_adc_output_stddev_approximated = SIGMA / EXPONENTIAL_SCALING_FACTOR * np.exp(
+        tau_axis[tau_axis_indices])
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 10), sharex=True)
+    ax1.plot(tau_axis[tau_axis_indices],
+             log_adc_output_stddev[tau_axis_indices],
+             label="Simulated")
+    ax1.plot(tau_axis[tau_axis_indices],
+             log_adc_output_stddev_theoretical,
+             label="Theoretical")
+    ax1.plot(tau_axis[tau_axis_indices],
+             log_adc_output_stddev_approximated,
+             label="Approximated")
+    ax1.set_title("Standard deviation of the log ADC samples")
+    ax1.set_xlabel("Time [tau]")
+    ax1.set_ylabel("Standard deviation")
+    ax1.legend()
+    ax2.plot(tau_axis[tau_axis_indices],
+             np.abs(log_adc_output_stddev[tau_axis_indices] -
+                    log_adc_output_stddev_theoretical),
+             label="Simulated - theoretical")
+    ax2.plot(tau_axis[tau_axis_indices],
+             np.abs(log_adc_output_stddev_approximated -
+                    log_adc_output_stddev_theoretical),
+             label="Approximated - theoretical")
+    ax2.set_title(
+        "Absolute difference in standard deviation of the log ADC samples")
+    ax2.set_xlabel("Time [tau]")
+    ax2.set_ylabel("Difference in standard deviation")
+    ax2.legend()
+    plt.show()
 
 
 def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
@@ -406,14 +496,14 @@ def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
     # Compare the standard deviation of the estimated slope with a weighted
     # linear regression with its approximation.
     fig, ax = plt.subplots(figsize=(12, 8))
-    plt.plot(1 / TAUS, slope_stddevs_weighted_linear, label="Simulated")
-    plt.plot(1 / TAUS,
-             np.sqrt(8 * SIGMA**2 /
-                     (EXPONENTIAL_SCALING_FACTOR**2 * sampling_rate * TAUS**3)),
-             label="Approximated")
-    plt.plot(1 / TAUS,
-             slope_stddevs_weighted_linear_theoretical,
-             label="Theoretical")
+    ax.plot(1 / TAUS, slope_stddevs_weighted_linear, label="Simulated")
+    ax.plot(1 / TAUS,
+            np.sqrt(8 * SIGMA**2 /
+                    (EXPONENTIAL_SCALING_FACTOR**2 * sampling_rate * TAUS**3)),
+            label="Approximated")
+    ax.plot(1 / TAUS,
+            slope_stddevs_weighted_linear_theoretical,
+            label="Theoretical")
     ax.set_title(
         "Standard deviation of the estimated slope with a weighted linear regression"
     )
@@ -447,11 +537,11 @@ def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
     # Compare the standard deviation of the estimated time constant with a
     # weighted linear regression with its approximation.
     fig, ax = plt.subplots(figsize=(12, 8))
-    plt.plot(TAUS, tau_stddevs_weighted_linear, label="Simulated")
-    plt.plot(TAUS,
-             np.sqrt(8 * SIGMA**2 * TAUS /
-                     (EXPONENTIAL_SCALING_FACTOR**2 * sampling_rate)),
-             label="Approximated")
+    ax.plot(TAUS, tau_stddevs_weighted_linear, label="Simulated")
+    ax.plot(TAUS,
+            np.sqrt(8 * SIGMA**2 * TAUS /
+                    (EXPONENTIAL_SCALING_FACTOR**2 * sampling_rate)),
+            label="Approximated")
     ax.set_title(
         "Standard deviation of the estimated time constant with a weighted linear regression"
     )
@@ -464,6 +554,7 @@ def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
 def main(argv):
     assert len(argv) == 1
     plot_single_transient_adc_data(FLAGS.tau, FLAGS.sampling_rate)
+    plot_transient_adc_data_distribution(FLAGS.tau, FLAGS.sampling_rate)
     plot_multiple_transient_adc_data_over_tau(FLAGS.sampling_rate)
 
 
