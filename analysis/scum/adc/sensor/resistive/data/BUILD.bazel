@@ -10,6 +10,7 @@ filegroup(
         "adc_data_resistor_2_2M_multiple.csv",
         "adc_data_resistor_4_7M_multiple.csv",
         "adc_data_resistor_8M_multiple.csv",
+        "adc_data_resistor_10k_multiple.csv",
         "adc_data_resistor_22k_multiple.csv",
         "adc_data_resistor_2s_multiple.csv",
         "adc_data_resistor_4s_multiple.csv",

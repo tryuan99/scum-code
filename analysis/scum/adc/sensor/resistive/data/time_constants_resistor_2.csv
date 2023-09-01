@@ -6,6 +6,18 @@
 # SCuM estimates the time constant with fixed-point numbers
 
 Resistance [MOhms],Number of ADC samples,Three tau index,Time constant,Time constant scaling factor
+# 10 kOhms
+0.00996,229,7,365,16384
+0.00996,172,8,364,16384
+0.00996,184,7,362,16384
+0.00996,223,8,365,16384
+0.00996,249,7,362,16384
+0.00996,242,7,359,16384
+0.00996,179,7,366,16384
+0.00996,239,8,372,16384
+0.00996,206,7,362,16384
+0.00996,178,7,364,16384
+
 # 22 kOhms
 0.0220,383,16,794,16384
 0.0220,232,15,786,16384
