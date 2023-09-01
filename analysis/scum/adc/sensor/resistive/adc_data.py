@@ -12,7 +12,7 @@ from utils.regression.polynomial_regression import PolynomialRegression
 NUM_ADC_SAMPLE_BITS = 10
 
 # Maximum difference in LSBs between consecutive ADC samples.
-MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES = 100  # LSBs
+MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES = 400  # LSBs
 
 # Number of ADC samples to average at the end to find the minimum ADC output.
 NUM_AVERAGES_FOR_MIN_ADC_OUTPUT = 100
@@ -71,13 +71,14 @@ class ExponentialAdcData:
             np.argwhere(
                 np.abs(np.diff(self.samples)) >
                 MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES))
-        self.samples[:np.min(diffs)] += correction
+        if len(diffs) > 0:
+            self.samples[:np.min(diffs)] += correction
 
-        # Debounce the ADC data at the discontinuities.
-        for i in range(np.min(diffs), np.max(diffs) + 1):
-            if self.samples[i] - self.samples[
-                    i - 1] < -MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES:
-                self.samples[i] += correction
+            # Debounce the ADC data at the discontinuities.
+            for i in range(np.min(diffs), np.max(diffs) + 1):
+                if self.samples[i] - self.samples[
+                        i - 1] < -MAX_DIFF_BETWEEN_CONSECUTIVE_ADC_SAMPLES:
+                    self.samples[i] += correction
 
     def filter_samples(self, cutoff_frequency: float = 10) -> None:
         """Filters the noise from the ADC data.
