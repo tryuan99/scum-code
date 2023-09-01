@@ -42,9 +42,13 @@ def plot_time_constants(data: str, sampling_rate: float,
     fig, ax = plt.subplots(figsize=(12, 8))
     time_constants.mean().plot.line(y=ESTIMATED_TIME_CONSTANT_COLUMN,
                                     ax=ax,
+                                    loglog=True,
                                     label="Estimated")
     actual_time_constants = df[ACTUAL_TIME_CONSTANT_COLUMN].unique()
-    ax.plot(actual_time_constants, actual_time_constants, "--", label="Actual")
+    ax.loglog(actual_time_constants,
+              actual_time_constants,
+              "--",
+              label="Actual")
     ax.set_title("Mean estimated time constant")
     ax.set_ylabel("Time constant [s]")
     plt.legend()
@@ -52,20 +56,43 @@ def plot_time_constants(data: str, sampling_rate: float,
 
     # Plot the error of the mean estimated time constant.
     fig, ax = plt.subplots(figsize=(12, 8))
-    ax.plot(time_constants.mean()[ESTIMATED_TIME_CONSTANT_COLUMN] -
-            time_constants.mean().index,
-            label="Estimated - actual")
+    ax.loglog(time_constants.mean()[ESTIMATED_TIME_CONSTANT_COLUMN] -
+              time_constants.mean().index,
+              label="Estimated - actual")
     ax.set_title("Error of the mean estimated time constant")
     ax.set_xlabel("Actual time constant [s]")
     ax.set_ylabel("Difference in time constant [s]")
     plt.legend()
     plt.show()
 
-    # Plot the standard deviation of the estimated time constant.
+    # Plot the percent error of the mean estimated time constant.
     fig, ax = plt.subplots(figsize=(12, 8))
-    time_constants.std().plot.line(y=ESTIMATED_TIME_CONSTANT_COLUMN, ax=ax)
-    ax.set_title("Standard deviation of the estimated time constant")
+    ax.semilogx(np.abs(time_constants.mean()[ESTIMATED_TIME_CONSTANT_COLUMN] -
+                       time_constants.mean().index) /
+                time_constants.mean().index * 100,
+                label="Percent error")
+    ax.set_title("Percent error of the mean estimated time constant")
+    ax.set_xlabel("Actual time constant [s]")
+    ax.set_ylabel("Percent error [%]")
+    plt.legend()
+    plt.show()
+
+    # Plot the standard error of the estimated time constant.
+    fig, ax = plt.subplots(figsize=(12, 8))
+    time_constants.std().plot.line(y=ESTIMATED_TIME_CONSTANT_COLUMN,
+                                   ax=ax,
+                                   loglog=True)
+    ax.set_title("Standard error of the estimated time constant")
     ax.set_ylabel("Standard deviation [s]")
+    plt.show()
+
+    # Plot the percent standard error of the estimated time constant.
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.semilogx(time_constants.std()[ESTIMATED_TIME_CONSTANT_COLUMN] /
+                time_constants.std().index * 100,
+                label="Percent standard error")
+    ax.set_title("Percent standard error of the estimated time constant")
+    ax.set_ylabel("Percent standard error [%]")
     plt.show()
 
 
@@ -77,9 +104,9 @@ def main(argv):
 if __name__ == "__main__":
     flags.DEFINE_string(
         "data",
-        "analysis/scum/adc/sensor/resistive/data/time_constants_resistor.csv",
+        "analysis/scum/adc/sensor/resistive/data/time_constants_resistor_2.csv",
         "Data filename.")
     flags.DEFINE_float("sampling_rate", 100, "Sampling rate in Hz.")
-    flags.DEFINE_float("capacitance", 50e-9, "Fixed capacitance in F.")
+    flags.DEFINE_float("capacitance", 2.1e-6, "Fixed capacitance in F.")
 
     app.run(main)

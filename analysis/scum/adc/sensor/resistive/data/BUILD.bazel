@@ -25,5 +25,8 @@ filegroup(
 
 filegroup(
     name = "time_constants_data",
-    srcs = ["time_constants_resistor.csv"],
+    srcs = [
+        "time_constants_resistor_1.csv",
+        "time_constants_resistor_2.csv",
+    ],
 )
