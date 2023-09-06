@@ -114,7 +114,8 @@ class ExponentialAdcData:
         """
         # Subtracting the minimum ADC output is the main source of error
         # between the simulation and the theory/approximations.
-        return np.log(self.samples - self.min_adc_output)
+        # return np.log(self.samples - self.min_adc_output)
+        return np.log(self.samples - 127)
 
     def perform_linear_regression(self) -> LinearRegression:
         """Performs a linear regression on the ADC data in log space.

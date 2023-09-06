@@ -39,7 +39,7 @@ def plot_time_constants(data: str, sampling_rate: float,
     logging.info(time_constants.describe())
 
     # Plot the mean estimated time constant.
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 6))
     time_constants.mean().plot.line(y=ESTIMATED_TIME_CONSTANT_COLUMN,
                                     ax=ax,
                                     loglog=True,
@@ -55,9 +55,9 @@ def plot_time_constants(data: str, sampling_rate: float,
     plt.show()
 
     # Plot the error of the mean estimated time constant.
-    fig, ax = plt.subplots(figsize=(12, 8))
-    ax.loglog(time_constants.mean()[ESTIMATED_TIME_CONSTANT_COLUMN] -
-              time_constants.mean().index,
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.loglog(np.abs(time_constants.mean()[ESTIMATED_TIME_CONSTANT_COLUMN] -
+                     time_constants.mean().index),
               label="Estimated - actual")
     ax.set_title("Error of the mean estimated time constant")
     ax.set_xlabel("Actual time constant [s]")
@@ -66,7 +66,7 @@ def plot_time_constants(data: str, sampling_rate: float,
     plt.show()
 
     # Plot the percent error of the mean estimated time constant.
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 6))
     ax.semilogx(np.abs(time_constants.mean()[ESTIMATED_TIME_CONSTANT_COLUMN] -
                        time_constants.mean().index) /
                 time_constants.mean().index * 100,
@@ -78,7 +78,7 @@ def plot_time_constants(data: str, sampling_rate: float,
     plt.show()
 
     # Plot the standard error of the estimated time constant.
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 6))
     time_constants.std().plot.line(y=ESTIMATED_TIME_CONSTANT_COLUMN,
                                    ax=ax,
                                    loglog=True)
@@ -87,7 +87,7 @@ def plot_time_constants(data: str, sampling_rate: float,
     plt.show()
 
     # Plot the percent standard error of the estimated time constant.
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 6))
     ax.semilogx(time_constants.std()[ESTIMATED_TIME_CONSTANT_COLUMN] /
                 time_constants.std().index * 100,
                 label="Percent standard error")

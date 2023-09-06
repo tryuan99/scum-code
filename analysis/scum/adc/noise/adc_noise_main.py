@@ -20,7 +20,7 @@ def plot_adc_data_histogram(data: str) -> None:
 
     # Plot the ADC data over time.
     adc_output = df[adc_output_column]
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(10, 4))
     adc_output.plot(ax=ax)
     ax.set_title("ADC output")
     ax.set_xlabel("Measurement index")
@@ -28,20 +28,25 @@ def plot_adc_data_histogram(data: str) -> None:
     plt.show()
 
     # Plot a histogram of the ADC data.
-    fig, ax = plt.subplots(figsize=(12, 8))
+    plt.rcParams.update({"font.size": 16})
+    fig, ax = plt.subplots(figsize=(12, 5))
     minimum_adc_output = adc_output.min()
     maximum_adc_output = adc_output.max()
     bins = np.arange(minimum_adc_output - 0.5, maximum_adc_output + 1)
-    adc_output.hist(ax=ax, bins=bins)
 
     # Plot the Gaussian fit.
     secax = ax.twinx()
     gaussian_fit = scipy.stats.norm.pdf(bins, adc_output.mean(),
                                         adc_output.std())
-    secax.plot(bins, gaussian_fit, "r")
+    for i in range(len(bins)):
+        print(f"{bins[i]},{gaussian_fit[i]}")
+    secax.plot(bins, gaussian_fit, "r", linestyle="--")
     secax.set_ylim(bottom=0)
-    ax.set_title("Histogram of the ADC data")
+    plt.ylabel("PDF")
+    ax.set_title(
+        "Histogram of the ADC data (mean=234.9 LSBs, stddev=4.54 LSBs)")
     ax.set_xlabel("ADC data [LSB]")
+    ax.set_ylabel("Count")
     plt.show()
 
 

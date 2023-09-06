@@ -32,10 +32,10 @@ PDF_STEP = 0.0001
 MAX_ABSOLUTE_PDF_SAMPLE = 10
 
 # Time constants to simulate.
-TAUS = np.arange(0.5, 10.5, 0.5)
+TAUS = 10**np.arange(-2, 1.01, 0.05)
 
 # Number of simulations per time constant.
-NUM_SIMULATIONS_PER_TAU = 100
+NUM_SIMULATIONS_PER_TAU = 1000
 
 
 def _generate_transient_adc_data(tau: float,
@@ -80,7 +80,7 @@ def _analyze_weighted_linear_regression(
     slope_stddev = np.sqrt(weighted_linear_regression.slope_variance)
     logging.info("Slope: mean = %f, stddev = %f", slope_mean, slope_stddev)
 
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 6))
     x = np.linspace(slope_mean - NUM_STDDEVS_TO_PLOT * slope_stddev,
                     slope_mean + NUM_STDDEVS_TO_PLOT * slope_stddev, 10000)
     slope_pdf = 1 / (np.sqrt(2 * np.pi) * slope_stddev) * np.exp(
@@ -100,7 +100,7 @@ def _analyze_weighted_linear_regression(
     tau_stddev = np.sqrt(tau_variance)
     logging.info("Time constant: mean = %f, stddev = %f", tau_mean, tau_stddev)
 
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 6))
     x, step = np.linspace(tau_mean - NUM_STDDEVS_TO_PLOT * tau_stddev,
                           tau_mean + NUM_STDDEVS_TO_PLOT * tau_stddev,
                           10000,
@@ -182,7 +182,7 @@ def _compare_linear_regressions_sse(
             bin_index] = residuals_bin_weighted_linear
 
     # Plot the binned residuals.
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 6))
     ax.plot(bin_indices,
             residuals_bins_linear,
             label="Linear regression residuals")
@@ -197,7 +197,7 @@ def _compare_linear_regressions_sse(
     plt.show()
 
     # Plot the difference between the binned residuals.
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 6))
     ax.plot(
         bin_indices,
         residuals_bins_linear - residuals_bins_weighted_linear,
@@ -254,10 +254,11 @@ def plot_single_transient_adc_data(tau: float, sampling_rate: float) -> None:
                  r_squared_polynomial)
 
     # Plot the transient ADC data in linear and log space.
-    n = np.arange(len(adc_output))
-    t = adc_data.t_axis
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
-    ax1.plot(n, adc_data.samples, label="ADC data")
+    n = np.arange(len(adc_output[:1000]))
+    t = adc_data.t_axis[:1000]
+    plt.rcParams.update({"font.size": 14})
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 7), sharex=True)
+    ax1.plot(n, adc_data.samples[:1000], label="ADC data")
     ax1.plot(n, exponential_regression.evaluate(t), label="Exponential fit")
     ax1.plot(n,
              np.exp(linear_regression.evaluate(t)) + adc_data.min_adc_output,
@@ -274,7 +275,7 @@ def plot_single_transient_adc_data(tau: float, sampling_rate: float) -> None:
     ax1.legend()
 
     ax2.plot(n,
-             np.log(adc_data.samples - adc_data.min_adc_output),
+             np.log(adc_data.samples[:1000] - adc_data.min_adc_output),
              label="Log ADC data minus offset")
     ax2.plot(
         n,
@@ -310,6 +311,7 @@ def plot_transient_adc_data_distribution(tau: float,
         tau: Time constant in seconds.
         sampling_rate: Sampling rate in Hz.
     """
+    plt.rcParams.update({"font.size": 14})
     adc_output_length = int(NUM_TAUS * sampling_rate * tau)
     adc_output = np.zeros((NUM_SIMULATIONS_FOR_PDF, adc_output_length))
     log_adc_output = np.zeros((NUM_SIMULATIONS_FOR_PDF, adc_output_length))
@@ -324,7 +326,7 @@ def plot_transient_adc_data_distribution(tau: float,
 
     # Plot the standard deviation of the ADC data.
     adc_output_stddev = np.std(adc_output, axis=0)
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 4))
     ax.plot(tau_axis[tau_axis_indices], adc_output_stddev[tau_axis_indices])
     ax.set_title("Standard deviation of the ADC samples")
     ax.set_xlabel("Time [tau]")
@@ -350,20 +352,27 @@ def plot_transient_adc_data_distribution(tau: float,
     log_adc_output_stddev = np.std(log_adc_output, axis=0)
     log_adc_output_stddev_approximated = SIGMA / EXPONENTIAL_SCALING_FACTOR * np.exp(
         tau_axis[tau_axis_indices])
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 10), sharex=True)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4), sharex=True)
     ax1.plot(tau_axis[tau_axis_indices],
              log_adc_output_stddev[tau_axis_indices],
              label="Simulated")
     ax1.plot(tau_axis[tau_axis_indices],
-             log_adc_output_stddev_theoretical,
-             label="Theoretical")
-    ax1.plot(tau_axis[tau_axis_indices],
              log_adc_output_stddev_approximated,
+             "--",
              label="Approximated")
+    ax1.plot(tau_axis[tau_axis_indices],
+             log_adc_output_stddev_theoretical,
+             ":",
+             c="lime",
+             label="Theoretical")
     ax1.set_title("Standard deviation of the log ADC samples")
     ax1.set_xlabel("Time [tau]")
     ax1.set_ylabel("Standard deviation")
     ax1.legend()
+    for i in range(len(tau_axis[tau_axis_indices])):
+        print(
+            f"{tau_axis[tau_axis_indices][i]},{log_adc_output_stddev[tau_axis_indices][i]},{log_adc_output_stddev_approximated[i]},{log_adc_output_stddev_theoretical[i]},{np.abs(log_adc_output_stddev[tau_axis_indices] - log_adc_output_stddev_theoretical)[i]},{np.abs(log_adc_output_stddev_approximated - log_adc_output_stddev_theoretical)[i]}"
+        )
     ax2.plot(tau_axis[tau_axis_indices],
              np.abs(log_adc_output_stddev[tau_axis_indices] -
                     log_adc_output_stddev_theoretical),
@@ -371,6 +380,7 @@ def plot_transient_adc_data_distribution(tau: float,
     ax2.plot(tau_axis[tau_axis_indices],
              np.abs(log_adc_output_stddev_approximated -
                     log_adc_output_stddev_theoretical),
+             "--",
              label="Approximated - theoretical")
     ax2.set_title(
         "Absolute difference in standard deviation of the log ADC samples")
@@ -465,96 +475,176 @@ def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
         slope_stddevs_polynomial[tau_index] = np.std(1 /
                                                      tau_estimates_polynomial)
 
-    # Plot the mean error and standard deviation of the estimated slope.
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
-    ax1.plot(1 / TAUS,
-             slope_means_exponential - 1 / TAUS,
-             label="Exponential fit")
-    ax1.plot(1 / TAUS, slope_means_linear - 1 / TAUS, label="Linear fit")
-    ax1.plot(1 / TAUS,
-             slope_means_weighted_linear - 1 / TAUS,
-             label="Weighted linear fit")
-    ax1.plot(1 / TAUS,
-             slope_means_polynomial - 1 / TAUS,
-             label="Polynomial fit")
-    ax1.set_title("Mean error of the estimated slope")
-    ax1.set_ylabel("Mean error [1/s]")
-    ax1.legend()
+    # # Plot the mean error and standard deviation of the estimated slope.
+    # fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
+    # ax1.plot(1 / TAUS,
+    #          slope_means_exponential - 1 / TAUS,
+    #          label="Exponential fit")
+    # ax1.plot(1 / TAUS, slope_means_linear - 1 / TAUS, label="Linear fit")
+    # ax1.plot(1 / TAUS,
+    #          slope_means_weighted_linear - 1 / TAUS,
+    #          label="Weighted linear fit")
+    # ax1.plot(1 / TAUS,
+    #          slope_means_polynomial - 1 / TAUS,
+    #          label="Polynomial fit")
+    # ax1.set_title("Mean error of the estimated slope")
+    # ax1.set_ylabel("Mean error [1/s]")
+    # ax1.legend()
 
-    ax2.plot(1 / TAUS, slope_stddevs_exponential, label="Exponential fit")
-    ax2.plot(1 / TAUS, slope_stddevs_linear, label="Linear fit")
-    ax2.plot(1 / TAUS,
-             slope_stddevs_weighted_linear,
-             label="Weighted linear fit")
-    ax2.plot(1 / TAUS, slope_stddevs_polynomial, label="Polynomial fit")
-    ax2.set_title("Standard deviation of the estimated slope")
-    ax2.set_xlabel("Slope [1/s]")
-    ax2.set_ylabel("Standard deviation [1/s]")
-    ax2.legend()
-    plt.show()
+    # ax2.plot(1 / TAUS, slope_stddevs_exponential, label="Exponential fit")
+    # ax2.plot(1 / TAUS, slope_stddevs_linear, label="Linear fit")
+    # ax2.plot(1 / TAUS,
+    #          slope_stddevs_weighted_linear,
+    #          label="Weighted linear fit")
+    # ax2.plot(1 / TAUS, slope_stddevs_polynomial, label="Polynomial fit")
+    # ax2.set_title("Standard deviation of the estimated slope")
+    # ax2.set_xlabel("Slope [1/s]")
+    # ax2.set_ylabel("Standard deviation [1/s]")
+    # ax2.legend()
+    # plt.show()
 
-    # Compare the standard deviation of the estimated slope with a weighted
-    # linear regression with its approximation.
-    fig, ax = plt.subplots(figsize=(12, 8))
-    ax.plot(1 / TAUS, slope_stddevs_weighted_linear, label="Simulated")
-    ax.plot(1 / TAUS,
-            np.sqrt(8 * SIGMA**2 /
-                    (EXPONENTIAL_SCALING_FACTOR**2 * sampling_rate * TAUS**3)),
-            label="Approximated")
-    ax.plot(1 / TAUS,
-            slope_stddevs_weighted_linear_theoretical,
-            label="Theoretical")
-    ax.set_title(
-        "Standard deviation of the estimated slope with a weighted linear regression"
-    )
-    ax.set_xlabel("Slope [1/s]")
-    ax.set_ylabel("Standard deviation [1/s]")
-    ax.legend()
-    plt.show()
+    # # Compare the standard deviation of the estimated slope with a weighted
+    # # linear regression with its approximation.
+    # fig, ax = plt.subplots(figsize=(12, 6))
+    # ax.plot(1 / TAUS, slope_stddevs_weighted_linear, label="Simulated")
+    # ax.plot(1 / TAUS,
+    #         np.sqrt(8 * SIGMA**2 /
+    #                 (EXPONENTIAL_SCALING_FACTOR**2 * sampling_rate * TAUS**3)),
+    #         label="Approximated")
+    # ax.plot(1 / TAUS,
+    #         slope_stddevs_weighted_linear_theoretical,
+    #         label="Theoretical")
+    # ax.set_title(
+    #     "Standard deviation of the estimated slope with a weighted linear regression"
+    # )
+    # ax.set_xlabel("Slope [1/s]")
+    # ax.set_ylabel("Standard deviation [1/s]")
+    # ax.legend()
+    # plt.show()
 
-    # Plot the mean error and standard deviation of the estimated time constant.
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
-    ax1.plot(TAUS, tau_means_exponential - TAUS, label="Exponential fit")
-    ax1.plot(TAUS, tau_means_linear - TAUS, label="Linear fit")
-    ax1.plot(TAUS,
-             tau_means_weighted_linear - TAUS,
-             label="Weighted linear fit")
-    ax1.plot(TAUS, tau_means_polynomial - TAUS, label="Polynomial fit")
-    ax1.set_title("Mean error of the estimated time constant")
-    ax1.set_ylabel("Mean error [s]")
-    ax1.legend()
+    # # Plot the mean error and standard deviation of the estimated time constant.
+    # fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), sharex=True)
+    # ax1.semilogx(TAUS, tau_means_exponential - TAUS, label="Exponential fit")
+    # ax1.semilogx(TAUS, tau_means_linear - TAUS, label="Linear fit")
+    # ax1.semilogx(TAUS,
+    #              tau_means_weighted_linear - TAUS,
+    #              label="Weighted linear fit")
+    # ax1.semilogx(TAUS, tau_means_polynomial - TAUS, label="Polynomial fit")
+    # ax1.set_title("Mean error of the estimated time constant")
+    # ax1.set_ylabel("Mean error [s]")
+    # ax1.legend()
 
-    ax2.plot(TAUS, tau_stddevs_exponential, label="Exponential fit")
-    ax2.plot(TAUS, tau_stddevs_linear, label="Linear fit")
-    ax2.plot(TAUS, tau_stddevs_weighted_linear, label="Weighted linear fit")
-    ax2.plot(TAUS, tau_stddevs_polynomial, label="Polynomial fit")
-    ax2.set_title("Standard deviation of the estimated time constant")
-    ax2.set_xlabel("tau [s]")
-    ax2.set_ylabel("Standard deviation [s]")
-    ax2.legend()
-    plt.show()
+    # ax2.semilogx(TAUS, tau_stddevs_exponential, label="Exponential fit")
+    # ax2.semilogx(TAUS, tau_stddevs_linear, label="Linear fit")
+    # ax2.semilogx(TAUS, tau_stddevs_weighted_linear, label="Weighted linear fit")
+    # ax2.semilogx(TAUS, tau_stddevs_polynomial, label="Polynomial fit")
+    # ax2.set_title("Standard deviation of the estimated time constant")
+    # ax2.set_xlabel("tau [s]")
+    # ax2.set_ylabel("Standard deviation [s]")
+    # ax2.legend()
+    # plt.show()
 
     # Compare the standard deviation of the estimated time constant with a
     # weighted linear regression with its approximation.
-    fig, ax = plt.subplots(figsize=(12, 8))
-    ax.plot(TAUS, tau_stddevs_weighted_linear, label="Simulated")
-    ax.plot(TAUS,
-            np.sqrt(8 * SIGMA**2 * TAUS /
-                    (EXPONENTIAL_SCALING_FACTOR**2 * sampling_rate)),
-            label="Approximated")
-    ax.set_title(
-        "Standard deviation of the estimated time constant with a weighted linear regression"
-    )
-    ax.set_xlabel("tau [s]")
-    ax.set_ylabel("Standard deviation [s]")
-    ax.legend()
+    select = tau_stddevs_exponential < 0.007
+    plt.rcParams.update({"font.size": 16})
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), sharex=True)
+    # ax1.semilogx(TAUS,
+    #              np.abs(tau_means_weighted_linear - TAUS),
+    #              label="Simulated",
+    #              linestyle="--")
+    # ax1.semilogx([0.6], [0.01])
+    ax1.loglog(
+        np.array([
+            0.020916, 0.04620, 0.09870, 0.17199, 0.21000, 0.46410, 0.99120,
+            1.70940, 2.08950, 4.59900, 9.80700
+        ]),
+        np.abs(
+            np.array([
+                0.020916, 0.04620, 0.09870, 0.17199, 0.21000, 0.46410, 0.99120,
+                1.70940, 2.08950, 4.59900, 9.80700
+            ]) - np.array([
+                0.022223, 0.047992, 0.103400, 0.180377, 0.221075, 0.490369,
+                1.044849, 1.767761, 2.154077, 4.516699, 9.253644
+            ])),
+        label="Measured",
+        marker="^")
+    for i in range(
+            len(
+                np.array([
+                    0.020916, 0.04620, 0.09870, 0.17199, 0.21000, 0.46410,
+                    0.99120, 1.70940, 2.08950, 4.59900, 9.80700
+                ]))):
+        print(f"""{np.array([
+            0.020916, 0.04620, 0.09870, 0.17199, 0.21000, 0.46410, 0.99120,
+            1.70940, 2.08950, 4.59900, 9.80700
+        ])[i]},{np.abs(
+            np.array([
+                0.020916, 0.04620, 0.09870, 0.17199, 0.21000, 0.46410, 0.99120,
+                1.70940, 2.08950, 4.59900, 9.80700
+            ]) - np.array([
+                0.022223, 0.047992, 0.103400, 0.180377, 0.221075, 0.490369,
+                1.044849, 1.767761, 2.154077, 4.516699, 9.253644
+            ]))[i]}""")
+    ax1.loglog(TAUS,
+               0.05 * TAUS,
+               c="red",
+               linestyle="--",
+               linewidth=0.5,
+               label="5% of tau")
+    for i in range(len(TAUS)):
+        print("tau =", TAUS[i], "weighted linear mean =",
+              tau_means_weighted_linear[i], "diff =",
+              tau_means_weighted_linear[i] - TAUS[i])
+    # ax1.semilogx(TAUS[select],
+    #              np.abs((tau_means_exponential - TAUS)[select]),
+    #              label="Exponential fit",
+    #              linestyle="-.")
+    ax1.set_title("Mean absolute error of the estimated time constant")
+    ax1.set_xlabel("tau [s]")
+    ax1.set_ylabel("Mean absolute error [s]")
+    ax1.legend()
+    ax2.loglog(np.array([
+        0.020916, 0.04620, 0.09870, 0.17199, 0.21000, 0.46410, 0.99120, 1.70940,
+        2.08950, 4.59900, 9.80700
+    ]), [
+        0.000210, 0.000454, 0.000691, 0.000880, 0.001430, 0.003742, 0.005265,
+        0.031757, 0.037831, 0.060056, 0.164514
+    ],
+               label="Measured",
+               marker="^")
+    ax2.loglog(TAUS,
+               tau_stddevs_weighted_linear,
+               label="Simulated",
+               linestyle="--")
+    ax2.loglog(TAUS,
+               np.sqrt(8 * SIGMA**2 * TAUS /
+                       (EXPONENTIAL_SCALING_FACTOR**2 * sampling_rate)),
+               label="Approximated",
+               linestyle=":")
+    for i in range(len(TAUS)):
+        print(f"""{TAUS[i]},{tau_stddevs_weighted_linear[i]}""")
+    ax2.loglog(TAUS,
+               0.01 * TAUS,
+               c="red",
+               linestyle="--",
+               linewidth=0.5,
+               label="1% of tau")
+    # ax2.semilogx(TAUS[select],
+    #              tau_stddevs_exponential[select],
+    #              label="Exponential fit",
+    #              linestyle="-.")
+    ax2.set_title("Standard error of the estimated time constant")
+    ax2.set_xlabel("tau [s]")
+    ax2.set_ylabel("Standard error [s]")
+    ax2.legend()
     plt.show()
 
 
 def main(argv):
     assert len(argv) == 1
-    plot_single_transient_adc_data(FLAGS.tau, FLAGS.sampling_rate)
-    plot_transient_adc_data_distribution(FLAGS.tau, FLAGS.sampling_rate)
+    # plot_single_transient_adc_data(FLAGS.tau, FLAGS.sampling_rate)
+    # plot_transient_adc_data_distribution(FLAGS.tau, FLAGS.sampling_rate)
     plot_multiple_transient_adc_data_over_tau(FLAGS.sampling_rate)
 
 
