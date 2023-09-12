@@ -15,8 +15,9 @@ def _parse_adc_data(read_data: str) -> float:
         The ADC output in LSBs.
     """
     try:
-        # The OpenMote prints (sequence number, coarse code, medium code, fine code, ADC output, RSSI).
-        adc_output = read_data.split(" ")[4]
+        # The OpenMote prints (sequence number, channel, coarse code, medium
+        # code, fine code, ADC output, RSSI).
+        adc_output = read_data.split(" ")[5]
         return float(adc_output)
     except:
         logging.error("Failed to parse ADC data.")
