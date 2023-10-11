@@ -60,6 +60,17 @@ py_binary(
 )
 
 py_binary(
+    name = "adc_transient_cap_dac_main",
+    srcs = ["adc_transient_cap_dac_main.py"],
+    data = ["//analysis/scum/adc/sensor/resistive/data:adc_resistive_cap_dac_data"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+    ],
+)
+
+py_binary(
     name = "time_constants_main",
     srcs = ["time_constants_main.py"],
     data = ["//analysis/scum/adc/sensor/resistive/data:time_constants_data"],

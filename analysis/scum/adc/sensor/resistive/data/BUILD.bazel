@@ -28,6 +28,11 @@ filegroup(
 )
 
 filegroup(
+    name = "adc_resistive_cap_dac_data",
+    srcs = ["adc_data_resistor_220k_cap_dac.csv"],
+)
+
+filegroup(
     name = "time_constants_data",
     srcs = [
         "time_constants_resistor_1.csv",
