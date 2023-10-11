@@ -7,7 +7,7 @@
 # 1.85 uF @ 0 V, 1.894 uF @ 1.5 V, 1.890 uF @ 2 V (measured at 10 kHz, 10 mV)
 # 3.32 uF @ 0 V, 3.455 uF @ 1.5 V, 3.252 uF @ 2 V (measured at 10 kHz, 10 mV)
 
-Resistance [MOhms], Capacitance [uF],Number of ADC samples,Three tau index,Time constant,Time constant scaling factor
+Resistance [MOhms],Capacitance [uF],Number of ADC samples,Three tau index,Time constant,Time constant scaling factor
 0.22131,1.85,388,139,8001,16384
 0.22131,1.85,564,142,8043,16384
 0.22131,1.85,572,141,8059,16384
