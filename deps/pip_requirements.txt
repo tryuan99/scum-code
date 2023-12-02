@@ -185,7 +185,9 @@ matplotlib==3.7.0 \
     --hash=sha256:f910d924da8b9fb066b5beae0b85e34ed1b6293014892baadcf2a51da1c65807 \
     --hash=sha256:f91d35b3ef51d29d9c661069b9e4ba431ce283ffc533b981506889e144b5b40e \
     --hash=sha256:fb0304c1cd802e9a25743414c887e8a7cd51d96c9ec96d388625d2cd1c137ae3
-    # via -r deps/pip_requirements.in
+    # via
+    #   -r deps/pip_requirements.in
+    #   scienceplots
 numpy==1.23.5 \
     --hash=sha256:01dd17cbb340bf0fc23981e52e1d18a9d4050792e8fb8363cecbf066a84b827d \
     --hash=sha256:06005a2ef6014e9956c09ba07654f9837d9e26696a0470e42beedadb78c11b07 \
@@ -430,6 +432,10 @@ regex==2022.7.9 \
     --hash=sha256:f87e9108bb532f8a1fc6bf7e69b930a35c7b0267b8fef0a3ede0bcb4c5aaa531 \
     --hash=sha256:f8a2fd2f62a77536e4e3193303bec380df40d99e253b1c8f9b6eafa07eaeff67 \
     --hash=sha256:fbdf4fc6adf38fab1091c579ece3fe9f493bd0f1cfc3d2c76d2e52461ca4f8a9
+    # via -r deps/pip_requirements.in
+scienceplots==2.1.1 \
+    --hash=sha256:2e64d2e93b4f98702f30145dbb70d238f5dc315e227fec331489631232dfc9e0 \
+    --hash=sha256:d8d197e3410f87ebdad0b9c265eaab596094fb082d97123e835f6bc32800ab54
     # via -r deps/pip_requirements.in
 scikit-rf==0.28.0 \
     --hash=sha256:4edf7ce4b02ea11000ee649533ccb269662ae251f765202fba48a6fd1120e9b5 \
