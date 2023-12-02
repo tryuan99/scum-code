@@ -1,0 +1,27 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_binary(
+    name = "iref_main",
+    srcs = ["iref_main.py"],
+    data = ["//tapeout/power/data:iref_data"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)
+
+py_binary(
+    name = "ldo_main",
+    srcs = ["ldo_main.py"],
+    data = ["//tapeout/power/data:ldo_data"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)

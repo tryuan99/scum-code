@@ -1,0 +1,23 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "iref_data",
+    srcs = [
+        "iref_vs_vref_measured.csv",
+        "iref_ext_measured.csv",
+        "iref_vs_vref_simulated.csv",
+        "iref_ext_simulated.csv",
+    ],
+)
+
+filegroup(
+    name = "ldo_data",
+    srcs = [
+        "ldo_analog_measured.csv",
+        "ldo_digital_measured.csv",
+        "ldo_rf_measured.csv",
+        "ldo_analog_simulated.csv",
+        "ldo_digital_simulated.csv",
+        "ldo_rf_simulated.csv",
+    ],
+)
