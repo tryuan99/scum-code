@@ -188,6 +188,10 @@ matplotlib==3.7.0 \
     # via
     #   -r deps/pip_requirements.in
     #   scienceplots
+networkx==2.8.4 \
+    --hash=sha256:5e53f027c0d567cf1f884dbb283224df525644e43afd1145d64c9d88a3584762 \
+    --hash=sha256:6933b9b3174a0bdf03c911bb4a1ee43a86ce3edeb813e37e1d4c553b3f4a2c4f
+    # via -r deps/pip_requirements.in
 numpy==1.23.5 \
     --hash=sha256:01dd17cbb340bf0fc23981e52e1d18a9d4050792e8fb8363cecbf066a84b827d \
     --hash=sha256:06005a2ef6014e9956c09ba07654f9837d9e26696a0470e42beedadb78c11b07 \

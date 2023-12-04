@@ -1,5 +1,6 @@
 absl-py==1.4.0
 matplotlib==3.7.0
+networkx==2.8.4
 numpy==1.23.5
 protobuf==4.23.2
 pandas==1.5.3
