@@ -3,6 +3,18 @@ load("@pip_deps//:requirements.bzl", "requirement")
 package(default_visibility = ["//visibility:public"])
 
 py_binary(
+    name = "bgr_main",
+    srcs = ["bgr_main.py"],
+    data = ["//tapeout/power/data:bgr_data"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)
+
+py_binary(
     name = "iref_main",
     srcs = ["iref_main.py"],
     data = ["//tapeout/power/data:iref_data"],

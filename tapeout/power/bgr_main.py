@@ -6,8 +6,8 @@ from absl import app, flags
 FLAGS = flags.FLAGS
 
 
-def plot_ldo(measured_data: str, simulated_data: str) -> None:
-    """Plots LDO voltage as a function of its current.
+def plot_bgr(measured_data: str, simulated_data: str) -> None:
+    """Plots bandgap reference voltage as a function of the supply voltage.
 
     Args:
         measured_data: Measured data filename.
@@ -25,8 +25,8 @@ def plot_ldo(measured_data: str, simulated_data: str) -> None:
     # Plot the simulated data.
     df_simulated.plot.line(ax=ax, x=df_simulated.columns[0], linestyle="--")
 
-    plt.xlabel("I_LOAD [A]")
-    plt.ylabel("LDO_VDD [V]")
+    plt.xlabel("LDO_VIN [V]")
+    plt.ylabel("BG_REF [V]")
     plt.legend()
     plt.show()
 
@@ -34,15 +34,15 @@ def plot_ldo(measured_data: str, simulated_data: str) -> None:
 def main(argv):
     assert len(argv) == 1
 
-    plot_ldo(FLAGS.ldo_measured_data, FLAGS.ldo_simulated_data)
+    plot_bgr(FLAGS.bgr_measured_data, FLAGS.bgr_simulated_data)
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string("ldo_measured_data",
-                        "tapeout/power/data/ldo_analog_measured.csv",
-                        "LDO measured data.")
-    flags.DEFINE_string("ldo_simulated_data",
-                        "tapeout/power/data/ldo_analog_simulated.csv",
-                        "LDO simulated data.")
+    flags.DEFINE_string("bgr_measured_data",
+                        "tapeout/power/data/bgr_measured.csv",
+                        "Bandgap reference measured data.")
+    flags.DEFINE_string("bgr_simulated_data",
+                        "tapeout/power/data/bgr_simulated.csv",
+                        "Bandgap reference simulated data.")
 
     app.run(main)
