@@ -1,0 +1,45 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "differential_mesh_grid",
+    srcs = ["differential_mesh_grid.py"],
+    deps = [
+        requirement("matplotlib"),
+        requirement("networkx"),
+        requirement("numpy"),
+    ],
+)
+
+py_binary(
+    name = "differential_mesh_grid_main",
+    srcs = ["differential_mesh_grid_main.py"],
+    data = ["//simulation/differential_mesh/data:example_edge_lists"],
+    deps = [
+        ":differential_mesh_grid",
+        requirement("absl-py"),
+    ],
+)
+
+py_library(
+    name = "differential_mesh_solver",
+    srcs = ["differential_mesh_solver.py"],
+    deps = [
+        ":differential_mesh_grid",
+        requirement("absl-py"),
+        requirement("networkx"),
+        requirement("numpy"),
+    ],
+)
+
+py_binary(
+    name = "differential_mesh_solver_main",
+    srcs = ["differential_mesh_solver_main.py"],
+    data = ["//simulation/differential_mesh/data:example_edge_lists"],
+    deps = [
+        ":differential_mesh_grid",
+        ":differential_mesh_solver",
+        requirement("absl-py"),
+    ],
+)
