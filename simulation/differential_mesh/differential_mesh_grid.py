@@ -7,7 +7,6 @@ The node potential is stored as a node attribute.
 
 import matplotlib.pyplot as plt
 import networkx as nx
-import numpy as np
 
 # Root node.
 DIFFERENTIAL_MESH_GRID_ROOT_NODE = 1
@@ -41,27 +40,3 @@ class DifferentialMeshGrid:
                              DIFFERENTIAL_MESH_GRID_NODE_POTENTIAL_ATTRIBUTE))
         nx.draw_networkx_edge_labels(self.graph, pos=pos, ax=ax)
         plt.show()
-
-    @classmethod
-    def read_edge_list(cls,
-                       edge_list: str,
-                       stddev: float = 0.0) -> "DifferentialMeshGrid":
-        """Create a differential mesh grid from a file with the edge list.
-
-        Args:
-            path: Edge list filename.
-            stddev: Standard deviation of the added noise.
-
-        Returns:
-            The differential mesh grid corresponding to the edge list.
-        """
-        with open(edge_list, "r") as f:
-            graph = nx.read_weighted_edgelist(f,
-                                              create_using=nx.DiGraph,
-                                              nodetype=int)
-
-        # Add noise to the differential measurements.
-        if stddev > 0.0:
-            for _, _, data in graph.edges(data=True):
-                data["weight"] += np.random.normal(scale=stddev)
-        return cls(graph)

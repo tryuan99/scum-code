@@ -1,5 +1,7 @@
 from absl import app, flags, logging
 
+from simulation.differential_mesh.differential_mesh_graph_factory import \
+    DifferentialMeshGraphFactory
 from simulation.differential_mesh.differential_mesh_grid import \
     DifferentialMeshGrid
 from simulation.differential_mesh.differential_mesh_solver import (
@@ -11,7 +13,8 @@ FLAGS = flags.FLAGS
 def main(argv):
     assert len(argv) == 1
 
-    grid = DifferentialMeshGrid.read_edge_list(FLAGS.edgelist)
+    graph = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
+    grid = DifferentialMeshGrid(graph)
     solver = StochasticDifferentialMeshSolver(grid, verbose=True)
     solver.solve()
     grid.draw()
