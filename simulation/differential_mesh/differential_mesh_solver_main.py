@@ -18,6 +18,7 @@ def main(argv):
     solver = StochasticDifferentialMeshSolver(grid, verbose=True)
     solver.solve()
     grid.draw()
+    solver.log_node_potentials()
     logging.info("MSE = %f", solver.calculate_mean_squared_error())
 
 

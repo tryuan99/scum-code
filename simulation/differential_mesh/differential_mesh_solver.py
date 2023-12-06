@@ -54,7 +54,12 @@ class DifferentialMeshSolver(ABC):
         ])
         return mean_squared_error
 
-    def write_potentials(self, output: str) -> None:
+    def log_node_potentials(self) -> None:
+        """Logs the node potentials."""
+        for node in self.graph.nodes:
+            logging.info("%s", self._format_node_potential(node))
+
+    def write_node_potentials(self, output: str) -> None:
         """Writes the node potentials to a file.
 
         Args:
@@ -62,8 +67,7 @@ class DifferentialMeshSolver(ABC):
         """
         with open(output, "w") as f:
             for node in self.graph.nodes:
-                potential = self._get_node_potential(node)
-                f.write(f"{node} {potential}\n")
+                f.write(f"{self._format_node_potential(node)}\n")
 
     def _get_neighbors(self, node: int) -> Iterator[int]:
         """Returns an iterator over the neighbors of the given node.
@@ -92,6 +96,18 @@ class DifferentialMeshSolver(ABC):
         """
         self.graph.nodes[node][
             DIFFERENTIAL_MESH_GRID_NODE_POTENTIAL_ATTRIBUTE] = potential
+
+    def _format_node_potential(self, node: int) -> str:
+        """Formats the node potential for output.
+
+        Args:
+            node: Node for which to output the potential.
+
+        Returns:
+            The string containing the formatted node potential.
+        """
+        potential = self._get_node_potential(node)
+        return f"{node} {potential}"
 
     def _calculate_node_error(self, node: int) -> float:
         """Calculates the node error of the given node.
