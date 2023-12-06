@@ -39,7 +39,6 @@ class DifferentialMeshGrid:
                          labels=nx.get_node_attributes(
                              self.graph,
                              DIFFERENTIAL_MESH_GRID_NODE_POTENTIAL_ATTRIBUTE))
-        # nx.draw_networkx_labels(self.graph, pos=pos, ax=ax)
         nx.draw_networkx_edge_labels(self.graph, pos=pos, ax=ax)
         plt.show()
 

@@ -248,7 +248,11 @@ class StochasticDifferentialMeshSolver(DifferentialMeshSolver):
 
 
 class MatrixDifferentialMeshSolver(DifferentialMeshSolver):
-    """Matrix differential mesh solver."""
+    """Matrix differential mesh solver.
+
+    The order of the nodes is determined by the order of the nodes determined
+    by the graph.
+    """
 
     def __init__(self, grid: DifferentialMeshGrid, verbose: bool = False):
         super().__init__(grid, verbose)
@@ -259,4 +263,67 @@ class MatrixDifferentialMeshSolver(DifferentialMeshSolver):
         The matrix differential mesh solver inverts a matrix to solve for the
         node potentials.
         """
-        pass
+        A = self._create_laplacian_matrix()
+        b = self._create_edge_measurements_vector()
+        node_potentials = np.linalg.solve(A, b)
+        for node_index, node in enumerate(self.graph.nodes):
+            self._set_node_potential(node, node_potentials[node_index])
+
+    def _get_node_to_index_map(self) -> dict[int, int]:
+        """Returns a map from the node to its index."""
+        return dict([(node, node_index)
+                     for node_index, node in enumerate(self.graph.nodes)])
+
+    def _create_laplacian_matrix(self) -> np.ndarray:
+        """Creates the modified Laplacian matrix.
+
+        The Laplacian matrix is modified by setting the row corresponding to
+        the root node to an elementary basis vector because the root node has
+        a potential of zero.
+
+        Returns:
+            The modified Laplacian matrix.
+        """
+        node_to_index_map = self._get_node_to_index_map()
+        root_index = node_to_index_map[DIFFERENTIAL_MESH_GRID_ROOT_NODE]
+
+        # Create the Laplacian matrix.
+        laplacian_matrix = np.zeros(
+            (self.graph.number_of_nodes(), self.graph.number_of_nodes()))
+        for u, v in self.graph.edges():
+            u_index = node_to_index_map[u]
+            v_index = node_to_index_map[v]
+            laplacian_matrix[u_index, v_index] -= 1
+            laplacian_matrix[v_index, u_index] -= 1
+            laplacian_matrix[u_index, u_index] += 1
+            laplacian_matrix[v_index, v_index] += 1
+
+        # Modify the Laplacian matrix.
+        laplacian_matrix[root_index, :] = 0
+        laplacian_matrix[root_index, root_index] = 1
+        return laplacian_matrix
+
+    def _create_edge_measurements_vector(self) -> np.ndarray:
+        """Creates a vector consisting of the sum of edge differential
+        measurements at each node.
+
+        Returns:
+            The vector of sums of edge differential measurements at each node.
+        """
+        node_to_index_map = self._get_node_to_index_map()
+        root_index = node_to_index_map[DIFFERENTIAL_MESH_GRID_ROOT_NODE]
+
+        edge_measurements_vector = np.zeros(self.graph.number_of_edges())
+        for node_index, node in enumerate(self.graph.nodes):
+            outgoing_edge_measurements = np.sum([
+                self._get_edge_measurement(u, v)
+                for u, v in self.graph.out_edges(node)
+            ])
+            incoming_edge_measurements = np.sum([
+                self._get_edge_measurement(u, v)
+                for u, v in self.graph.in_edges(node)
+            ])
+            edge_measurements = outgoing_edge_measurements - incoming_edge_measurements
+            edge_measurements_vector[node_index] = edge_measurements
+        edge_measurements_vector[root_index] = 0
+        return edge_measurements_vector

@@ -2,8 +2,8 @@ from absl import app, flags, logging
 
 from simulation.differential_mesh.differential_mesh_grid import \
     DifferentialMeshGrid
-from simulation.differential_mesh.differential_mesh_solver import \
-    StochasticDifferentialMeshSolver
+from simulation.differential_mesh.differential_mesh_solver import (
+    MatrixDifferentialMeshSolver, StochasticDifferentialMeshSolver)
 
 FLAGS = flags.FLAGS
 
