@@ -36,6 +36,31 @@ def simulate_standard_error(solver: DifferentialMeshSolver, num_rows: int,
     for node, stderr in stderrs:
         logging.info("%d %f", node, stderr)
 
+    node_stderrs = np.zeros((num_cols, num_rows))
+    for node, stderr in stderrs:
+        node_index = node - 1
+        row = node_index // num_cols
+        col = node_index % num_cols
+        node_stderrs[col, row] = stderr
+
+    # Plot the standard error across the grid.
+    plt.style.use(["science"])
+    fig, ax = plt.subplots(
+        figsize=(12, 8),
+        subplot_kw={"projection": "3d"},
+    )
+    surf = ax.plot_surface(
+        *np.meshgrid(np.arange(1, num_rows + 1), np.arange(1, num_cols + 1)),
+        node_stderrs,
+        cmap=COLOR_MAPS["parula"],
+        antialiased=False,
+    )
+    ax.set_xlabel("Row")
+    ax.set_ylabel("Column")
+    ax.view_init(30, -45)
+    plt.colorbar(surf)
+    plt.show()
+
 
 def simulate_standard_error_sweep(solver: DifferentialMeshSolver,
                                   max_num_rows: int, max_num_cols: int,
@@ -62,12 +87,12 @@ def simulate_standard_error_sweep(solver: DifferentialMeshSolver,
                 simulator = DifferentialMeshSimulator(graph)
                 stderrs = simulator.simulate_node_standard_errors(
                     solver, noise, num_iterations, verbose)
-                # The maximum standard error occurs at the farthest corner of
-                # the grid.
-                corner_stderr = stderrs[-1][1]
+                # Record the standard error at the farthest corner of the grid.
+                _, corner_stderr = max(stderrs, key=lambda x: x[0])
                 corner_stderrs[num_cols - 1, num_rows - 1] = corner_stderr
                 logging.info("(%d, %d) %f", num_rows, num_cols, corner_stderr)
 
+    # Plot the standard error as a function of the grid dimensions.
     plt.style.use(["science"])
     fig, ax = plt.subplots(
         figsize=(12, 8),
@@ -90,13 +115,13 @@ def simulate_standard_error_sweep(solver: DifferentialMeshSolver,
 def main(argv):
     assert len(argv) == 1
 
-    # simulate_standard_error(DIFFERENTIAL_MESH_SOLVERS[FLAGS.solver],
-    #                         FLAGS.num_rows, FLAGS.num_cols, FLAGS.noise,
-    #                         FLAGS.num_iterations, FLAGS.verbose)
-    simulate_standard_error_sweep(DIFFERENTIAL_MESH_SOLVERS[FLAGS.solver],
-                                  FLAGS.max_num_rows, FLAGS.max_num_cols,
-                                  FLAGS.noise, FLAGS.num_iterations,
-                                  FLAGS.verbose)
+    simulate_standard_error(DIFFERENTIAL_MESH_SOLVERS[FLAGS.solver],
+                            FLAGS.num_rows, FLAGS.num_cols, FLAGS.noise,
+                            FLAGS.num_iterations, FLAGS.verbose)
+    # simulate_standard_error_sweep(DIFFERENTIAL_MESH_SOLVERS[FLAGS.solver],
+    #                               FLAGS.max_num_rows, FLAGS.max_num_cols,
+    #                               FLAGS.noise, FLAGS.num_iterations,
+    #                               FLAGS.verbose)
 
 
 if __name__ == "__main__":

@@ -104,10 +104,10 @@ class DifferentialMeshGrid:
             ValueError: If the graph is invalid.
         """
         # Validate the nodes are labeled from 1 to the total number of nodes.
-        if np.min(self.graph.nodes) != DIFFERENTIAL_MESH_GRID_ROOT_NODE:
+        if min(self.graph.nodes) != DIFFERENTIAL_MESH_GRID_ROOT_NODE:
             raise ValueError(f"Minimum node should be labeled "
                              f"{DIFFERENTIAL_MESH_GRID_ROOT_NODE}.")
-        if np.max(self.graph.nodes) != self.graph.number_of_nodes():
+        if max(self.graph.nodes) != self.graph.number_of_nodes():
             raise ValueError(f"Node should be labeled consecutively from "
                              f"{DIFFERENTIAL_MESH_GRID_ROOT_NODE}.")
 
@@ -142,8 +142,9 @@ class DifferentialMeshGrid:
         num_cols = self._get_number_of_columns()
         for node, data in self.graph.nodes(data=True):
             node_index = node - 1
-            data[DIFFERENTIAL_MESH_GRID_NODE_POSITION_ATTRIBUTE] = (
-                node_index % num_cols, node_index // num_cols)
+            row = node_index // num_cols
+            col = node_index % num_cols
+            data[DIFFERENTIAL_MESH_GRID_NODE_POSITION_ATTRIBUTE] = (col, row)
 
     @staticmethod
     def _round_map_values(input_map: dict[Any, float],

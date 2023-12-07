@@ -50,11 +50,15 @@ def solve_differential_mesh_grid(solver_cls: DifferentialMeshSolver,
     grid.add_edge_measurement_noise(noise)
     solver = solver_cls(grid, verbose=verbose)
     solver.solve()
-    plt.style.use(["science"])
-    grid.draw()
+
+    # Log the edge measurements and node potentials.
     _log_edge_measurements(solver.get_edge_measurements())
     _log_node_potentials(solver.get_node_potentials())
     logging.info("MSE = %f", solver.calculate_mean_squared_error())
+
+    # Draw the grid.
+    plt.style.use(["science"])
+    grid.draw()
 
 
 def main(argv):
