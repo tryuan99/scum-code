@@ -192,8 +192,8 @@ class StochasticDifferentialMeshSolver(DifferentialMeshSolver):
 
     def __init__(self,
                  grid: DifferentialMeshGrid,
-                 max_error: float = 0.001,
-                 verbose: bool = False):
+                 verbose: bool = False,
+                 max_error: float = 0.001):
         super().__init__(grid, verbose)
         self.max_error = max_error
 

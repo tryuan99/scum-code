@@ -7,7 +7,7 @@ from simulation.differential_mesh.differential_mesh_graph_factory import \
 from simulation.differential_mesh.differential_mesh_grid import \
     DifferentialMeshGrid
 from simulation.differential_mesh.differential_mesh_solver import (
-    MatrixDifferentialMeshSolver, StochasticDifferentialMeshSolver)
+    DIFFERENTIAL_MESH_SOLVERS, DifferentialMeshSolver)
 
 FLAGS = flags.FLAGS
 
@@ -34,13 +34,21 @@ def _log_edge_measurements(measurements: list[tuple[int, int], float]) -> None:
         logging.info("%d %d %f", u, v, measurement)
 
 
-def main(argv):
-    assert len(argv) == 1
+def solve_differential_mesh_grid(solver_cls: DifferentialMeshSolver,
+                                 edge_list: str, noise: float,
+                                 verbose: bool) -> None:
+    """Solves the differential mesh grid.
 
-    graph = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
+    Args:
+        solver_cls: Differential mesh solver class.
+        edge_list: Edge list filename.
+        noise: Standard deviation of the noise.
+        verbose: If true, log verbose messages.
+    """
+    graph = DifferentialMeshGraphFactory.create_from_edge_list(edge_list)
     grid = DifferentialMeshGrid(graph)
-    grid.add_edge_measurement_noise(FLAGS.noise)
-    solver = StochasticDifferentialMeshSolver(grid, verbose=FLAGS.verbose)
+    grid.add_edge_measurement_noise(noise)
+    solver = solver_cls(grid, verbose=verbose)
     solver.solve()
     plt.style.use(["science"])
     grid.draw()
@@ -49,7 +57,16 @@ def main(argv):
     logging.info("MSE = %f", solver.calculate_mean_squared_error())
 
 
+def main(argv):
+    assert len(argv) == 1
+
+    solve_differential_mesh_grid(DIFFERENTIAL_MESH_SOLVERS[FLAGS.solver],
+                                 FLAGS.edgelist, FLAGS.noise, FLAGS.verbose)
+
+
 if __name__ == "__main__":
+    flags.DEFINE_enum("solver", "matrix", DIFFERENTIAL_MESH_SOLVERS.keys(),
+                      "Differential mesh solver.")
     flags.DEFINE_string(
         "edgelist", "simulation/differential_mesh/data/example_2x2.edgelist",
         "Input edge list.")

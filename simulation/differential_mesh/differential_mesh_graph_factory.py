@@ -60,7 +60,7 @@ class DifferentialMeshGraphFactory:
         """Creates a 2-dimensional directed grid graph from an edge list file.
 
         Args:
-            path: Edge list filename.
+            edge_list: Edge list filename.
 
         Returns:
             The 2-dimensional directed grid graph corresponding to the edge list.
