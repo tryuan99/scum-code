@@ -29,6 +29,7 @@ class DifferentialMeshSolver(ABC):
     def __init__(self, grid: DifferentialMeshGrid, verbose: bool = False):
         self.grid = grid
         self.verbose = verbose
+        self._reset_node_potentials()
 
     @property
     def graph(self) -> nx.DiGraph:
@@ -96,6 +97,11 @@ class DifferentialMeshSolver(ABC):
         """
         self.graph.nodes[node][
             DIFFERENTIAL_MESH_GRID_NODE_POTENTIAL_ATTRIBUTE] = potential
+
+    def _reset_node_potentials(self) -> None:
+        """Sets potential of all nodes to zero."""
+        for node in self.graph.nodes:
+            self._set_node_potential(node, 0)
 
     def _format_node_potential(self, node: int) -> str:
         """Formats the node potential for output.
@@ -203,8 +209,6 @@ class StochasticDifferentialMeshSolver(DifferentialMeshSolver):
 
         For optimality, the node error of every node should be zero.
         """
-        # Set the node potential of the root node to zero.
-        self._set_node_potential(DIFFERENTIAL_MESH_GRID_ROOT_NODE, 0)
         iteration = 0
         while not self._has_converged():
             iteration += 1

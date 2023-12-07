@@ -29,6 +29,7 @@ py_library(
     deps = [
         requirement("matplotlib"),
         requirement("networkx"),
+        requirement("numpy"),
     ],
 )
 

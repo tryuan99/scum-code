@@ -13,9 +13,10 @@ FLAGS = flags.FLAGS
 def main(argv):
     assert len(argv) == 1
 
-    graph = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
+    graph = DifferentialMeshGraphFactory.create_from_edge_list(
+        FLAGS.edgelist, noise=FLAGS.noise)
     grid = DifferentialMeshGrid(graph)
-    solver = StochasticDifferentialMeshSolver(grid, verbose=True)
+    solver = StochasticDifferentialMeshSolver(grid, verbose=FLAGS.verbose)
     solver.solve()
     grid.draw()
     solver.log_node_potentials()
@@ -26,5 +27,7 @@ if __name__ == "__main__":
     flags.DEFINE_string(
         "edgelist", "simulation/differential_mesh/data/example_2x2.edgelist",
         "Input edge list.")
+    flags.DEFINE_float("noise", 0, "Standard deviation of the added noise.")
+    flags.DEFINE_boolean("verbose", True, "If true, log verbose messages.")
 
     app.run(main)
