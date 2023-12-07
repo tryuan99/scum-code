@@ -45,6 +45,26 @@ class DifferentialMeshSolver(ABC):
     def solve(self) -> None:
         """Solves for the node potentials."""
 
+    def get_node_potentials(self) -> list[tuple[int, float]]:
+        """Returns the solved node potentials.
+
+        This function returns a list of 2-tuples, each consisting of the node
+        label and its potential.
+        """
+        return [
+            (node, self._get_node_potential(node)) for node in self.graph.nodes
+        ]
+
+    def get_edge_measurements(self) -> list[tuple[tuple[int, int], float]]:
+        """Returns the edge differential measurements.
+
+        This function returns a list of 2-tuples, each consisting of a 2-tuple
+        denoting the adjacent nodes of the edge and the edge differential
+        measurement.
+        """
+        return [((u, v), self._get_edge_measurement(u, v))
+                for u, v in self.graph.edges]
+
     def calculate_mean_squared_error(self) -> float:
         """Calculates the mean squared error along all edges.
 
@@ -59,21 +79,6 @@ class DifferentialMeshSolver(ABC):
             self._calculate_edge_error(u, v)**2 for u, v in self.graph.edges()
         ])
         return mean_squared_error
-
-    def log_node_potentials(self) -> None:
-        """Logs the node potentials."""
-        for node in self.graph.nodes:
-            logging.info("%s", self._format_node_potential(node))
-
-    def write_node_potentials(self, output: str) -> None:
-        """Writes the node potentials to a file.
-
-        Args:
-            output: Output filename.
-        """
-        with open(output, "w") as f:
-            for node in self.graph.nodes:
-                f.write(f"{self._format_node_potential(node)}\n")
 
     def _get_neighbors(self, node: int) -> Iterator[int]:
         """Returns an iterator over the neighbors of the given node.
@@ -107,18 +112,6 @@ class DifferentialMeshSolver(ABC):
         """Sets potential of all nodes to zero."""
         for node in self.graph.nodes:
             self._set_node_potential(node, 0)
-
-    def _format_node_potential(self, node: int) -> str:
-        """Formats the node potential for output.
-
-        Args:
-            node: Node for which to output the potential.
-
-        Returns:
-            The string containing the formatted node potential.
-        """
-        potential = self._get_node_potential(node)
-        return f"{node} {potential}"
 
     def _calculate_node_error(self, node: int) -> float:
         """Calculates the node error of the given node.
