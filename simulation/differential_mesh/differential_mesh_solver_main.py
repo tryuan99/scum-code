@@ -24,12 +24,12 @@ def _log_node_potentials(potentials: list[int, float]) -> None:
 
 
 def _log_edge_measurements(measurements: list[tuple[int, int], float]) -> None:
-    """Logs the edge differential measurements.
+    """Logs the differential edge measurements.
 
     Args:
         measurements: List of edge measurements.
     """
-    logging.info("Edge differential measurements:")
+    logging.info("Edge measurements:")
     for (u, v), measurement in measurements:
         logging.info("%d %d %f", u, v, measurement)
 

@@ -1,5 +1,6 @@
 """The differential mesh grid is a 2-dimensional directed grid graph, where the
-directed weights between adjacent nodes represent the differential measurement.
+directed edge weights between incident nodes represent the differential
+measurement.
 
 The weight of the edge (i, j) represents the differential measurement V(i) - V(j).
 The node potential is stored as a node attribute.

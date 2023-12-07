@@ -1,9 +1,11 @@
 """The differential mesh solver accepts a differential mesh grid and solves for
-the node potentials given the edge differential measurements.
+the node potentials given the differential edge measurements.
 
 The solution ensures that each node takes on the average potential of what its
-neighbors think the node is at. Equivalently, the sum of the errors of the
-incident differential measurements is 0 for every node.
+neighbors think the node is at. Equivalently, the sum of the incident edge
+errors is 0 at every node, where the edge error is defined as the difference
+between the incident nodes' potential difference and the differential
+measurement.
 
 The node potentials are written to the graph as node attributes.
 """
@@ -56,25 +58,17 @@ class DifferentialMeshSolver(ABC):
         ]
 
     def get_edge_measurements(self) -> list[tuple[tuple[int, int], float]]:
-        """Returns the edge differential measurements.
+        """Returns the differential edge measurements.
 
         This function returns a list of 2-tuples, each consisting of a 2-tuple
-        denoting the adjacent nodes of the edge and the edge differential
+        denoting the incident nodes of the edge and the differential edge
         measurement.
         """
         return [((u, v), self._get_edge_measurement(u, v))
                 for u, v in self.graph.edges]
 
     def calculate_mean_squared_error(self) -> float:
-        """Calculates the mean squared error along all edges.
-
-        The error along an edge is defined as the difference between the node
-        potential difference and the corresponding edge differential
-        measurement.
-
-        Returns:
-            Mean squared error of the solved node potentials.
-        """
+        """Returns the mean squared edge error."""
         mean_squared_error = np.mean([
             self._calculate_edge_error(u, v)**2 for u, v in self.graph.edges()
         ])
@@ -116,9 +110,9 @@ class DifferentialMeshSolver(ABC):
     def _calculate_node_error(self, node: int) -> float:
         """Calculates the node error of the given node.
 
-        The node error is defined as the sum of incident differential
-        measurement errors. We define it as the sum of the outgoing edge errors
-        minus the sum of the incoming edge errors.
+        The node error is defined as the directed sum of the incident edge
+        errors, i.e., the sum of the outgoing edge errors minus the sum of the
+        incoming edge errors.
 
         Args:
             node: Node for which to calculate the error.
@@ -146,7 +140,7 @@ class DifferentialMeshSolver(ABC):
                                self.graph.out_edges(node, data=True))
 
     def _get_edge_measurement(self, u: int, v: int) -> float:
-        """Gets the edge differential measurement along the given edge.
+        """Returns the differential edge measurement along the given edge.
 
         Args:
             u: Outgoing node.
@@ -163,8 +157,8 @@ class DifferentialMeshSolver(ABC):
     def _calculate_edge_error(self, u: int, v: int) -> float:
         """Calculates the edge error between node u and node v.
 
-        The edge error is defined as the difference between the adjacent node
-        potentials and the edge differential measurement.
+        The edge error is defined as the difference between the incident nodes'
+        potential difference and the differential edge measurement.
 
         Args:
             u: Outgoing node.
@@ -186,8 +180,7 @@ class StochasticDifferentialMeshSolver(DifferentialMeshSolver):
     """Stochastic differential mesh solver.
 
     Attributes:
-        max_error: Maximum error threshold for the error at each node to declare
-            convergence.
+        max_error: Maximum node error to declare convergence.
     """
 
     def __init__(self,
@@ -201,10 +194,10 @@ class StochasticDifferentialMeshSolver(DifferentialMeshSolver):
         """Solves for the node potentials.
 
         The stochastic differential mesh solver randomly chooses nodes and sets
-        the potential equal to its neighbors' estimates of the node's potential
-        accordingly until the node potentials converge.
+        the potential equal to the average of its neighbors' estimates of the
+        node's potential until the node potentials converge.
 
-        For optimality, the node error of every node should be zero.
+        For optimality, the node error should be zero at every node.
         """
         iteration = 0
         while not self._has_converged():
@@ -220,7 +213,7 @@ class StochasticDifferentialMeshSolver(DifferentialMeshSolver):
             potential = self._calculate_average_neighbor_potential(node)
             self._set_node_potential(node, potential)
 
-            # If verbose, log the overall error.
+            # If verbose, log the overall mean squared edge error.
             if self.verbose:
                 logging.info("Iteration %d: MSE=%f", iteration,
                              self.calculate_mean_squared_error())
@@ -255,8 +248,8 @@ class StochasticDifferentialMeshSolver(DifferentialMeshSolver):
     def _has_converged(self) -> bool:
         """Returns whether the solver has converged on a solution.
 
-        Convergence occurs once the error at each node is less than or equal to
-        the maximum error.
+        Convergence occurs once the node error is less than or equal to the
+        maximum error at every node.
         """
         for node in self.graph.nodes:
             if self._calculate_node_error(node) > self.max_error:
@@ -322,11 +315,11 @@ class MatrixDifferentialMeshSolver(DifferentialMeshSolver):
         return laplacian_matrix
 
     def _create_edge_measurements_vector(self) -> np.ndarray:
-        """Creates a vector consisting of the sum of edge differential
+        """Creates a vector consisting of the directed sum of the incident edge
         measurements at each node.
 
         Returns:
-            The vector of sums of edge differential measurements at each node.
+            The vector of sums of incident edge measurements at each node.
         """
         node_to_index_map = self._get_node_to_index_map()
         root_index = node_to_index_map[DIFFERENTIAL_MESH_GRID_ROOT_NODE]
