@@ -288,8 +288,9 @@ class MatrixDifferentialMeshSolver(DifferentialMeshSolver):
 
     def _get_node_to_index_map(self) -> dict[int, int]:
         """Returns a map from the node to its index."""
-        return dict([(node, node_index)
-                     for node_index, node in enumerate(self.graph.nodes)])
+        return {
+            node: node_index for node_index, node in enumerate(self.graph.nodes)
+        }
 
     def _create_laplacian_matrix(self) -> np.ndarray:
         """Creates the modified Laplacian matrix.
@@ -330,7 +331,7 @@ class MatrixDifferentialMeshSolver(DifferentialMeshSolver):
         node_to_index_map = self._get_node_to_index_map()
         root_index = node_to_index_map[DIFFERENTIAL_MESH_GRID_ROOT_NODE]
 
-        edge_measurements_vector = np.zeros(self.graph.number_of_edges())
+        edge_measurements_vector = np.zeros(self.graph.number_of_nodes())
         for node_index, node in enumerate(self.graph.nodes):
             outgoing_edge_measurements = np.sum([
                 self._get_edge_measurement(u, v)

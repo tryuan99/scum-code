@@ -1,11 +1,13 @@
+import matplotlib.pyplot as plt
+import scienceplots
 from absl import app, flags
-
-FLAGS = flags.FLAGS
 
 from simulation.differential_mesh.differential_mesh_graph_factory import \
     DifferentialMeshGraphFactory
 from simulation.differential_mesh.differential_mesh_grid import \
     DifferentialMeshGrid
+
+FLAGS = flags.FLAGS
 
 
 def main(argv):
@@ -14,6 +16,7 @@ def main(argv):
     graph = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
     grid = DifferentialMeshGrid(graph)
     grid.add_edge_measurement_noise(FLAGS.noise)
+    plt.style.use(["science"])
     grid.draw()
 
 

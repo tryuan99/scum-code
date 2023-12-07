@@ -23,6 +23,9 @@ DIFFERENTIAL_MESH_GRID_NODE_POSITION_ATTRIBUTE = "pos"
 # Edge attribute for the differential measurement.
 DIFFERENTIAL_MESH_GRID_EDGE_MEASUREMENT_ATTRIBUTE = "weight"
 
+# Default edge drawing color.
+DIFFERENTIAL_MESH_GRID_EDGE_COLOR = "#1f78b4"
+
 
 class DifferentialMeshGrid:
     """2-dimensional directed grid graph.
@@ -59,7 +62,11 @@ class DifferentialMeshGrid:
         # Round the node potentials for drawing.
         potentials = nx.get_node_attributes(
             self.graph, DIFFERENTIAL_MESH_GRID_NODE_POTENTIAL_ATTRIBUTE)
-        self._round_map_values(potentials)
+        if potentials:
+            self._round_map_values(potentials)
+            node_labels = potentials
+        else:
+            node_labels = {node: node for node in self.graph.nodes}
 
         # Round the edge measurements for drawing.
         measurements = nx.get_edge_attributes(
@@ -67,11 +74,23 @@ class DifferentialMeshGrid:
         self._round_map_values(measurements)
 
         # Draw the graph with node and edge labels.
-        nx.draw_networkx(self.graph, pos=pos, ax=ax, labels=potentials)
-        nx.draw_networkx_edge_labels(self.graph,
-                                     pos=pos,
-                                     ax=ax,
-                                     edge_labels=measurements)
+        nx.draw_networkx_nodes(self.graph,
+                               pos=pos,
+                               ax=ax,
+                               node_color="none",
+                               node_size=1000)
+        nx.draw_networkx_labels(self.graph, pos=pos, ax=ax, labels=node_labels)
+        nx.draw_networkx_edges(self.graph,
+                               pos=pos,
+                               ax=ax,
+                               edge_color=DIFFERENTIAL_MESH_GRID_EDGE_COLOR,
+                               node_size=1000)
+        nx.draw_networkx_edge_labels(
+            self.graph,
+            pos=pos,
+            ax=ax,
+            edge_labels=measurements,
+            font_color=DIFFERENTIAL_MESH_GRID_EDGE_COLOR)
         plt.show()
 
     def _validate_graph(self) -> None:

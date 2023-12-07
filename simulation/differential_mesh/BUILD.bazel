@@ -19,6 +19,8 @@ py_binary(
         ":differential_mesh_graph_factory",
         ":differential_mesh_grid",
         requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("SciencePlots"),
     ],
 )
 
@@ -40,6 +42,8 @@ py_binary(
         ":differential_mesh_graph_factory",
         ":differential_mesh_grid",
         requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("SciencePlots"),
     ],
 )
 
@@ -63,5 +67,34 @@ py_binary(
         ":differential_mesh_grid",
         ":differential_mesh_solver",
         requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("SciencePlots"),
+    ],
+)
+
+py_library(
+    name = "differential_mesh_simulator",
+    srcs = ["differential_mesh_simulator.py"],
+    deps = [
+        ":differential_mesh_grid",
+        ":differential_mesh_solver",
+        requirement("networkx"),
+        requirement("numpy"),
+    ],
+)
+
+py_binary(
+    name = "differential_mesh_simulator_main",
+    srcs = ["differential_mesh_simulator_main.py"],
+    data = ["//simulation/differential_mesh/data:example_edge_lists"],
+    deps = [
+        ":differential_mesh_graph_factory",
+        ":differential_mesh_simulator",
+        ":differential_mesh_solver",
+        "//utils/visualization:color_maps",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("SciencePlots"),
     ],
 )

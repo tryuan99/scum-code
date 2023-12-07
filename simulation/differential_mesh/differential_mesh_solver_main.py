@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+import scienceplots
 from absl import app, flags, logging
 
 from simulation.differential_mesh.differential_mesh_graph_factory import \
@@ -40,6 +42,7 @@ def main(argv):
     grid.add_edge_measurement_noise(FLAGS.noise)
     solver = StochasticDifferentialMeshSolver(grid, verbose=FLAGS.verbose)
     solver.solve()
+    plt.style.use(["science"])
     grid.draw()
     _log_edge_measurements(solver.get_edge_measurements())
     _log_node_potentials(solver.get_node_potentials())

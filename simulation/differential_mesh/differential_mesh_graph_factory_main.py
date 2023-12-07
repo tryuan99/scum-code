@@ -2,6 +2,9 @@ from absl import app, flags
 
 FLAGS = flags.FLAGS
 
+import matplotlib.pyplot as plt
+import scienceplots
+
 from simulation.differential_mesh.differential_mesh_graph_factory import \
     DifferentialMeshGraphFactory
 from simulation.differential_mesh.differential_mesh_grid import \
@@ -16,12 +19,18 @@ def main(argv):
         FLAGS.num_rows, FLAGS.num_cols)
     grid = DifferentialMeshGrid(graph)
     grid.add_edge_measurement_noise(FLAGS.noise)
+
+    # Draw the grid.
+    plt.style.use(["science"])
     grid.draw()
 
     # Create the graph from the edge list.
     graph = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
     grid = DifferentialMeshGrid(graph)
     grid.add_edge_measurement_noise(FLAGS.noise)
+
+    # Draw the grid.
+    plt.style.use(["science"])
     grid.draw()
 
 
