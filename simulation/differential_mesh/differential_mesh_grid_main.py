@@ -11,9 +11,9 @@ from simulation.differential_mesh.differential_mesh_grid import \
 def main(argv):
     assert len(argv) == 1
 
-    graph = DifferentialMeshGraphFactory.create_from_edge_list(
-        FLAGS.edgelist, noise=FLAGS.noise)
+    graph = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
     grid = DifferentialMeshGrid(graph)
+    grid.add_edge_measurement_noise(FLAGS.noise)
     grid.draw()
 
 

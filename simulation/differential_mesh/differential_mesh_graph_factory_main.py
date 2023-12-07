@@ -12,16 +12,16 @@ def main(argv):
     assert len(argv) == 1
 
     # Create the graph from the number of rows and columns.
-    graph = DifferentialMeshGraphFactory.create_zero_2d_graph(FLAGS.num_rows,
-                                                              FLAGS.num_cols,
-                                                              noise=FLAGS.noise)
+    graph = DifferentialMeshGraphFactory.create_zero_2d_graph(
+        FLAGS.num_rows, FLAGS.num_cols)
     grid = DifferentialMeshGrid(graph)
+    grid.add_edge_measurement_noise(FLAGS.noise)
     grid.draw()
 
     # Create the graph from the edge list.
-    graph = DifferentialMeshGraphFactory.create_from_edge_list(
-        FLAGS.edgelist, noise=FLAGS.noise)
+    graph = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
     grid = DifferentialMeshGrid(graph)
+    grid.add_edge_measurement_noise(FLAGS.noise)
     grid.draw()
 
 

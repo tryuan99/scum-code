@@ -24,7 +24,12 @@ from simulation.differential_mesh.differential_mesh_grid import (
 
 
 class DifferentialMeshSolver(ABC):
-    """Interface for a differential mesh solver."""
+    """Interface for a differential mesh solver.
+
+    Attributes:
+        grid: Differential mesh grid.
+        verbose: If verbose, log verbose messages.
+    """
 
     def __init__(self, grid: DifferentialMeshGrid, verbose: bool = False):
         self.grid = grid
@@ -188,7 +193,6 @@ class StochasticDifferentialMeshSolver(DifferentialMeshSolver):
     """Stochastic differential mesh solver.
 
     Attributes:
-        alpha: Correction factor for the node potential during each iteration.
         max_error: Maximum error threshold for the error at each node to declare
             convergence.
     """
@@ -347,3 +351,9 @@ class MatrixDifferentialMeshSolver(DifferentialMeshSolver):
             edge_measurements_vector[node_index] = edge_measurements
         edge_measurements_vector[root_index] = 0
         return edge_measurements_vector
+
+
+DIFFERENTIAL_MESH_SOLVERS = {
+    "stochastic": StochasticDifferentialMeshSolver,
+    "matrix": MatrixDifferentialMeshSolver,
+}

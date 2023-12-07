@@ -35,9 +35,20 @@ class DifferentialMeshGrid:
     """
 
     def __init__(self, graph: nx.DiGraph):
-        self.graph = graph
+        self.graph = graph.copy()
         self._validate_graph()
         self._place_nodes_in_grid()
+
+    def add_edge_measurement_noise(self, stddev: float) -> None:
+        """Adds noise to the edge measurements.
+
+        Args:
+            stddev: Standard deviation of the added noise.
+        """
+        for _, _, data in self.graph.edges(data=True):
+            data[
+                DIFFERENTIAL_MESH_GRID_EDGE_MEASUREMENT_ATTRIBUTE] += np.random.normal(
+                    scale=stddev)
 
     def draw(self) -> None:
         """Draws the differential mesh grid."""

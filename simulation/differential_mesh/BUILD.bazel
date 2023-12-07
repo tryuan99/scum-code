@@ -8,7 +8,6 @@ py_library(
     deps = [
         ":differential_mesh_grid",
         requirement("networkx"),
-        requirement("numpy"),
     ],
 )
 
