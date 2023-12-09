@@ -1,0 +1,8 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "priority_queue",
+    srcs = ["priority_queue.py"],
+)
