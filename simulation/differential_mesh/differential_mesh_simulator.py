@@ -19,7 +19,7 @@ class DifferentialMeshSimulator:
 
     """
 
-    def __init__(self, graph: nx.DiGraph):
+    def __init__(self, graph: nx.DiGraph) -> None:
         self.graph = graph
 
     def simulate_node_standard_errors(self, solver_cls: DifferentialMeshSolver,

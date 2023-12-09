@@ -38,7 +38,7 @@ class DifferentialMeshGrid:
         graph: Graph object corresponding to the differential mesh grid.
     """
 
-    def __init__(self, graph: nx.DiGraph):
+    def __init__(self, graph: nx.DiGraph) -> None:
         self.graph = graph.copy()
         self._validate_graph()
         self._place_nodes_in_grid()

@@ -34,7 +34,9 @@ class DifferentialMeshSolver(ABC):
         verbose: If verbose, log verbose messages.
     """
 
-    def __init__(self, grid: DifferentialMeshGrid, verbose: bool = False):
+    def __init__(self,
+                 grid: DifferentialMeshGrid,
+                 verbose: bool = False) -> None:
         self.grid = grid
         self.verbose = verbose
         self._reset_node_potentials()
@@ -184,7 +186,9 @@ class MatrixDifferentialMeshSolver(DifferentialMeshSolver):
     by the graph.
     """
 
-    def __init__(self, grid: DifferentialMeshGrid, verbose: bool = False):
+    def __init__(self,
+                 grid: DifferentialMeshGrid,
+                 verbose: bool = False) -> None:
         super().__init__(grid, verbose)
 
     def solve(self) -> None:
@@ -272,7 +276,7 @@ class IterativeDifferentialMeshSolver(DifferentialMeshSolver, ABC):
                  grid: DifferentialMeshGrid,
                  verbose: bool = False,
                  max_error: float = 0.001,
-                 max_num_iterations: int = None):
+                 max_num_iterations: int = None) -> None:
         super().__init__(grid, verbose)
         self.max_error = max_error
         self.max_num_iterations = max_num_iterations or np.iinfo(int).max
@@ -377,7 +381,7 @@ class PriorityDifferentialMeshSolver(IterativeDifferentialMeshSolver):
                  grid: DifferentialMeshGrid,
                  verbose: bool = False,
                  max_error: float = 0.001,
-                 max_num_iterations: int = None):
+                 max_num_iterations: int = None) -> None:
         super().__init__(grid, verbose, max_error, max_num_iterations)
 
         # Initialize the node priority queue.
@@ -415,7 +419,7 @@ class StochasticDifferentialMeshSolver(IterativeDifferentialMeshSolver):
                  grid: DifferentialMeshGrid,
                  verbose: bool = False,
                  max_error: float = 0.001,
-                 max_num_iterations: int = None):
+                 max_num_iterations: int = None) -> None:
         super().__init__(grid, verbose, max_error, max_num_iterations)
 
     def _choose_node(self) -> int:
