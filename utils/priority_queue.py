@@ -8,6 +8,8 @@ from typing import Any
 class PriorityQueue:
     """Priority queue.
 
+    All elements to be inserted into the queue must be hashable.
+
     Attributes:
         buffer: Buffer for the data.
         size: Number of elements in the queue.
@@ -16,7 +18,8 @@ class PriorityQueue:
 
     def __init__(self, capacity: int):
         # Index 0 of the buffer is unused.
-        self.buffer = [()] * (capacity + 1)  # type: list[tuple[Any, int]]
+        self.buffer = [PriorityQueueElement(None, None)] * (
+            capacity + 1)  # type: list[PriorityQueueElement]
         self.size = 0
         self.element_to_index_map = {}
 
@@ -38,11 +41,14 @@ class PriorityQueue:
         Args:
             element: Element to add.
             priority: Priority of the element.
+
+        Raises:
+            RuntimeError: If the queue is full.
         """
         if self.full():
             raise RuntimeError("Queue is full.")
 
-        self.buffer[self.size + 1] = (element, priority)
+        self.buffer[self.size + 1] = PriorityQueueElement(element, priority)
         self.element_to_index_map[element] = self.size + 1
         self.size += 1
         self._swim(self.size)
@@ -52,18 +58,21 @@ class PriorityQueue:
 
         Returns:
             A 2-tuple consisting of the removed element and its priority.
+
+        Raises:
+            RuntimeError: If the queue is empty.
         """
         if self.empty():
             raise RuntimeError("Queue is empty.")
 
-        element, priority = self.buffer[1]
-        self.element_to_index_map.pop(element)
+        element = self.buffer[1]
+        self.element_to_index_map.pop(element.element)
         self.buffer[1] = self.buffer[self.size]
-        self.element_to_index_map[self.buffer[1][0]] = 1
+        self.element_to_index_map[self.buffer[1].element] = 1
         self.size -= 1
         if self._in_bounds(1):
             self._sink(1)
-        return element, priority
+        return element.element, element.priority
 
     def update(self, element: Any, priority: float) -> None:
         """Updates the given element with the given priority.
@@ -73,8 +82,8 @@ class PriorityQueue:
             priority: Updated priority of the element.
         """
         index = self.element_to_index_map[element]
-        old_priority = self.buffer[index][1]
-        self.buffer[index] = (element, priority)
+        old_priority = self.buffer[index].priority
+        self.buffer[index].priority = priority
         if priority < old_priority:
             self._swim(index)
         elif priority > old_priority:
@@ -131,13 +140,13 @@ class PriorityQueue:
             index1: Index of the element to compare.
             index2: Index of the element to compare.
         """
-        contents1 = self._get_element(index1)
-        contents2 = self._get_element(index2)
-        if contents1 is None:
+        element1 = self._get_element(index1)
+        element2 = self._get_element(index2)
+        if element1 is None:
             return index2
-        if contents2 is None:
+        if element2 is None:
             return index1
-        if contents1[1] < contents2[1]:
+        if element1.priority < element2.priority:
             return index1
         return index2
 
@@ -148,12 +157,12 @@ class PriorityQueue:
             index1: Index to swap.
             index2: Index to swap.
         """
-        contents = self.buffer[index1]
-        self.buffer[index1] = self.buffer[index2]
-        self.buffer[index2] = contents
-
-        self.element_to_index_map[self.buffer[index1][0]] = index1
-        self.element_to_index_map[self.buffer[index2][0]] = index2
+        self.buffer[index1], self.buffer[index2] = self.buffer[
+            index2], self.buffer[index1]
+        element1 = self.buffer[index1].element
+        self.element_to_index_map[element1] = index1
+        element2 = self.buffer[index2].element
+        self.element_to_index_map[element2] = index2
 
     def _swim(self, index: int) -> None:
         """Bubbles up the element at the given index.
@@ -179,3 +188,11 @@ class PriorityQueue:
                 index, min_child_index) == min_child_index:
             self._swap(index, min_child_index)
             self._sink(min_child_index)
+
+
+class PriorityQueueElement:
+    """Priority queue element."""
+
+    def __init__(self, element: Any, priority: int):
+        self.element = element
+        self.priority = priority
