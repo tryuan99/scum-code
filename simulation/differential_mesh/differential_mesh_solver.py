@@ -23,6 +23,7 @@ from simulation.differential_mesh.differential_mesh_grid import (
     DIFFERENTIAL_MESH_GRID_EDGE_MEASUREMENT_ATTRIBUTE,
     DIFFERENTIAL_MESH_GRID_NODE_POTENTIAL_ATTRIBUTE,
     DIFFERENTIAL_MESH_GRID_ROOT_NODE, DifferentialMeshGrid)
+from utils.priority_queue import PriorityQueue
 
 
 class DifferentialMeshSolver(ABC):
@@ -176,87 +177,6 @@ class DifferentialMeshSolver(ABC):
         return potential_difference - edge_measurement
 
 
-class StochasticDifferentialMeshSolver(DifferentialMeshSolver):
-    """Stochastic differential mesh solver.
-
-    Attributes:
-        max_error: Maximum node error to declare convergence.
-    """
-
-    def __init__(self,
-                 grid: DifferentialMeshGrid,
-                 verbose: bool = False,
-                 max_error: float = 0.001):
-        super().__init__(grid, verbose)
-        self.max_error = max_error
-
-    def solve(self) -> None:
-        """Solves for the node potentials.
-
-        The stochastic differential mesh solver randomly chooses nodes and sets
-        the potential equal to the average of its neighbors' estimates of the
-        node's potential until the node potentials converge.
-
-        For optimality, the node error should be zero at every node.
-        """
-        iteration = 0
-        while not self._has_converged():
-            iteration += 1
-
-            # Choose a random node that is not the root node.
-            node = random.choice([
-                node for node in self.graph.nodes
-                if node != DIFFERENTIAL_MESH_GRID_ROOT_NODE
-            ])
-
-            # Set the node potential to the average of its neighbors' estimates.
-            potential = self._calculate_average_neighbor_potential(node)
-            self._set_node_potential(node, potential)
-
-            # If verbose, log the overall mean squared edge error.
-            if self.verbose:
-                logging.info("Iteration %d: MSE=%f", iteration,
-                             self.calculate_mean_squared_error())
-
-    def _calculate_average_neighbor_potential(self, node: int) -> float:
-        """Calculates the node potential as the average of the neighbors'
-        estimates.
-
-        Args;
-            node: Node for which to calculate the node potential.
-        """
-        # The average of the neighbors' estimates of the given node's potential
-        # is equivalent to the sum of the neighboring node potentials and the
-        # outgoing edge measurements minus the incoming edge measurements, all
-        # divided by the node's degree.
-        neighbor_potentials = np.sum([
-            self._get_node_potential(neighbor)
-            for neighbor in self._get_neighbors(node)
-        ])
-        outgoing_edge_measurements = np.sum([
-            self._get_edge_measurement(u, v)
-            for u, v in self.graph.out_edges(node)
-        ])
-        incoming_edge_measurements = np.sum([
-            self._get_edge_measurement(u, v)
-            for u, v in self.graph.in_edges(node)
-        ])
-        mean_estimate = (neighbor_potentials + outgoing_edge_measurements -
-                         incoming_edge_measurements) / self.graph.degree(node)
-        return mean_estimate
-
-    def _has_converged(self) -> bool:
-        """Returns whether the solver has converged on a solution.
-
-        Convergence occurs once the node error is less than or equal to the
-        maximum error at every node.
-        """
-        for node in self.graph.nodes:
-            if self._calculate_node_error(node) > self.max_error:
-                return False
-        return True
-
-
 class MatrixDifferentialMeshSolver(DifferentialMeshSolver):
     """Matrix differential mesh solver.
 
@@ -340,7 +260,174 @@ class MatrixDifferentialMeshSolver(DifferentialMeshSolver):
         return edge_measurements_vector
 
 
+class IterativeDifferentialMeshSolver(DifferentialMeshSolver, ABC):
+    """Interface for a iterative differential mesh solver.
+
+    Attributes:
+        max_error: Maximum node error to declare convergence.
+        max_num_iterations: Maximum number of iterations.
+    """
+
+    def __init__(self,
+                 grid: DifferentialMeshGrid,
+                 verbose: bool = False,
+                 max_error: float = 0.001,
+                 max_num_iterations: int = None):
+        super().__init__(grid, verbose)
+        self.max_error = max_error
+        self.max_num_iterations = max_num_iterations or np.iinfo(int).max
+
+    def _calculate_average_neighbor_potential(self, node: int) -> float:
+        """Calculates the node potential as the average of the neighbors'
+        estimates.
+
+        Args;
+            node: Node for which to calculate the node potential.
+        """
+        # The average of the neighbors' estimates of the given node's potential
+        # is equivalent to the sum of the neighboring node potentials and the
+        # outgoing edge measurements minus the incoming edge measurements, all
+        # divided by the node's degree.
+        neighbor_potentials = np.sum([
+            self._get_node_potential(neighbor)
+            for neighbor in self._get_neighbors(node)
+        ])
+        outgoing_edge_measurements = np.sum([
+            self._get_edge_measurement(u, v)
+            for u, v in self.graph.out_edges(node)
+        ])
+        incoming_edge_measurements = np.sum([
+            self._get_edge_measurement(u, v)
+            for u, v in self.graph.in_edges(node)
+        ])
+        mean_estimate = (neighbor_potentials + outgoing_edge_measurements -
+                         incoming_edge_measurements) / self.graph.degree(node)
+        return mean_estimate
+
+    def _has_converged(self) -> bool:
+        """Returns whether the solver has converged on a solution.
+
+        Convergence occurs once the node error is less than or equal to the
+        maximum error at every node.
+        """
+        for node in self.graph.nodes:
+            if np.abs(self._calculate_node_error(node)) > self.max_error:
+                return False
+        return True
+
+
+class PriorityDifferentialMeshSolver(IterativeDifferentialMeshSolver):
+    """Priority differential mesh solver."""
+
+    def __init__(self,
+                 grid: DifferentialMeshGrid,
+                 verbose: bool = False,
+                 max_error: float = 0.001,
+                 max_num_iterations: int = None):
+        super().__init__(grid, verbose, max_error, max_num_iterations)
+
+    def solve(self) -> None:
+        """Solves for the node potentials.
+
+        The priority differential mesh solver chooses the node with the highest
+        error and sets the potential equal to the average of its neighbors'
+        estimates of the node's potential until the node potentials converge.
+
+        For optimality, the node error should be zero at every node.
+        """
+        # Initialize the node priority queue.
+        node_queue = PriorityQueue(self.graph.number_of_nodes())
+        for node in self.graph.nodes:
+            error = self._calculate_node_error(node)
+            node_queue.add(node, -np.abs(error))
+
+        iteration = 0
+        while not self._has_converged() and iteration < self.max_num_iterations:
+            iteration += 1
+
+            # Get the node with the largest error.
+            node, _ = node_queue.remove()
+
+            # Set the node potential to the average of its neighbors' estimates.
+            potential = self._calculate_average_neighbor_potential(node)
+            self._set_node_potential(node, potential)
+
+            # Put the node and its neighbors back into the priority queue.
+            node_queue.add(node, 0)
+            for neighbor in self._get_neighbors(node):
+                error = self._calculate_node_error(neighbor)
+                node_queue.update(neighbor, -np.abs(error))
+
+            # If verbose, log the overall mean squared edge error.
+            if self.verbose:
+                logging.info("Iteration %d: MSE=%f", iteration,
+                             self.calculate_mean_squared_error())
+
+        if not self._has_converged():
+            logging.warning(
+                "Priority differential mesh solver did not converge.")
+
+        # Subtract the root node's potential from all node potentials.
+        root_potential = self._get_node_potential(
+            DIFFERENTIAL_MESH_GRID_ROOT_NODE)
+        for node in self.graph.nodes:
+            potential = self._get_node_potential(node)
+            self._set_node_potential(node, potential - root_potential)
+
+
+class StochasticDifferentialMeshSolver(IterativeDifferentialMeshSolver):
+    """Stochastic differential mesh solver."""
+
+    def __init__(self,
+                 grid: DifferentialMeshGrid,
+                 verbose: bool = False,
+                 max_error: float = 0.001,
+                 max_num_iterations: int = None):
+        super().__init__(grid, verbose, max_error, max_num_iterations)
+
+    def solve(self) -> None:
+        """Solves for the node potentials.
+
+        The stochastic differential mesh solver randomly chooses nodes and sets
+        the potential equal to the average of its neighbors' estimates of the
+        node's potential until the node potentials converge.
+
+        For optimality, the node error should be zero at every node.
+        """
+        iteration = 0
+        nodes = list(self.graph.nodes)
+        while not self._has_converged() and iteration < self.max_num_iterations:
+            iteration += 1
+
+            # Choose a random node that has a non-zero error.
+            while True:
+                node = random.choice(nodes)
+                if np.abs(self._calculate_node_error(node)) > self.max_error:
+                    break
+
+            # Set the node potential to the average of its neighbors' estimates.
+            potential = self._calculate_average_neighbor_potential(node)
+            self._set_node_potential(node, potential)
+
+            # If verbose, log the overall mean squared edge error.
+            if self.verbose:
+                logging.info("Iteration %d: MSE=%f", iteration,
+                             self.calculate_mean_squared_error())
+
+        if not self._has_converged():
+            logging.warning(
+                "Stochastic differential mesh solver did not converge.")
+
+        # Subtract the root node's potential from all node potentials.
+        root_potential = self._get_node_potential(
+            DIFFERENTIAL_MESH_GRID_ROOT_NODE)
+        for node in self.graph.nodes:
+            potential = self._get_node_potential(node)
+            self._set_node_potential(node, potential - root_potential)
+
+
 DIFFERENTIAL_MESH_SOLVERS = {
-    "stochastic": StochasticDifferentialMeshSolver,
     "matrix": MatrixDifferentialMeshSolver,
+    "priority": PriorityDifferentialMeshSolver,
+    "stochastic": StochasticDifferentialMeshSolver,
 }

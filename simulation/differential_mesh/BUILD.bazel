@@ -39,6 +39,7 @@ py_library(
     srcs = ["differential_mesh_solver.py"],
     deps = [
         ":differential_mesh_grid",
+        "//utils:priority_queue",
         requirement("absl-py"),
         requirement("networkx"),
         requirement("numpy"),
