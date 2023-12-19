@@ -2,7 +2,7 @@
 # M2
 # pH 7 solution
 # Berkeley reference electrode
-# 1.25 kSps sampling rate with Saleae Logic Pro 2
+# 1.25 kSps sampling rate with Saleae Logic Pro 8
 
 Time [s],PWM ramp [V],Output [V]
 726.948072562,-0.090,-0.032

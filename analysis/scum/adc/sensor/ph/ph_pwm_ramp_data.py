@@ -1,7 +1,7 @@
 """The pH PWM ramp data represents the data collected from the pH sensor when
 excited by a PWM ramp.
 
-The Saleae Logic Pro 2 analyzer records the time, the PWM ramp voltage, and the
+The Saleae Logic Pro 8 analyzer records the time, the PWM ramp voltage, and the
 output voltage.
 """
 

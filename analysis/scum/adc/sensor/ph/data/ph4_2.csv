@@ -2,7 +2,7 @@
 # M2
 # pH 4 solution
 # Colorado reference electrode with different pH sensor
-# 1.25 kSps sampling rate with Saleae Logic Pro 2
+# 1.25 kSps sampling rate with Saleae Logic Pro 8
 
 Time [s],PWM ramp [V],Output [V]
 15.260072562,-0.080,-0.057
