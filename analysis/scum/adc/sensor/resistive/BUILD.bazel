@@ -43,6 +43,7 @@ py_binary(
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
+        requirement("SciencePlots"),
     ],
 )
 
@@ -56,6 +57,7 @@ py_binary(
         requirement("matplotlib"),
         requirement("numpy"),
         requirement("pandas"),
+        requirement("SciencePlots"),
     ],
 )
 

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scienceplots
 import scipy.stats
 from absl import app, flags, logging
 
@@ -28,11 +29,17 @@ def plot_adc_data_histogram(data: str) -> None:
     plt.show()
 
     # Plot a histogram of the ADC data.
-    plt.rcParams.update({"font.size": 16})
-    fig, ax = plt.subplots(figsize=(12, 5))
+    plt.style.use(["science"])
+    plt.rcParams.update({
+        "font.size": 16,
+        "lines.linewidth": 3,
+        "lines.markersize": 8,
+    })
+    fig, ax = plt.subplots(figsize=(20, 5))
     minimum_adc_output = adc_output.min()
     maximum_adc_output = adc_output.max()
     bins = np.arange(minimum_adc_output - 0.5, maximum_adc_output + 1)
+    adc_output.hist(ax=ax, bins=bins)
 
     # Plot the Gaussian fit.
     secax = ax.twinx()
@@ -43,9 +50,10 @@ def plot_adc_data_histogram(data: str) -> None:
     secax.plot(bins, gaussian_fit, "r", linestyle="--")
     secax.set_ylim(bottom=0)
     plt.ylabel("PDF")
-    ax.set_title(
-        "Histogram of the ADC data (mean=234.9 LSBs, stddev=4.54 LSBs)")
-    ax.set_xlabel("ADC data [LSB]")
+    ax.set_title(f"Histogram of the ADC data "
+                 f"(mean={adc_output.mean():.2f} LSBs, "
+                 f"stddev={adc_output.std():.2f} LSBs)")
+    ax.set_xlabel("ADC output [LSB]")
     ax.set_ylabel("Count")
     plt.show()
 
