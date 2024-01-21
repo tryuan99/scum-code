@@ -1,8 +1,8 @@
-absl-py==2.0.0
+absl-py==2.1.0
 matplotlib==3.7.2
-networkx==3.1
+networkx==3.2.1
 numpy==1.25.2
-protobuf==4.25.1
+protobuf==4.25.2
 pandas==2.0.3
 pyserial==3.5
 regex==2022.7.9
