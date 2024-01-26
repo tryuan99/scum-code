@@ -94,6 +94,48 @@ class DifferentialMeshGrid:
             font_color=DIFFERENTIAL_MESH_GRID_EDGE_COLOR)
         plt.show()
 
+    def output_spice_netlist(self, netlist: str, target_node: int = -1) -> None:
+        """Outputs the SPICE netlist corresponding to the differential mesh
+        grid.
+
+        Each edge is represented by a 1 Ohm resistor, and the root node is
+        grounded. A 1 A current source is connected to the target node, and the
+        resulting node potential is equal to the standard error of the node
+        potential.
+
+        Args:
+            netlist: Netlist file to output.
+            node: Target node.
+        """
+        # By default, the target node is the furthest node from the reference node.
+        if target_node not in self.graph.nodes:
+            target_node = self.graph.number_of_nodes()
+
+        with open(netlist, "w") as f:
+            # SPICE title card.
+            num_rows = self._get_number_of_rows()
+            num_cols = self._get_number_of_columns()
+            f.write(f"* SPICE netlist for {num_rows}x{num_cols} grid\n")
+
+            # Add a 1 Ohm resistor for each edge.
+            resistor_index = 1
+            for u, v in self.graph.edges:
+                f.write(f"R{resistor_index} {u} {v} {{R}}\n")
+                resistor_index += 1
+
+            # Add the reference node.
+            f.write(f"V 0 {DIFFERENTIAL_MESH_GRID_ROOT_NODE} 0\n")
+
+            # Add a 1 A current source to the target node.
+            f.write(f"I 0 {target_node} 1\n")
+
+            # Add a DC analysis, define the resistance, and print the node
+            # potential.
+            f.write(".dc I 1 1 1\n")
+            f.write(".param R=1\n")
+            f.write(f".print dc v({target_node})\n")
+            f.write(".end\n")
+
     def _validate_graph(self) -> None:
         """Validates the graph.
 
@@ -119,7 +161,12 @@ class DifferentialMeshGrid:
         if self.graph.number_of_nodes() % num_cols != 0:
             raise ValueError("Graph is not a 2-dimensional grid.")
 
-    def _get_number_of_columns(self) -> None:
+    def _get_number_of_rows(self) -> int:
+        """Returns the number of rows in the graph."""
+        num_cols = self._get_number_of_columns()
+        return self.graph.number_of_nodes() // num_cols
+
+    def _get_number_of_columns(self) -> int:
         """Returns the number of columns in the graph.
 
         Raises:

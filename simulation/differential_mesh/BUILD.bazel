@@ -34,6 +34,16 @@ py_binary(
     ],
 )
 
+py_binary(
+    name = "differential_mesh_grid_spice_main",
+    srcs = ["differential_mesh_grid_spice_main.py"],
+    deps = [
+        ":differential_mesh_graph_factory",
+        ":differential_mesh_grid",
+        requirement("absl-py"),
+    ],
+)
+
 py_library(
     name = "differential_mesh_solver",
     srcs = ["differential_mesh_solver.py"],
