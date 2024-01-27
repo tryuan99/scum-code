@@ -2,6 +2,33 @@ load("@pip_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
+py_binary(
+    name = "differential_mesh_analysis_main",
+    srcs = ["differential_mesh_analysis_main.py"],
+    data = ["//simulation/differential_mesh/data:standard_errors"],
+    deps = [
+        "//utils/visualization:color_maps",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)
+
+py_binary(
+    name = "differential_mesh_analysis_square_main",
+    srcs = ["differential_mesh_analysis_square_main.py"],
+    data = ["//simulation/differential_mesh/data:standard_errors"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)
+
 py_library(
     name = "differential_mesh_graph_factory",
     srcs = ["differential_mesh_graph_factory.py"],

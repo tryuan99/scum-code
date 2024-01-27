@@ -4,3 +4,11 @@ filegroup(
     name = "example_edge_lists",
     srcs = glob(["example_*.edgelist"]),
 )
+
+filegroup(
+    name = "standard_errors",
+    srcs = [
+        "grid_standard_errors.csv",
+        "square_standard_errors.csv",
+    ],
+)
