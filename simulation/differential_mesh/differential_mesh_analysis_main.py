@@ -40,6 +40,25 @@ def plot_standard_error_sweep(standard_errors: str) -> None:
     plt.colorbar(surf)
     plt.show()
 
+    # Plot the squared standard error as a function of the grid dimensions.
+    plt.style.use(["science"])
+    fig, ax = plt.subplots(
+        figsize=(12, 8),
+        subplot_kw={"projection": "3d"},
+    )
+    surf = ax.plot_trisurf(
+        df[num_rows_column],
+        df[num_cols_column],
+        df[standard_error_squared_column],
+        cmap=COLOR_MAPS["parula"],
+        antialiased=False,
+    )
+    ax.set_xlabel("Number of rows")
+    ax.set_ylabel("Number of columns")
+    ax.view_init(30, -45)
+    plt.colorbar(surf)
+    plt.show()
+
 
 def main(argv):
     assert len(argv) == 1

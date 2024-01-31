@@ -17,9 +17,21 @@ py_library(
     name = "linear_regression",
     srcs = ["linear_regression.py"],
     deps = [
-        ":regression",
+        ":polynomial_regression",
         requirement("numpy"),
-    ],)
+    ],
+)
+
+py_library(
+    name = "logarithmic_regression",
+    srcs = ["logarithmic_regression.py"],
+    deps = [
+        ":regression",
+        requirement("absl-py"),
+        requirement("numpy"),
+        requirement("scipy"),
+    ],
+)
 
 py_library(
     name = "parabolic_regression",
@@ -27,7 +39,8 @@ py_library(
     deps = [
         ":polynomial_regression",
         requirement("numpy"),
-    ],)
+    ],
+)
 
 py_library(
     name = "polynomial_regression",

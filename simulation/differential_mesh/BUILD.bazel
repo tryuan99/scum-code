@@ -21,6 +21,7 @@ py_binary(
     srcs = ["differential_mesh_analysis_square_main.py"],
     data = ["//simulation/differential_mesh/data:standard_errors"],
     deps = [
+        "//utils/regression:logarithmic_regression",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),

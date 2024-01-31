@@ -44,8 +44,7 @@ class ExponentialRegression(Regression):
     def _perform_regression(self) -> None:
         """Performs an exponential regression.
 
-        This function sets a, tau, and b, where y = a * exp(-x/tau) + b are the
-        coefficients of the exponential.
+        This function sets a, tau, and b, where y = a * exp(-x/tau) + b.
         """
         A = np.vstack([self.x, np.ones(len(self.x))]).T
         result = np.squeeze(np.linalg.lstsq(A, np.log(self.y), rcond=None)[0])
@@ -61,8 +60,7 @@ class ExponentialRegression(Regression):
                 params: Three-dimensional vector consisting of (a, tau, b).
 
             Returns:
-                The squared cost between the given exponential and the given
-                data.
+                The norm between the given exponential and the given data.
             """
             a, tau, b = params
             return np.linalg.norm(a * np.exp(-1 / tau * self.x) + b - self.y)
