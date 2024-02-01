@@ -4,8 +4,6 @@ from absl import app, flags, logging
 
 from simulation.differential_mesh.differential_mesh_graph_factory import \
     DifferentialMeshGraphFactory
-from simulation.differential_mesh.differential_mesh_grid import \
-    DifferentialMeshGrid
 from simulation.differential_mesh.differential_mesh_solver import (
     DIFFERENTIAL_MESH_SOLVERS, DifferentialMeshSolver)
 
@@ -45,15 +43,14 @@ def solve_differential_mesh_grid(solver_cls: DifferentialMeshSolver,
         noise: Standard deviation of the noise.
         verbose: If true, log verbose messages.
     """
-    graph = DifferentialMeshGraphFactory.create_from_edge_list(edge_list)
-    grid = DifferentialMeshGrid(graph)
+    grid = DifferentialMeshGraphFactory.create_from_edge_list(edge_list)
     grid.add_edge_measurement_noise(noise)
     solver = solver_cls(grid, verbose=verbose)
     solver.solve()
 
     # Log the edge measurements and node potentials.
-    _log_edge_measurements(solver.get_edge_measurements())
-    _log_node_potentials(solver.get_node_potentials())
+    _log_edge_measurements(grid.get_edge_measurements())
+    _log_node_potentials(grid.get_node_potentials())
     logging.info("MSE = %f", solver.calculate_mean_squared_error())
 
     # Draw the grid.

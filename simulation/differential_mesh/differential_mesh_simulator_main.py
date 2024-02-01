@@ -27,9 +27,8 @@ def simulate_standard_error(solver: DifferentialMeshSolver, num_rows: int,
         num_iterations: Number of iterations to simulate.
         verbose: If true, log verbose messages.
     """
-    graph = DifferentialMeshGraphFactory.create_zero_2d_graph(
-        num_rows, num_cols)
-    simulator = DifferentialMeshSimulator(graph)
+    grid = DifferentialMeshGraphFactory.create_zero_2d_graph(num_rows, num_cols)
+    simulator = DifferentialMeshSimulator(grid)
     stderrs = simulator.simulate_node_standard_errors(solver, noise,
                                                       num_iterations, verbose)
     logging.info("Node potential standard errors:")
@@ -82,9 +81,9 @@ def simulate_standard_error_sweep(solver: DifferentialMeshSolver,
     for num_rows in range(1, max_num_rows + 1):
         for num_cols in range(1, max_num_cols + 1):
             if num_rows != 1 or num_cols != 1:
-                graph = DifferentialMeshGraphFactory.create_zero_2d_graph(
+                grid = DifferentialMeshGraphFactory.create_zero_2d_graph(
                     num_rows, num_cols)
-                simulator = DifferentialMeshSimulator(graph)
+                simulator = DifferentialMeshSimulator(grid)
                 stderrs = simulator.simulate_node_standard_errors(
                     solver, noise, num_iterations, verbose)
                 # Record the standard error at the farthest corner of the grid.

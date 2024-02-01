@@ -34,8 +34,19 @@ py_library(
     name = "differential_mesh_graph_factory",
     srcs = ["differential_mesh_graph_factory.py"],
     deps = [
+        ":differential_mesh_graph",
         ":differential_mesh_grid",
         requirement("networkx"),
+    ],
+)
+
+py_library(
+    name = "differential_mesh_graph",
+    srcs = ["differential_mesh_graph.py"],
+    deps = [
+        requirement("matplotlib"),
+        requirement("networkx"),
+        requirement("numpy"),
     ],
 )
 
@@ -43,7 +54,7 @@ py_library(
     name = "differential_mesh_grid",
     srcs = ["differential_mesh_grid.py"],
     deps = [
-        requirement("matplotlib"),
+        ":differential_mesh_graph",
         requirement("networkx"),
         requirement("numpy"),
     ],
@@ -55,7 +66,6 @@ py_binary(
     data = ["//simulation/differential_mesh/data:example_edge_lists"],
     deps = [
         ":differential_mesh_graph_factory",
-        ":differential_mesh_grid",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("SciencePlots"),
@@ -67,7 +77,6 @@ py_binary(
     srcs = ["differential_mesh_grid_spice_main.py"],
     deps = [
         ":differential_mesh_graph_factory",
-        ":differential_mesh_grid",
         requirement("absl-py"),
     ],
 )
@@ -76,7 +85,7 @@ py_library(
     name = "differential_mesh_solver",
     srcs = ["differential_mesh_solver.py"],
     deps = [
-        ":differential_mesh_grid",
+        ":differential_mesh_graph",
         "//utils:priority_queue",
         requirement("absl-py"),
         requirement("networkx"),
@@ -90,7 +99,6 @@ py_binary(
     data = ["//simulation/differential_mesh/data:example_edge_lists"],
     deps = [
         ":differential_mesh_graph_factory",
-        ":differential_mesh_grid",
         ":differential_mesh_solver",
         requirement("absl-py"),
         requirement("matplotlib"),
@@ -102,9 +110,8 @@ py_library(
     name = "differential_mesh_simulator",
     srcs = ["differential_mesh_simulator.py"],
     deps = [
-        ":differential_mesh_grid",
+        ":differential_mesh_graph",
         ":differential_mesh_solver",
-        requirement("networkx"),
         requirement("numpy"),
     ],
 )

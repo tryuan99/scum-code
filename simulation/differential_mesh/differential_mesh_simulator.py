@@ -1,12 +1,13 @@
-"""The differential mesh simulator solves the differential mesh grid and
+"""The differential mesh simulator solves the differential mesh graph and
 simulates various metrics of the solution.
 """
 
-import networkx as nx
+import copy
+
 import numpy as np
 
-from simulation.differential_mesh.differential_mesh_grid import \
-    DifferentialMeshGrid
+from simulation.differential_mesh.differential_mesh_graph import \
+    DifferentialMeshGraph
 from simulation.differential_mesh.differential_mesh_solver import \
     DifferentialMeshSolver
 
@@ -16,16 +17,15 @@ class DifferentialMeshSimulator:
 
     Attributes:
         graph: Differential mesh graph.
-
     """
 
-    def __init__(self, graph: nx.DiGraph) -> None:
+    def __init__(self, graph: DifferentialMeshGraph) -> None:
         self.graph = graph
 
     def simulate_node_standard_errors(self, solver_cls: DifferentialMeshSolver,
                                       noise: float, num_iterations: int,
                                       verbose: bool) -> list[tuple[int, float]]:
-        """Simulate the standard error at each node.
+        """Simulates the standard error at each node.
 
         Args:
             solver_cls: Differential mesh solver class.
@@ -38,18 +38,19 @@ class DifferentialMeshSimulator:
             corresponding standard error.
         """
         # Initialize the solved node potentials as a 2D matrix.
-        potentials = np.zeros((self.graph.number_of_nodes(), num_iterations))
+        potentials = np.zeros(
+            (self.graph.graph.number_of_nodes(), num_iterations))
 
         # Simulate the solver.
         for iteration in range(num_iterations):
             # Solve for the node potentials.
-            grid = DifferentialMeshGrid(self.graph)
-            grid.add_edge_measurement_noise(noise)
-            solver = solver_cls(grid, verbose=verbose)
+            graph = copy.deepcopy(self.graph)
+            graph.add_edge_measurement_noise(noise)
+            solver = solver_cls(graph, verbose=verbose)
             solver.solve()
 
             # Record the solved node potentials.
-            for node, potential in solver.get_node_potentials():
+            for node, potential in graph.get_node_potentials():
                 potentials[node - 1, iteration] = potential
 
         # Calculate the standard eror of each node.

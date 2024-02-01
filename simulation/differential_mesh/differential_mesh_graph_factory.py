@@ -1,16 +1,18 @@
-"""The differential mesh graph factory creates a 2-dimensional directed grid
-graph for a differential mesh grid.
+"""The differential mesh graph factory creates a differential mesh graph,
+such as a 2-dimensional directed grid graph for a differential mesh grid.
 """
 
 import networkx as nx
 
-from simulation.differential_mesh.differential_mesh_grid import (
-    DIFFERENTIAL_MESH_GRID_EDGE_MEASUREMENT_ATTRIBUTE,
-    DIFFERENTIAL_MESH_GRID_ROOT_NODE)
+from simulation.differential_mesh.differential_mesh_graph import (
+    DIFFERENTIAL_MESH_GRAPH_EDGE_MEASUREMENT_ATTRIBUTE,
+    DIFFERENTIAL_MESH_GRAPH_ROOT_NODE)
+from simulation.differential_mesh.differential_mesh_grid import \
+    DifferentialMeshGrid
 
 
 class DifferentialMeshGraphFactory:
-    """2-dimensional directed grid graph factory."""
+    """Differential mesh graph factory."""
 
     @classmethod
     def create_zero_2d_graph(cls, num_rows: int, num_cols: int) -> nx.DiGraph:
@@ -35,25 +37,26 @@ class DifferentialMeshGraphFactory:
         graph = nx.DiGraph()
 
         # Add the horizontal edges.
-        node_index = DIFFERENTIAL_MESH_GRID_ROOT_NODE
+        node_index = DIFFERENTIAL_MESH_GRAPH_ROOT_NODE
         for _ in range(num_rows):
             for _ in range(num_cols - 1):
                 graph.add_edge(
                     node_index, node_index + 1,
-                    **{DIFFERENTIAL_MESH_GRID_EDGE_MEASUREMENT_ATTRIBUTE: 0})
+                    **{DIFFERENTIAL_MESH_GRAPH_EDGE_MEASUREMENT_ATTRIBUTE: 0})
                 node_index += 1
             node_index += 1
 
         # Add the vertical edges.
-        node_index = DIFFERENTIAL_MESH_GRID_ROOT_NODE
+        node_index = DIFFERENTIAL_MESH_GRAPH_ROOT_NODE
         for _ in range(num_rows - 1):
             for _ in range(num_cols):
                 graph.add_edge(
                     node_index, node_index + num_cols,
-                    **{DIFFERENTIAL_MESH_GRID_EDGE_MEASUREMENT_ATTRIBUTE: 0})
+                    **{DIFFERENTIAL_MESH_GRAPH_EDGE_MEASUREMENT_ATTRIBUTE: 0})
                 node_index += 1
 
-        return graph
+        # Return a differential mesh grid.
+        return DifferentialMeshGrid(graph)
 
     @classmethod
     def create_from_edge_list(cls, edge_list: str) -> nx.DiGraph:
@@ -69,4 +72,6 @@ class DifferentialMeshGraphFactory:
             graph = nx.read_weighted_edgelist(f,
                                               create_using=nx.DiGraph,
                                               nodetype=int)
-        return graph
+
+        # Return a differential mesh grid.
+        return DifferentialMeshGrid(graph)

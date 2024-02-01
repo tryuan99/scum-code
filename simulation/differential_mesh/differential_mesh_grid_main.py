@@ -4,8 +4,6 @@ from absl import app, flags
 
 from simulation.differential_mesh.differential_mesh_graph_factory import \
     DifferentialMeshGraphFactory
-from simulation.differential_mesh.differential_mesh_grid import \
-    DifferentialMeshGrid
 
 FLAGS = flags.FLAGS
 
@@ -13,10 +11,9 @@ FLAGS = flags.FLAGS
 def main(argv):
     assert len(argv) == 1
 
-    # Create the graph from the number of rows and columns.
-    graph = DifferentialMeshGraphFactory.create_zero_2d_graph(
+    # Create the grid graph from the number of rows and columns.
+    grid = DifferentialMeshGraphFactory.create_zero_2d_graph(
         FLAGS.num_rows, FLAGS.num_cols)
-    grid = DifferentialMeshGrid(graph)
     grid.add_edge_measurement_noise(FLAGS.noise)
 
     # Draw the grid.
@@ -24,8 +21,7 @@ def main(argv):
     grid.draw()
 
     # Create the graph from the edge list.
-    graph = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
-    grid = DifferentialMeshGrid(graph)
+    grid = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
     grid.add_edge_measurement_noise(FLAGS.noise)
 
     # Draw the grid.
