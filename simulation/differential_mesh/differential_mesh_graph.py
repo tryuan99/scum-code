@@ -268,24 +268,23 @@ class DifferentialMeshGraph:
             corresponding standard error.
         """
         L = self.create_laplacian_matrix()
-        Lambda, V = np.linalg.eigh(L)
-        zero_index = np.argmin(Lambda)
+        eigenvalues, eigenvectors = np.linalg.eigh(L)
+        zero_index = np.argmin(eigenvalues)
 
-        # Calculate the node-independent factor.
-        eigenvector_difference_squared = np.zeros(
-            (self.graph.number_of_nodes()))
-        for u, v in self.graph.edges:
-            eigenvector_difference_squared += (V[u - 1] - V[v - 1])**2
+        # Calculate the eigenvector component difference with the reference
+        # node component.
+        eigenvector_minus_reference_squared = (eigenvectors -
+                                               eigenvectors[zero_index])**2
 
-        # Calculate the eigenvector component difference with the zero
-        # eigenvalue component.
-        eigenvector_difference_zero_squared = (V - V[zero_index])**2
+        # Remove the zero eigenvalue and its corresponding eigenvector.
+        eigenvector_minus_reference_squared_without_zero = np.delete(
+            eigenvector_minus_reference_squared, zero_index, axis=1)
+        eigenvalues_without_zero = np.delete(eigenvalues, zero_index)
 
-        product = eigenvector_difference_zero_squared * eigenvector_difference_squared
-        product = np.delete(product, zero_index, axis=1)
-        product /= np.delete(Lambda, zero_index)**2
-
-        squared_stderrs = np.sum(product, axis=1).T
+        squared_stderrs = np.sum(
+            eigenvector_minus_reference_squared_without_zero /
+            eigenvalues_without_zero,
+            axis=1).T
         return [(node_index + 1, np.sqrt(squared_stderr))
                 for node_index, squared_stderr in enumerate(squared_stderrs)]
 
