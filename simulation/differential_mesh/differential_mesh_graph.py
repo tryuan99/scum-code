@@ -192,10 +192,6 @@ class DifferentialMeshGraph:
             laplacian_matrix[v_index, u_index] -= 1
             laplacian_matrix[u_index, u_index] += 1
             laplacian_matrix[v_index, v_index] += 1
-
-        # Modify the Laplacian matrix.
-        laplacian_matrix[root_index, :] = 0
-        laplacian_matrix[root_index, root_index] = 1
         return laplacian_matrix
 
     def create_edge_measurements_vector(self) -> np.ndarray:
@@ -262,6 +258,36 @@ class DifferentialMeshGraph:
             f.write(".param R=1\n")
             f.write(f".print dc v({target_node})\n")
             f.write(".end\n")
+
+    def calculate_node_standard_errors(self) -> list[tuple[int, int]]:
+        """Calculates the standard error of the node potentials using
+        eigendecomposition.
+
+        Returns:
+            A list of 2-tuples, each consisting of the node label and the
+            corresponding standard error.
+        """
+        L = self.create_laplacian_matrix()
+        Lambda, V = np.linalg.eigh(L)
+        zero_index = np.argmin(Lambda)
+
+        # Calculate the node-independent factor.
+        eigenvector_difference_squared = np.zeros(
+            (self.graph.number_of_nodes()))
+        for u, v in self.graph.edges:
+            eigenvector_difference_squared += (V[u - 1] - V[v - 1])**2
+
+        # Calculate the eigenvector component difference with the zero
+        # eigenvalue component.
+        eigenvector_difference_zero_squared = (V - V[zero_index])**2
+
+        product = eigenvector_difference_zero_squared * eigenvector_difference_squared
+        product = np.delete(product, zero_index, axis=1)
+        product /= np.delete(Lambda, zero_index)**2
+
+        squared_stderrs = np.sum(product, axis=1).T
+        return [(node_index + 1, np.sqrt(squared_stderr))
+                for node_index, squared_stderr in enumerate(squared_stderrs)]
 
     def _validate_graph(self) -> None:
         """Validates the graph.
