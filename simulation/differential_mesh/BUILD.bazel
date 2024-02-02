@@ -131,3 +131,16 @@ py_binary(
         requirement("SciencePlots"),
     ],
 )
+
+py_binary(
+    name = "differential_mesh_standard_error_main",
+    srcs = ["differential_mesh_standard_error_main.py"],
+    deps = [
+        ":differential_mesh_graph_factory",
+        "//utils/visualization:color_maps",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("SciencePlots"),
+    ],
+)

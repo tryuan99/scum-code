@@ -14,6 +14,30 @@ from utils.visualization.color_maps import COLOR_MAPS
 FLAGS = flags.FLAGS
 
 
+def _2d_list_to_grid(values: list[tuple[int, int]], num_rows: int,
+                     num_cols: int) -> np.ndarray:
+    """Places the values in the list of 2-tuples into a 2D grid.
+
+    The list should consist of 2-tuples, each consisting of the node label and
+    the corresponding value.
+
+    Args:
+        values: List of 2-tuples.
+        num_rows: Number of rows.
+        num_cols: Number of columns.
+
+    Returns:
+        A 2D array with the values of the list of 2-tuples.
+    """
+    grid = np.zeros((num_rows, num_cols))
+    for node, value in values:
+        node_index = node - 1
+        row = node_index // num_cols
+        col = node_index % num_cols
+        grid[row, col] = value
+    return grid
+
+
 def simulate_standard_error(solver: DifferentialMeshSolver, num_rows: int,
                             num_cols: int, noise: float, num_iterations: int,
                             verbose: bool) -> None:
@@ -29,20 +53,19 @@ def simulate_standard_error(solver: DifferentialMeshSolver, num_rows: int,
     """
     grid = DifferentialMeshGraphFactory.create_zero_2d_graph(num_rows, num_cols)
     simulator = DifferentialMeshSimulator(grid)
-    stderrs = simulator.simulate_node_standard_errors(solver, noise,
-                                                      num_iterations, verbose)
+    simulated_stderrs = simulator.simulate_node_standard_errors(
+        solver, noise, num_iterations, verbose)
     logging.info("Node potential standard errors:")
-    for node, stderr in stderrs:
+    for node, stderr in simulated_stderrs:
         logging.info("%d %f", node, stderr)
+    calculated_stderrs = grid.calculate_node_standard_errors()
 
-    node_stderrs = np.zeros((num_cols, num_rows))
-    for node, stderr in stderrs:
-        node_index = node - 1
-        row = node_index // num_cols
-        col = node_index % num_cols
-        node_stderrs[col, row] = stderr
+    simulated_stderrs_grid = _2d_list_to_grid(simulated_stderrs, num_rows,
+                                              num_cols).T
+    calculated_stderrs_grid = _2d_list_to_grid(calculated_stderrs, num_rows,
+                                               num_cols).T
 
-    # Plot the standard error across the grid.
+    # Plot the simulated and calculated standard error across the grid.
     plt.style.use(["science"])
     fig, ax = plt.subplots(
         figsize=(12, 8),
@@ -50,8 +73,15 @@ def simulate_standard_error(solver: DifferentialMeshSolver, num_rows: int,
     )
     surf = ax.plot_surface(
         *np.meshgrid(np.arange(1, num_rows + 1), np.arange(1, num_cols + 1)),
-        node_stderrs,
+        simulated_stderrs_grid,
         cmap=COLOR_MAPS["parula"],
+        antialiased=False,
+    )
+    ax.plot_surface(
+        *np.meshgrid(np.arange(1, num_rows + 1), np.arange(1, num_cols + 1)),
+        calculated_stderrs_grid,
+        cmap=COLOR_MAPS["parula"],
+        alpha=0.2,
         antialiased=False,
     )
     ax.set_xlabel("Row")
