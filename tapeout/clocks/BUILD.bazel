@@ -1,0 +1,15 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_binary(
+    name = "analog_clock_main",
+    srcs = ["analog_clock_main.py"],
+    data = ["//tapeout/clocks/data:analog_clock_data"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)

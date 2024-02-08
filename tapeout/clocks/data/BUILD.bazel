@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "analog_clock_data",
+    srcs = ["analog_clock_measured.csv"],
+)
