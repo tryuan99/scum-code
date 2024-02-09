@@ -4,3 +4,8 @@ filegroup(
     name = "analog_clock_data",
     srcs = ["analog_clock_measured.csv"],
 )
+
+filegroup(
+    name = "digital_clock_spectrum_data",
+    srcs = ["digital_clock_spectrum_measured.csv"],
+)

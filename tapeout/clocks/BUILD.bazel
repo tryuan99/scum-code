@@ -13,3 +13,15 @@ py_binary(
         requirement("SciencePlots"),
     ],
 )
+
+py_binary(
+    name = "digital_clock_spectrum_main",
+    srcs = ["digital_clock_spectrum_main.py"],
+    data = ["//tapeout/clocks/data:digital_clock_spectrum_data"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)
