@@ -1,0 +1,15 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_binary(
+    name = "lo_spectrum_main",
+    srcs = ["lo_spectrum_main.py"],
+    data = ["//tapeout/rf/data:lo_spectrum_data"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)
