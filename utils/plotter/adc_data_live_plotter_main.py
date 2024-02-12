@@ -40,7 +40,7 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string("port", "/dev/cu.usbserial-A10M1IFE",
+    flags.DEFINE_string("port", "/dev/tty.usbserial-A10M1IFE",
                         "Serial port to plot for.")
     flags.DEFINE_integer("baudrate", 19200, "Serial port baud rate.")
     flags.DEFINE_integer("max_duration", 30,

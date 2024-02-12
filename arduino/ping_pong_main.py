@@ -31,7 +31,7 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string("port", "/dev/cu.usbmodem11401",
+    flags.DEFINE_string("port", "/dev/tty.usbmodem11401",
                         "Serial port of the Arduino.")
     flags.DEFINE_integer("baudrate",
                          250000,

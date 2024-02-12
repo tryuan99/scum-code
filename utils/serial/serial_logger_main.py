@@ -14,7 +14,7 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string("port", "/dev/cu.usbserial-A10M1IFE",
+    flags.DEFINE_string("port", "/dev/tty.usbserial-A10M1IFE",
                         "Serial port to log.")
     flags.DEFINE_integer("baudrate", 19200, "Serial port baud rate.")
     flags.DEFINE_string("output_file", None, "Output file to log the data to.")
