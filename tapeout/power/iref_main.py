@@ -14,20 +14,29 @@ def plot_iref_vs_vref(measured_data: str, simulated_data: str) -> None:
         simulated_data: Simulated data filename.
     """
     df_measured = pd.read_csv(measured_data, comment="#")
+    df_measured[df_measured.columns[df_measured.columns !=
+                                    df_measured.columns[0]]] *= 1000000
     df_simulated = pd.read_csv(simulated_data, comment="#")
+    df_simulated[df_simulated.columns[df_simulated.columns !=
+                                      df_simulated.columns[0]]] *= 1000000
 
     plt.style.use(["science", "grid"])
-    fig, ax = plt.subplots(figsize=(12, 8))
+    plt.rcParams.update({
+        "font.size": 16,
+        "lines.linewidth": 1,
+        "lines.markersize": 8,
+    })
+    fig, ax = plt.subplots(figsize=(12, 3))
 
     # Plot the measured data.
-    df_measured.plot.line(ax=ax, x=df_measured.columns[0], linewidth=2)
+    df_measured.plot.line(ax=ax, x=df_measured.columns[0], linewidth=5)
 
     # Plot the simulated data.
     df_simulated.plot.line(ax=ax, x=df_simulated.columns[0], linestyle="--")
 
-    plt.xlabel("VREF [V]")
-    plt.ylabel("IREF [A]")
-    plt.legend()
+    plt.xlabel("Output voltage at IREF [V]")
+    plt.ylabel("Reference current [µA]")
+    plt.legend(["Measured reference current [µA]"])
     plt.show()
 
 

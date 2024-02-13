@@ -20,7 +20,12 @@ def plot_analog_clock_tuning(measured_data: str, simulated_data: str) -> None:
     df_simulated = pd.read_csv(simulated_data, comment="#")
 
     plt.style.use(["science", "grid"])
-    fig, ax = plt.subplots(figsize=(12, 8))
+    plt.rcParams.update({
+        "font.size": 16,
+        "lines.linewidth": 3,
+        "lines.markersize": 8,
+    })
+    fig, ax = plt.subplots(figsize=(12, 3))
 
     # Plot the measured data.
     df_measured.plot.line(ax=ax,
@@ -29,11 +34,11 @@ def plot_analog_clock_tuning(measured_data: str, simulated_data: str) -> None:
                           marker="^")
 
     # Plot the simulated data.
-    df_simulated.plot.line(ax=ax, x=df_simulated.columns[0], linestyle="--")
+    # df_simulated.plot.line(ax=ax, x=df_simulated.columns[0], linestyle="--")
 
-    plt.xlabel(f"Analog tuning code ({ANALOG_CLOCK_NUM_TUNING_BITS} bits)")
-    plt.ylabel("Frequency [MHz]")
-    plt.legend()
+    plt.xlabel(f"ADC clock tuning code ({ANALOG_CLOCK_NUM_TUNING_BITS} bits)")
+    plt.ylabel("Clock frequency [MHz]")
+    plt.legend(["ADC clock frequency"])
     plt.show()
 
 

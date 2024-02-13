@@ -37,3 +37,14 @@ py_binary(
         requirement("SciencePlots"),
     ],
 )
+
+py_binary(
+    name = "switched_cap_main",
+    srcs = ["switched_cap_main.py"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)

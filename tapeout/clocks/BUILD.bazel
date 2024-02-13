@@ -25,3 +25,14 @@ py_binary(
         requirement("SciencePlots"),
     ],
 )
+
+py_binary(
+    name = "clock_power_main",
+    srcs = ["clock_power_main.py"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)
