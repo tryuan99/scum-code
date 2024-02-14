@@ -4,7 +4,11 @@ filegroup(
     name = "bgr_data",
     srcs = [
         "bgr_measured.csv",
+        "bgr_default_measured.csv",
+        "bgr_vref_control_measured.csv",
         "bgr_simulated.csv",
+        "bgr_default_simulated.csv",
+        "bgr_vref_control_simulated.csv",
     ],
 )
 
