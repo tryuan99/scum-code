@@ -15,15 +15,27 @@ def plot_ldo(measured_data: str, simulated_data: str) -> None:
     """
     df_measured = pd.read_csv(measured_data, comment="#")
     df_simulated = pd.read_csv(simulated_data, comment="#")
+    current_column_measured = df_measured.columns[0]
+    current_column_simulated = df_simulated.columns[0]
+    max_current_to_plot = min(df_measured[current_column_measured].max(),
+                              df_simulated[current_column_simulated].max())
 
     plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
 
     # Plot the measured data.
-    df_measured.plot.line(ax=ax, x=df_measured.columns[0], linewidth=2)
+    rows_to_plot_measured = df_measured[
+        current_column_measured] <= max_current_to_plot
+    df_measured[rows_to_plot_measured].plot.line(ax=ax,
+                                                 x=current_column_measured,
+                                                 linewidth=2)
 
     # Plot the simulated data.
-    df_simulated.plot.line(ax=ax, x=df_simulated.columns[0], linestyle="--")
+    rows_to_plot_simulated = df_simulated[
+        current_column_simulated] <= max_current_to_plot
+    df_simulated[rows_to_plot_simulated].plot.line(ax=ax,
+                                                   x=current_column_simulated,
+                                                   linestyle="--")
 
     plt.xlabel("I_LOAD [A]")
     plt.ylabel("LDO_VDD [V]")
@@ -39,7 +51,7 @@ def main(argv):
 
 if __name__ == "__main__":
     flags.DEFINE_string("ldo_measured_data",
-                        "tapeout/power/data/ldo_analog_measured.csv",
+                        "tapeout/power/data/ldo_analog_measured_chip13.csv",
                         "LDO measured data.")
     flags.DEFINE_string("ldo_simulated_data",
                         "tapeout/power/data/ldo_analog_simulated.csv",

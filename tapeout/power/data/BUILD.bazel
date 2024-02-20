@@ -25,9 +25,12 @@ filegroup(
 filegroup(
     name = "ldo_data",
     srcs = [
-        "ldo_analog_measured.csv",
-        "ldo_digital_measured.csv",
-        "ldo_rf_measured.csv",
+        "ldo_analog_measured_chip5.csv",
+        "ldo_analog_measured_chip13.csv",
+        "ldo_digital_measured_chip5.csv",
+        "ldo_digital_measured_chip13.csv",
+        "ldo_rf_measured_chip5.csv",
+        "ldo_rf_measured_chip14.csv",
         "ldo_analog_simulated.csv",
         "ldo_digital_simulated.csv",
         "ldo_rf_simulated.csv",
