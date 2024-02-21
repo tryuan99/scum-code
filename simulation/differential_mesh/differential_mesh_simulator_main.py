@@ -14,7 +14,8 @@ from utils.visualization.color_maps import COLOR_MAPS
 FLAGS = flags.FLAGS
 
 
-def _2d_list_to_grid(values: list[tuple[int, int]], num_rows: int,
+def _2d_list_to_grid(values: list[tuple[int, int]],
+                     node_to_index_map: dict[int, int], num_rows: int,
                      num_cols: int) -> np.ndarray:
     """Places the values in the list of 2-tuples into a 2D grid.
 
@@ -23,6 +24,7 @@ def _2d_list_to_grid(values: list[tuple[int, int]], num_rows: int,
 
     Args:
         values: List of 2-tuples.
+        node_to_index_map: Map from the node to its index.
         num_rows: Number of rows.
         num_cols: Number of columns.
 
@@ -31,7 +33,7 @@ def _2d_list_to_grid(values: list[tuple[int, int]], num_rows: int,
     """
     grid = np.zeros((num_rows, num_cols))
     for node, value in values:
-        node_index = node - 1
+        node_index = node_to_index_map[node]
         row = node_index // num_cols
         col = node_index % num_cols
         grid[row, col] = value
@@ -47,7 +49,7 @@ def simulate_standard_error(solver: DifferentialMeshSolver, num_rows: int,
         solver: Differential mesh solver class.
         num_rows: Number of rows.
         num_cols: Number of columns.
-        stddev: Standard deviation of the noise.
+        noise: Standard deviation of the noise.
         num_iterations: Number of iterations to simulate.
         verbose: If true, log verbose messages.
     """
@@ -58,11 +60,14 @@ def simulate_standard_error(solver: DifferentialMeshSolver, num_rows: int,
     logging.info("Node potential standard errors:")
     for node, stderr in simulated_stderrs:
         logging.info("%d %f", node, stderr)
-    calculated_stderrs = grid.calculate_node_standard_errors()
+    calculated_stderrs = grid.calculate_node_standard_errors(noise)
 
-    simulated_stderrs_grid = _2d_list_to_grid(simulated_stderrs, num_rows,
+    node_to_index_map = grid.get_node_to_index_map()
+    simulated_stderrs_grid = _2d_list_to_grid(simulated_stderrs,
+                                              node_to_index_map, num_rows,
                                               num_cols).T
-    calculated_stderrs_grid = _2d_list_to_grid(calculated_stderrs, num_rows,
+    calculated_stderrs_grid = _2d_list_to_grid(calculated_stderrs,
+                                               node_to_index_map, num_rows,
                                                num_cols).T
 
     # Plot the simulated and calculated standard error across the grid.

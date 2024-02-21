@@ -64,9 +64,10 @@ class DifferentialMeshGrid(DifferentialMeshGraph):
 
         The position of each node is stored as a node attribute.
         """
+        node_to_index_map = self.get_node_to_index_map()
         num_cols = self._get_number_of_columns()
         for node, data in self.graph.nodes(data=True):
-            node_index = node - 1
+            node_index = node_to_index_map[node]
             row = node_index // num_cols
             col = node_index % num_cols
             data[DIFFERENTIAL_MESH_GRAPH_NODE_POSITION_ATTRIBUTE] = (col, row)

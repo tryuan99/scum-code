@@ -37,6 +37,9 @@ class DifferentialMeshSimulator:
             A list of 2-tuples, each consisting of the node label and the
             corresponding standard error.
         """
+        node_to_index_map = self.graph.get_node_to_index_map()
+        index_to_node_map = self.graph.get_index_to_node_map()
+
         # Initialize the solved node potentials as a 2D matrix.
         potentials = np.zeros(
             (self.graph.graph.number_of_nodes(), num_iterations))
@@ -51,10 +54,11 @@ class DifferentialMeshSimulator:
 
             # Record the solved node potentials.
             for node, potential in graph.get_node_potentials():
-                potentials[node - 1, iteration] = potential
+                node_index = node_to_index_map[node]
+                potentials[node_index, iteration] = potential
 
         # Calculate the standard eror of each node.
         stderrs = np.std(potentials, axis=1)
 
-        return [(node_index + 1, stderr)
+        return [(index_to_node_map[node_index], stderr)
                 for node_index, stderr in enumerate(stderrs)]

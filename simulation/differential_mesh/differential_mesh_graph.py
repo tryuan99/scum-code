@@ -75,6 +75,18 @@ class DifferentialMeshGraph:
         for node in self.graph.nodes:
             self.set_node_potential(node, 0)
 
+    def get_node_to_index_map(self) -> dict[int, int]:
+        """Returns a map from the node to its index."""
+        return {
+            node: node_index for node_index, node in enumerate(self.graph.nodes)
+        }
+
+    def get_index_to_node_map(self) -> dict[int, int]:
+        """Returns a map from the index to the node."""
+        return {
+            node_index: node for node_index, node in enumerate(self.graph.nodes)
+        }
+
     def get_edge_measurements(self) -> list[tuple[tuple[int, int], float]]:
         """Returns the differential edge measurements.
 
@@ -179,10 +191,7 @@ class DifferentialMeshGraph:
         Returns:
             The modified Laplacian matrix.
         """
-        node_to_index_map = self._get_node_to_index_map()
-        root_index = node_to_index_map[DIFFERENTIAL_MESH_GRAPH_ROOT_NODE]
-
-        # Create the Laplacian matrix.
+        node_to_index_map = self.get_node_to_index_map()
         laplacian_matrix = np.zeros(
             (self.graph.number_of_nodes(), self.graph.number_of_nodes()))
         for u, v in self.graph.edges():
@@ -201,7 +210,7 @@ class DifferentialMeshGraph:
         Returns:
             The vector of sums of incident edge measurements at each node.
         """
-        node_to_index_map = self._get_node_to_index_map()
+        node_to_index_map = self.get_node_to_index_map()
         root_index = node_to_index_map[DIFFERENTIAL_MESH_GRAPH_ROOT_NODE]
 
         edge_measurements_vector = np.zeros(self.graph.number_of_nodes())
@@ -259,33 +268,29 @@ class DifferentialMeshGraph:
             f.write(f".print dc v({target_node})\n")
             f.write(".end\n")
 
-    def calculate_node_standard_errors(self) -> list[tuple[int, int]]:
+    def calculate_node_standard_errors(self,
+                                       noise: float = 1
+                                      ) -> list[tuple[int, int]]:
         """Calculates the standard error of the node potentials using
         eigendecomposition.
+
+        Args:
+            noise: Standard deviation of the noise.
 
         Returns:
             A list of 2-tuples, each consisting of the node label and the
             corresponding standard error.
         """
+        node_to_index_map = self.get_node_to_index_map()
+        root_index = node_to_index_map[DIFFERENTIAL_MESH_GRAPH_ROOT_NODE]
+        index_to_node_map = self.get_index_to_node_map()
+
         L = self.create_laplacian_matrix()
-        eigenvalues, eigenvectors = np.linalg.eigh(L)
-        zero_index = np.argmin(eigenvalues)
-
-        # Calculate the eigenvector component difference with the reference
-        # node component.
-        eigenvector_minus_reference_squared = (eigenvectors -
-                                               eigenvectors[zero_index])**2
-
-        # Remove the zero eigenvalue and its corresponding eigenvector.
-        eigenvector_minus_reference_squared_without_zero = np.delete(
-            eigenvector_minus_reference_squared, zero_index, axis=1)
-        eigenvalues_without_zero = np.delete(eigenvalues, zero_index)
-
-        squared_stderrs = np.sum(
-            eigenvector_minus_reference_squared_without_zero /
-            eigenvalues_without_zero,
-            axis=1).T
-        return [(node_index + 1, np.sqrt(squared_stderr))
+        L[root_index, :] = 0
+        L[:, root_index] = 0
+        Linv = np.linalg.pinv(L, hermitian=True)
+        squared_stderrs = np.diag(Linv)
+        return [(index_to_node_map[node_index], np.sqrt(squared_stderr) * noise)
                 for node_index, squared_stderr in enumerate(squared_stderrs)]
 
     def _validate_graph(self) -> None:
@@ -304,12 +309,6 @@ class DifferentialMeshGraph:
         if max(self.graph.nodes) != self.graph.number_of_nodes():
             raise ValueError(f"Node should be labeled consecutively from "
                              f"{DIFFERENTIAL_MESH_GRAPH_ROOT_NODE}.")
-
-    def _get_node_to_index_map(self) -> dict[int, int]:
-        """Returns a map from the node to its index."""
-        return {
-            node: node_index for node_index, node in enumerate(self.graph.nodes)
-        }
 
     @staticmethod
     def _round_map_values(input_map: dict[Any, float],

@@ -23,9 +23,10 @@ def plot_standard_error(num_rows: int, num_cols: int) -> None:
     for node, stderr in stderrs:
         logging.info("%d %f", node, stderr)
 
+    node_to_index_map = grid.get_node_to_index_map()
     node_stderrs = np.zeros((num_cols, num_rows))
     for node, stderr in stderrs:
-        node_index = node - 1
+        node_index = node_to_index_map[node]
         row = node_index // num_cols
         col = node_index % num_cols
         node_stderrs[col, row] = stderr

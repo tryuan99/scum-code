@@ -110,16 +110,17 @@ class MatrixDifferentialMeshSolver(DifferentialMeshSolver):
 
     def solve(self) -> None:
         """Solves for the node potentials."""
+        node_to_index_map = self.graph.get_node_to_index_map()
         L = self.graph.create_laplacian_matrix()
         b = self.graph.create_edge_measurements_vector()
 
         # Modify the Laplacian matrix to set the reference node potential to 0.
-        root_index = self.graph.graph.nodes[DIFFERENTIAL_MESH_GRAPH_ROOT_NODE]
+        root_index = node_to_index_map[DIFFERENTIAL_MESH_GRAPH_ROOT_NODE]
         L[root_index, :] = 0
         L[root_index, root_index] = 1
 
         node_potentials = np.linalg.solve(L, b)
-        for node_index, node in enumerate(self.graph.graph.nodes):
+        for node, node_index in node_to_index_map.items():
             self.graph.set_node_potential(node, node_potentials[node_index])
 
 
