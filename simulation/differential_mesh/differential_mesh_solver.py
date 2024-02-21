@@ -257,7 +257,7 @@ class PriorityDifferentialMeshSolver(IterativeDifferentialMeshSolver):
         The priority differential mesh solver chooses the node with the highest
         error.
         """
-        node, _ = self.node_queue.remove()
+        node, _ = self.node_queue.peek()
         return node
 
     def _post_update_node(self, node: int) -> None:
@@ -266,11 +266,21 @@ class PriorityDifferentialMeshSolver(IterativeDifferentialMeshSolver):
         Args:
             node: Node that had its potential updated.
         """
-        # Put the updated node and its neighbors back into the priority queue.
-        self.node_queue.add(node, 0)
+        # Update the node's priority as well as those of its neighbors in the
+        # priority queue.
+        self.node_queue.update(node, 0)
         for neighbor in self.graph.get_neighbors(node):
             error = self._calculate_node_error(neighbor)
             self.node_queue.update(neighbor, -np.abs(error))
+
+    def _has_converged(self) -> bool:
+        """Returns whether the solver has converged on a solution.
+
+        Convergence occurs once the node error is less than or equal to the
+        maximum error at every node.
+        """
+        _, max_node_error = self.node_queue.peek()
+        return np.abs(max_node_error) <= self.max_error
 
 
 class StochasticDifferentialMeshSolver(IterativeDifferentialMeshSolver):

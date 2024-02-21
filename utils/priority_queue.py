@@ -46,7 +46,7 @@ class PriorityQueue:
             RuntimeError: If the queue is full.
         """
         if self.full():
-            raise RuntimeError("Queue is full.")
+            raise RuntimeError("Priority queue is full.")
 
         self.buffer[self.size + 1] = PriorityQueueElement(element, priority)
         self.element_to_index_map[element] = self.size + 1
@@ -63,7 +63,7 @@ class PriorityQueue:
             RuntimeError: If the queue is empty.
         """
         if self.empty():
-            raise RuntimeError("Queue is empty.")
+            raise RuntimeError("Priority queue is empty.")
 
         element = self.buffer[1]
         self.element_to_index_map.pop(element.element)
@@ -72,6 +72,20 @@ class PriorityQueue:
         self.size -= 1
         if self._in_bounds(1):
             self._sink(1)
+        return element.element, element.priority
+
+    def peek(self) -> tuple[Any, float]:
+        """Peek at the element with the minimum priority.
+
+        Returns:
+            A 2-tuple consisting of the removed element and its priority.
+
+        Raises:
+            RuntimeError: If the queue is empty.
+        """
+        if self.empty():
+            raise RuntimeError("Priority queue is empty.")
+        element = self.buffer[1]
         return element.element, element.priority
 
     def update(self, element: Any, priority: float) -> None:
