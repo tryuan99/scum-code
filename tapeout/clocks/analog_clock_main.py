@@ -29,7 +29,8 @@ def plot_analog_clock_tuning(measured_data: str, simulated_data: str) -> None:
                           marker="^")
 
     # Plot the simulated data.
-    df_simulated.plot.line(ax=ax, x=df_simulated.columns[0], linestyle="--")
+    df_simulated.interpolate(method="cubic").plot.line(
+        ax=ax, x=df_simulated.columns[0], linestyle="--")
 
     plt.xlabel(f"Analog tuning code ({ANALOG_CLOCK_NUM_TUNING_BITS} bits)")
     plt.ylabel("Frequency [MHz]")
@@ -48,9 +49,8 @@ if __name__ == "__main__":
     flags.DEFINE_string("analog_clock_measured_data",
                         "tapeout/clocks/data/analog_clock_measured.csv",
                         "Analog clock measured data.")
-    flags.DEFINE_string(
-        "analog_clock_simulated_data",
-        "tapeout/clocks/data/analog_clock_schematic_simulated.csv",
-        "Analog clock simulated data.")
+    flags.DEFINE_string("analog_clock_simulated_data",
+                        "tapeout/clocks/data/analog_clock_simulated.csv",
+                        "Analog clock simulated data.")
 
     app.run(main)

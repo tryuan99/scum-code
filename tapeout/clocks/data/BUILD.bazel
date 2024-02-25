@@ -5,6 +5,7 @@ filegroup(
     srcs = [
         "analog_clock_measured.csv",
         "analog_clock_schematic_simulated.csv",
+        "analog_clock_simulated.csv",
     ],
 )
 
