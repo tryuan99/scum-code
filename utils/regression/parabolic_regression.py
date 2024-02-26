@@ -13,7 +13,7 @@ class ParabolicRegression(PolynomialRegression):
     """Performs a parabolic interpolation."""
 
     def __init__(self, x: np.ndarray, y: np.ndarray):
-        super().__init__(x, y)
+        super().__init__(x, y, 2)
 
     @property
     def a(self) -> float:
