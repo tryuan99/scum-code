@@ -36,27 +36,31 @@ def plot_standard_error_sweep(standard_errors: str) -> None:
     logging.info("Logarithmic regression: a = %f, b = %f",
                  logarithmic_regression.a, logarithmic_regression.b)
 
-    # Plot the squared standard error as a function of the grid dimensions.
     plt.style.use(["science"])
-    fig, ax = plt.subplots(figsize=(12, 8))
+    plt.rcParams.update({
+        "font.size": 16,
+        "lines.linewidth": 3,
+        "lines.markersize": 8,
+    })
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 3))
+
+    # Plot the squared standard error as a function of the grid dimensions.
     ax.plot(df[num_rows_column], df[standard_error_squared_column])
     ax.plot(df[num_rows_column],
             logarithmic_regression.evaluate(df[num_rows_column]), "--")
     ax.set_xlabel("Square grid dimensions")
     ax.set_ylabel("Squared standard error")
-    plt.show()
+    # plt.show()
 
     # Plot the squared standard error as a function of the grid dimensions on a
     # semilog x-axis.
-    plt.style.use(["science"])
-    fig, ax = plt.subplots(figsize=(12, 8))
-    ax.semilogx(df[num_rows_column],
-                df[standard_error_squared_column],
-                linewidth=2)
-    ax.semilogx(df[num_rows_column],
-                logarithmic_regression.evaluate(df[num_rows_column]), "--")
-    ax.set_xlabel("Square grid dimensions")
-    ax.set_ylabel("Squared standard error")
+    ax2.semilogx(df[num_rows_column],
+                 df[standard_error_squared_column],
+                 linewidth=2)
+    ax2.semilogx(df[num_rows_column],
+                 logarithmic_regression.evaluate(df[num_rows_column]), "--")
+    ax2.set_xlabel("Square grid dimensions")
+    ax2.set_ylabel("Squared standard error")
     plt.show()
 
 

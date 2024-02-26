@@ -33,8 +33,13 @@ def plot_standard_error(num_rows: int, num_cols: int) -> None:
 
     # Plot the standard error across the grid.
     plt.style.use(["science"])
+    plt.rcParams.update({
+        "font.size": 16,
+        "lines.linewidth": 3,
+        "lines.markersize": 8,
+    })
     fig, ax = plt.subplots(
-        figsize=(12, 8),
+        figsize=(6, 6),
         subplot_kw={"projection": "3d"},
     )
     surf = ax.plot_surface(

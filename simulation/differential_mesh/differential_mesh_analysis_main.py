@@ -42,8 +42,13 @@ def plot_standard_error_sweep(standard_errors: str) -> None:
 
     # Plot the squared standard error as a function of the grid dimensions.
     plt.style.use(["science"])
+    plt.rcParams.update({
+        "font.size": 16,
+        "lines.linewidth": 3,
+        "lines.markersize": 8,
+    })
     fig, ax = plt.subplots(
-        figsize=(12, 8),
+        figsize=(6, 6),
         subplot_kw={"projection": "3d"},
     )
     surf = ax.plot_trisurf(
@@ -56,7 +61,7 @@ def plot_standard_error_sweep(standard_errors: str) -> None:
     ax.set_xlabel("Number of rows")
     ax.set_ylabel("Number of columns")
     ax.view_init(30, -45)
-    plt.colorbar(surf)
+    # plt.colorbar(surf)
     plt.show()
 
 

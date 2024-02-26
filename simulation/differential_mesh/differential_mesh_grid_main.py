@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import scienceplots
 from absl import app, flags
 
@@ -14,19 +15,20 @@ def main(argv):
     # Create the grid graph from the number of rows and columns.
     grid = DifferentialMeshGraphFactory.create_zero_2d_graph(
         FLAGS.num_rows, FLAGS.num_cols)
+    np.random.seed(1)
     grid.add_edge_measurement_noise(FLAGS.noise)
 
     # Draw the grid.
     plt.style.use(["science"])
     grid.draw()
 
-    # Create the graph from the edge list.
-    grid = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
-    grid.add_edge_measurement_noise(FLAGS.noise)
+    # # Create the graph from the edge list.
+    # grid = DifferentialMeshGraphFactory.create_from_edge_list(FLAGS.edgelist)
+    # grid.add_edge_measurement_noise(FLAGS.noise)
 
-    # Draw the grid.
-    plt.style.use(["science"])
-    grid.draw()
+    # # Draw the grid.
+    # plt.style.use(["science"])
+    # grid.draw()
 
 
 if __name__ == "__main__":

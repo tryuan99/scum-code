@@ -8,6 +8,7 @@ from simulation.differential_mesh.differential_mesh_graph_factory import \
     DifferentialMeshGraphFactory
 from simulation.differential_mesh.differential_mesh_solver import (
     DIFFERENTIAL_MESH_SOLVERS, IterativeDifferentialMeshSolver)
+from utils.regression.exponential_regression import ExponentialRegression
 from utils.visualization.color_maps import COLOR_MAPS
 
 FLAGS = flags.FLAGS
@@ -73,8 +74,12 @@ def plot_num_iterations(num_iterations_per_grid: str) -> None:
 
     # Plot the number of iterations as a function of the grid dimensions.
     plt.style.use(["science"])
+    plt.rcParams.update({
+        "font.size": 16,
+        "lines.linewidth": 3,
+    })
     fig, ax = plt.subplots(
-        figsize=(12, 8),
+        figsize=(6, 6),
         subplot_kw={"projection": "3d"},
     )
     surf = ax.plot_surface(
@@ -86,8 +91,36 @@ def plot_num_iterations(num_iterations_per_grid: str) -> None:
     )
     ax.set_xlabel("Number of rows")
     ax.set_ylabel("Number of columns")
-    ax.view_init(30, -45)
-    plt.colorbar(surf)
+    ax.view_init(25, -60)
+    # plt.colorbar(surf)
+    plt.show()
+
+    mean_num_iterations = df[
+        df[num_rows_column] == df[num_cols_column]].groupby(
+            [num_rows_column, num_cols_column])[num_iterations_column].mean()
+
+    logging.info("Mean number of iterations:")
+    num_iterations = np.zeros((max_num_cols, max_num_rows))
+    for num_rows in range(1, max_num_rows + 1):
+        for num_cols in range(1, max_num_cols + 1):
+            if (num_rows, num_cols) in mean_num_iterations.index:
+                mean_iterations = mean_num_iterations.loc[(num_rows, num_cols)]
+                num_iterations[num_cols - 1, num_rows - 1] = mean_iterations
+                logging.info("(%d, %d) %f", num_rows, num_cols, mean_iterations)
+
+    plt.style.use(["science"])
+    plt.rcParams.update({
+        "font.size": 16,
+        "lines.linewidth": 3,
+    })
+    fig, ax = plt.subplots(figsize=(4, 4))
+    dimensions = np.arange(2, 21)
+    ax.plot(dimensions, mean_num_iterations.to_numpy())
+    data = mean_num_iterations.to_numpy()
+    exponential_regression = ExponentialRegression(dimensions, data)
+    ax.plot(dimensions, exponential_regression.evaluate(dimensions), "--")
+    ax.set_xlabel("Square grid dimensions")
+    ax.set_ylabel("Mean number of iterations")
     plt.show()
 
 
