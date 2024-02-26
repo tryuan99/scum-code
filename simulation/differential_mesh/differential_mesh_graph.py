@@ -150,7 +150,11 @@ class DifferentialMeshGraph:
 
     def draw(self) -> None:
         """Draws the differential mesh graph."""
-        fig, ax = plt.subplots(figsize=(12, 8))
+        plt.rcParams.update({
+            "font.size": 16,
+            "lines.linewidth": 3,
+        })
+        fig, ax = plt.subplots(figsize=(7.5, 4.5))
         pos = nx.get_node_attributes(
             self.graph, DIFFERENTIAL_MESH_GRAPH_NODE_POSITION_ATTRIBUTE)
 
@@ -158,7 +162,7 @@ class DifferentialMeshGraph:
         potentials = nx.get_node_attributes(
             self.graph, DIFFERENTIAL_MESH_GRAPH_NODE_POTENTIAL_ATTRIBUTE)
         if potentials:
-            self._round_map_values(potentials)
+            self._round_map_values(potentials, decimals=2)
             node_labels = potentials
         else:
             node_labels = {node: node for node in self.graph.nodes}
@@ -166,7 +170,12 @@ class DifferentialMeshGraph:
         # Round the edge measurements for drawing.
         measurements = nx.get_edge_attributes(
             self.graph, DIFFERENTIAL_MESH_GRAPH_EDGE_MEASUREMENT_ATTRIBUTE)
-        self._round_map_values(measurements)
+        self._round_map_values(measurements, decimals=2)
+
+        edge_labels = {
+            (a, b): rf"$\mathrm{{V}}_{{{a}, {b}}}$"
+            for a, b in nx.edges(self.graph)
+        }
 
         # Draw the graph with node and edge labels.
         nx.draw_networkx_nodes(
@@ -182,6 +191,7 @@ class DifferentialMeshGraph:
             pos=pos,
             ax=ax,
             labels=node_labels,
+            font_size=16,
         )
         nx.draw_networkx_edges(
             self.graph,
@@ -196,8 +206,9 @@ class DifferentialMeshGraph:
             self.graph,
             pos=pos,
             ax=ax,
-            edge_labels=measurements,
+            edge_labels=edge_labels,
             font_color=DIFFERENTIAL_MESH_GRAPH_EDGE_COLOR,
+            font_size=16,
         )
         ax.axis("off")
         plt.show()
