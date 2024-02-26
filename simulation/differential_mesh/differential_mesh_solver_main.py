@@ -29,7 +29,7 @@ def _log_edge_measurements(measurements: list[tuple[int, int], float]) -> None:
     """
     logging.info("Edge measurements:")
     for (u, v), measurement in measurements:
-        logging.info("%d %d %f", u, v, measurement)
+        logging.info("(%d %d) %f", u, v, measurement)
 
 
 def solve_differential_mesh_grid(solver_cls: DifferentialMeshSolver,

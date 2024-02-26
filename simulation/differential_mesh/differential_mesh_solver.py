@@ -139,7 +139,15 @@ class IterativeDifferentialMeshSolver(DifferentialMeshSolver, ABC):
                  max_num_iterations: int = None) -> None:
         super().__init__(graph, verbose)
         self.max_error = max_error
+        self.iteration = 0
         self.max_num_iterations = max_num_iterations or np.iinfo(int).max
+
+    @property
+    def num_iterations(self) -> int:
+        """Returns the number of iterations to solve the differential mesh
+        graph.
+        """
+        return self.iteration
 
     def solve(self) -> None:
         """Solves for the node potentials.
@@ -151,9 +159,10 @@ class IterativeDifferentialMeshSolver(DifferentialMeshSolver, ABC):
 
         For optimality, the node error should be zero at every node.
         """
-        iteration = 0
-        while not self._has_converged() and iteration < self.max_num_iterations:
-            iteration += 1
+        self.iteration = 0
+        while not self._has_converged(
+        ) and self.iteration < self.max_num_iterations:
+            self.iteration += 1
 
             # Class-specific logic for choosing a node.
             node = self._choose_node()
@@ -167,7 +176,7 @@ class IterativeDifferentialMeshSolver(DifferentialMeshSolver, ABC):
 
             # If verbose, log the overall mean squared edge error.
             if self.verbose:
-                logging.info("Iteration %d: MSE=%f", iteration,
+                logging.info("Iteration %d: MSE=%f", self.iteration,
                              self.calculate_mean_squared_error())
 
         if not self._has_converged():

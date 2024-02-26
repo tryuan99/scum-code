@@ -6,6 +6,15 @@ filegroup(
 )
 
 filegroup(
+    name = "num_iterations",
+    srcs = [
+        "num_iterations_10x10.csv",
+        "num_iterations_20x20.csv",
+    ],
+)
+
+
+filegroup(
     name = "standard_errors",
     srcs = [
         "grid_standard_errors.csv",

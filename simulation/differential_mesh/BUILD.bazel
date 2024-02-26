@@ -94,6 +94,22 @@ py_library(
 )
 
 py_binary(
+    name = "differential_mesh_iterative_solver_main",
+    srcs = ["differential_mesh_iterative_solver_main.py"],
+    data = ["//simulation/differential_mesh/data:num_iterations"],
+    deps = [
+        ":differential_mesh_graph_factory",
+        ":differential_mesh_solver",
+        "//utils/visualization:color_maps",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)
+
+py_binary(
     name = "differential_mesh_solver_main",
     srcs = ["differential_mesh_solver_main.py"],
     data = ["//simulation/differential_mesh/data:example_edge_lists"],
