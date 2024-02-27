@@ -162,23 +162,37 @@ class DifferentialMeshGraph:
         self._round_map_values(measurements)
 
         # Draw the graph with node and edge labels.
-        nx.draw_networkx_nodes(self.graph,
-                               pos=pos,
-                               ax=ax,
-                               node_color="none",
-                               node_size=1000)
-        nx.draw_networkx_labels(self.graph, pos=pos, ax=ax, labels=node_labels)
-        nx.draw_networkx_edges(self.graph,
-                               pos=pos,
-                               ax=ax,
-                               edge_color=DIFFERENTIAL_MESH_GRAPH_EDGE_COLOR,
-                               node_size=1000)
+        nx.draw_networkx_nodes(
+            self.graph,
+            pos=pos,
+            ax=ax,
+            node_color="none",
+            node_size=1000,
+            edgecolors=DIFFERENTIAL_MESH_GRAPH_EDGE_COLOR,
+        )
+        nx.draw_networkx_labels(
+            self.graph,
+            pos=pos,
+            ax=ax,
+            labels=node_labels,
+        )
+        nx.draw_networkx_edges(
+            self.graph,
+            pos=pos,
+            ax=ax,
+            width=2,
+            edge_color=DIFFERENTIAL_MESH_GRAPH_EDGE_COLOR,
+            arrowsize=20,
+            node_size=1000,
+        )
         nx.draw_networkx_edge_labels(
             self.graph,
             pos=pos,
             ax=ax,
             edge_labels=measurements,
-            font_color=DIFFERENTIAL_MESH_GRAPH_EDGE_COLOR)
+            font_color=DIFFERENTIAL_MESH_GRAPH_EDGE_COLOR,
+        )
+        ax.axis("off")
         plt.show()
 
     def create_laplacian_matrix(self) -> np.ndarray:
