@@ -1,0 +1,44 @@
+load("@pip_deps//:requirements.bzl", "requirement")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "hdlc",
+    srcs = ["hdlc.py"],
+)
+
+py_test(
+    name = "hdlc_test",
+    srcs = ["hdlc_test.py"],
+    deps = [
+        ":hdlc",
+        requirement("absl-py"),
+    ],
+)
+
+py_library(
+    name = "hdlc_aggregator",
+    srcs = ["hdlc_aggregator.py"],
+    deps = [":hdlc"],
+)
+
+py_library(
+    name = "openserial_interface",
+    srcs = ["openserial_interface.py"],
+    deps = [
+        ":hdlc",
+        ":hdlc_aggregator",
+        "//utils/serial:serial_interface",
+        requirement("absl-py"),
+    ],
+)
+
+py_binary(
+    name = "openserial_interface_logger_main",
+    srcs = ["openserial_interface_logger_main.py"],
+    deps = [
+        ":openserial_interface",
+        "//utils:struct",
+        requirement("absl-py"),
+    ],
+)
