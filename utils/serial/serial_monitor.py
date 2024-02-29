@@ -2,7 +2,7 @@
 
 from absl import logging
 
-from utils.serial import serial_interface
+from utils.serial.serial_interface import SerialInterface
 
 
 class SerialMonitor:
@@ -10,7 +10,7 @@ class SerialMonitor:
 
     def __init__(self, port: str, baudrate: int):
         # Open the serial port.
-        self.serial = serial_interface.SerialInterface(port, baudrate)
+        self.serial = SerialInterface(port, baudrate)
 
     def run(self) -> None:
         """Logs data received by the serial port."""

@@ -5,7 +5,7 @@ from collections.abc import Callable
 from absl import logging
 
 from utils.plotter.live_plotter import ContinuousLivePlotter
-from utils.serial import serial_interface
+from utils.serial.serial_interface import SerialInterface
 
 
 class SerialLivePlotter(ContinuousLivePlotter):
@@ -18,7 +18,7 @@ class SerialLivePlotter(ContinuousLivePlotter):
         self.parse_data = parse_data
 
         # Open the serial port.
-        self.serial = serial_interface.SerialInterface(port, baudrate)
+        self.serial = SerialInterface(port, baudrate)
 
     def next(self) -> float:
         """Returns the next data to be plotted."""

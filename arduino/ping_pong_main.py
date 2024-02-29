@@ -2,7 +2,7 @@ import time
 
 from absl import app, flags, logging
 
-from utils.serial import serial_interface
+from utils.serial.serial_interface import SerialInterface
 
 FLAGS = flags.FLAGS
 
@@ -16,7 +16,7 @@ def ping_pong(port: str, baudrate: int, num_bytes: int) -> None:
         num_bytes: Number of bytes to send every time.
     """
     # Open the serial port to the Arduino.
-    arduino_serial = serial_interface.SerialInterface(port, baudrate)
+    arduino_serial = SerialInterface(port, baudrate)
 
     data = b"A" * (num_bytes - 1) + b"\n"
     while True:

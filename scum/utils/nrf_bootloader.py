@@ -4,7 +4,7 @@ import random
 
 from absl import logging
 
-from utils.serial import serial_interface
+from utils.serial.serial_interface import SerialInterface
 
 # Baud rate of the nRF board.
 NRF_BAUDRATE = 250000
@@ -18,7 +18,7 @@ class NrfBootloader:
 
     def __init__(self, port: str):
         # Open the serial port to the nRF board.
-        self.serial = serial_interface.SerialInterface(port, NRF_BAUDRATE)
+        self.serial = SerialInterface(port, NRF_BAUDRATE)
 
     def bootload(self, binary: str, use_random_padding: bool) -> None:
         """Bootloads SCuM using the nRF board.

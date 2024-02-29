@@ -2,7 +2,7 @@
 
 from absl import logging
 
-from utils.serial import serial_interface
+from utils.serial.serial_interface import SerialInterface
 
 
 class SerialLogger:
@@ -11,7 +11,7 @@ class SerialLogger:
     def __init__(self, port: str, baudrate: int, output_file: str,
                  log_to_stderr: bool):
         # Open the serial port.
-        self.serial = serial_interface.SerialInterface(port, baudrate)
+        self.serial = SerialInterface(port, baudrate)
         self.output_file = output_file
         self.log_to_stderr = log_to_stderr
 
