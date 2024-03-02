@@ -18,8 +18,9 @@ class PriorityQueue:
 
     def __init__(self, capacity: int):
         # Index 0 of the buffer is unused.
-        self.buffer = [PriorityQueueElement(None, None)] * (
-            capacity + 1)  # type: list[PriorityQueueElement]
+        self.buffer: list[PriorityQueueElement] = [
+            PriorityQueueElement(None, None)
+        ] * (capacity + 1)
         self.size = 0
         self.element_to_index_map = {}
 

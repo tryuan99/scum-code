@@ -14,7 +14,7 @@ class PolynomialRegression(Regression):
 
     def __init__(self, x: np.ndarray, y: np.ndarray, degree: int):
         self.degree = degree
-        self.coeffs = None  # type: np.ndarray
+        self.coeffs: np.ndarray = None
         self.residuals = 0
         super().__init__(x, y)
 

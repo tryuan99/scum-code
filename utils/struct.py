@@ -83,7 +83,7 @@ class Struct(ABC):
         endian: StructFieldEndianness = StructFieldEndianness.LITTLE_ENDIAN,
     ) -> None:
         # Calculate the byte offset for each field.
-        self.offsets = {}  # dict[str, int]
+        self.offsets: dict[str, int] = {}
         offset = 0
         for field, (field_type, num_elements) in self.fields.items():
             self.offsets[field] = offset
