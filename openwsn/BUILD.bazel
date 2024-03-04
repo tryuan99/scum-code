@@ -34,8 +34,8 @@ py_library(
 )
 
 py_binary(
-    name = "openserial_interface_logger_main",
-    srcs = ["openserial_interface_logger_main.py"],
+    name = "openserial_monitor_main",
+    srcs = ["openserial_monitor_main.py"],
     deps = [
         ":openserial_interface",
         "//utils:struct",
