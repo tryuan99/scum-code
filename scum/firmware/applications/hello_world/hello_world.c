@@ -23,7 +23,6 @@ int main(void) {
 
   while (true) {
     printf("Hello World!\n");
-    for (i = 0; i < 1000000; ++i)
-      ;
+    for (i = 0; i < 1000000; ++i) {}
   }
 }
