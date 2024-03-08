@@ -6,14 +6,14 @@ filegroup(
         "adc_data_resistor_10M_1.csv",
         "adc_data_resistor_10M_2.csv",
         "adc_data_resistor_10M_multiple.csv",
-        "adc_data_resistor_20M_multiple.csv",
-        "adc_data_resistor_2_2M_multiple.csv",
-        "adc_data_resistor_4_7M_multiple.csv",
-        "adc_data_resistor_8M_multiple.csv",
         "adc_data_resistor_10k_multiple.csv",
+        "adc_data_resistor_20M_multiple.csv",
         "adc_data_resistor_22k_multiple.csv",
+        "adc_data_resistor_2_2M_multiple.csv",
         "adc_data_resistor_2s_multiple.csv",
+        "adc_data_resistor_4_7M_multiple.csv",
         "adc_data_resistor_4s_multiple.csv",
+        "adc_data_resistor_8M_multiple.csv",
         "adc_data_thermistor_3a_1.csv",
         "adc_data_thermistor_3a_2.csv",
         "adc_data_thermistor_3a_3.csv",
@@ -30,8 +30,8 @@ filegroup(
 filegroup(
     name = "adc_resistive_cap_dac_data",
     srcs = [
-        "adc_data_resistor_47k_cap_dac.csv",
         "adc_data_resistor_220k_cap_dac.csv",
+        "adc_data_resistor_47k_cap_dac.csv",
     ],
 )
 

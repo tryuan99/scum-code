@@ -32,9 +32,9 @@ py_binary(
 
 pkg_tar(
     name = "serial_logger_main_tar_pkg",
+    srcs = [":serial_logger_main"],
     extension = ".tar.gz",
     include_runfiles = True,
-    srcs = [":serial_logger_main"],
     strip_prefix = "/utils/serial/",
 )
 
@@ -58,8 +58,8 @@ py_binary(
 
 pkg_tar(
     name = "serial_monitor_main_tar_pkg",
+    srcs = [":serial_monitor_main"],
     extension = ".tar.gz",
     include_runfiles = True,
-    srcs = [":serial_monitor_main"],
     strip_prefix = "/utils/serial/",
 )

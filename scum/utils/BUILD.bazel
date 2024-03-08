@@ -23,8 +23,8 @@ py_binary(
 
 pkg_tar(
     name = "nrf_bootloader_main_tar_pkg",
+    srcs = [":nrf_bootloader_main"],
     extension = ".tar.gz",
     include_runfiles = True,
-    srcs = [":nrf_bootloader_main"],
     strip_prefix = "/scum/utils/",
 )

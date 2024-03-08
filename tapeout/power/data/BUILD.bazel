@@ -3,11 +3,11 @@ package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "bgr_data",
     srcs = [
-        "bgr_measured.csv",
         "bgr_default_measured.csv",
-        "bgr_vref_control_measured.csv",
-        "bgr_simulated.csv",
         "bgr_default_simulated.csv",
+        "bgr_measured.csv",
+        "bgr_simulated.csv",
+        "bgr_vref_control_measured.csv",
         "bgr_vref_control_simulated.csv",
     ],
 )
@@ -15,24 +15,24 @@ filegroup(
 filegroup(
     name = "iref_data",
     srcs = [
-        "iref_vs_vref_measured.csv",
         "iref_ext_measured.csv",
-        "iref_vs_vref_simulated.csv",
         "iref_ext_simulated.csv",
+        "iref_vs_vref_measured.csv",
+        "iref_vs_vref_simulated.csv",
     ],
 )
 
 filegroup(
     name = "ldo_data",
     srcs = [
-        "ldo_analog_measured_chip5.csv",
         "ldo_analog_measured_chip13.csv",
-        "ldo_digital_measured_chip5.csv",
-        "ldo_digital_measured_chip13.csv",
-        "ldo_rf_measured_chip5.csv",
-        "ldo_rf_measured_chip14.csv",
+        "ldo_analog_measured_chip5.csv",
         "ldo_analog_simulated.csv",
+        "ldo_digital_measured_chip13.csv",
+        "ldo_digital_measured_chip5.csv",
         "ldo_digital_simulated.csv",
+        "ldo_rf_measured_chip14.csv",
+        "ldo_rf_measured_chip5.csv",
         "ldo_rf_simulated.csv",
     ],
 )

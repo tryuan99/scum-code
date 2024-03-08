@@ -3,7 +3,7 @@ package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "lo_spectrum_data",
     srcs = [
-        "lo_spectrum_startup_measured.csv",
         "lo_spectrum_1_63ghz_measured.csv",
+        "lo_spectrum_startup_measured.csv",
     ],
 )

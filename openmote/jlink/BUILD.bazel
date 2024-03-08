@@ -20,9 +20,9 @@ py_binary(
 
 pkg_tar(
     name = "jlink_interface_main_tar_pkg",
+    srcs = [":jlink_interface_main"],
     extension = ".tar.gz",
     include_runfiles = True,
-    srcs = [":jlink_interface_main"],
     strip_prefix = "/openmote/jlink/",
 )
 
@@ -46,8 +46,8 @@ py_binary(
 
 pkg_tar(
     name = "jlink_programmer_main_tar_pkg",
+    srcs = [":jlink_programmer_main"],
     extension = ".tar.gz",
     include_runfiles = True,
-    srcs = [":jlink_programmer_main"],
     strip_prefix = "/openmote/jlink/",
 )

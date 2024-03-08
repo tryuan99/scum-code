@@ -48,12 +48,12 @@ filegroup(
 filegroup(
     name = "objcopy_files",
     srcs = ["bin/arm-none-eabi-objcopy"],
-    )
+)
 
 filegroup(
     name = "strip_files",
     srcs = ["bin/arm-none-eabi-strip"],
-    )
+)
 
 filegroup(
     name = "all_files",
