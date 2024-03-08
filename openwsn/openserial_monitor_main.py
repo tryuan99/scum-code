@@ -2,7 +2,7 @@ from absl import app, flags, logging
 
 from openwsn.openserial_interface import (OpenSerialFrameType,
                                           OpenSerialInterface)
-from utils.struct import Struct, StructFieldType
+from utils.struct import Struct, StructFields, StructFieldType
 
 FLAGS = flags.FLAGS
 
@@ -10,10 +10,10 @@ FLAGS = flags.FLAGS
 class OpenSerialStruct(Struct):
     """OpenSerial struct."""
 
-    @property
-    def fields(self) -> dict[str, (StructFieldType, int)]:
-        """Returns a dictionary mapping each field name to its size in bytes
-        and the array length.
+    @classmethod
+    def fields(cls) -> StructFields:
+        """Returns a dictionary mapping each field name to its size in bytes,
+        the array length, and an optional struct.
         """
         return {
             "type": (StructFieldType.CHAR, 1),

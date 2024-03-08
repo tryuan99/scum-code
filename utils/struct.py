@@ -3,7 +3,7 @@
 import struct
 from abc import ABC, abstractmethod
 from enum import Enum, auto
-from typing import Any
+from typing import Any, TypeAlias
 
 
 class StructFieldEndianness(Enum):
@@ -33,6 +33,8 @@ class StructFieldType(Enum):
     UINT64 = auto()
     FLOAT = auto()
     DOUBLE = auto()
+    STRUCT = auto()
+    UNION = auto()
 
 
 # Map from the struct field type to its size in bytes.
@@ -67,6 +69,10 @@ STRUCT_FIELD_TYPE_TO_FORMAT_CHAR = {
     StructFieldType.DOUBLE: "d",
 }
 
+# Struct fields type. Anonymous structs or unions are not supported.
+StructFields: TypeAlias = dict[str, tuple[StructFieldType, int] |
+                               tuple[StructFieldType, int, "Struct"]]
+
 
 class Struct(ABC):
     """Interface for a C-style struct.
@@ -74,7 +80,6 @@ class Struct(ABC):
     Attributes:
         buffer: Data bytearray.
         endian: Endianness of the bytearray.
-        offsets: Dictionary mapping each field name to its byte offset.
     """
 
     def __init__(
@@ -82,25 +87,39 @@ class Struct(ABC):
         buffer: bytearray = None,
         endian: StructFieldEndianness = StructFieldEndianness.LITTLE_ENDIAN,
     ) -> None:
-        # Calculate the byte offset for each field.
-        self.offsets: dict[str, int] = {}
-        offset = 0
-        for field, (field_type, num_elements) in self.fields.items():
-            self.offsets[field] = offset
-            offset += STRUCT_FIELD_TYPE_TO_SIZE[field_type] * num_elements
-
         if buffer is not None:
             self.buffer = buffer
         else:
-            self.buffer = bytearray(offset)
+            self.buffer = bytearray(self.size())
         self.endian = endian
 
-    @property
+    @classmethod
+    def union(cls) -> bool:
+        """Returns whether the struct is a union."""
+        return False
+
+    @classmethod
     @abstractmethod
-    def fields(self) -> dict[str, (StructFieldType, int)]:
-        """Returns a dictionary mapping each field name to its size in bytes
-        and the array length.
+    def fields(cls) -> StructFields:
+        """Returns a dictionary mapping each field name to its size in bytes,
+        the array length, and an optional struct.
+
+        If the field type is a basic data type, the extra argument is unused.
+        If the field type is a struct or a union, the extra argument is a struct.
+        Anonymous structs or unions are not supported.
         """
+
+    @classmethod
+    def size(cls) -> int:
+        """Returns the size of the struct."""
+        offsets, size = Struct._calculate_offsets(cls.fields(), cls.union())
+        return size
+
+    @classmethod
+    def offsets(cls) -> dict[str, int]:
+        """Returns a dictionary mapping each field name to its byte offset."""
+        offsets, size = Struct._calculate_offsets(cls.fields(), cls.union())
+        return offsets
 
     def get(self, field: str, index: int = None) -> Any:
         """Accesses the specified struct field.
@@ -116,19 +135,18 @@ class Struct(ABC):
         Raises:
             ValueError: If the field does not exist.
         """
-        if field not in self.fields:
+        if field not in self.fields():
             raise ValueError(f"Field {field} does not exist.")
-        field_type, num_elements = self.fields[field]
-        field_size = STRUCT_FIELD_TYPE_TO_SIZE[field_type]
-        offset = self.offsets[field]
+        field_type, num_elements, *struct_cls = self.fields()[field]
+        field_size = Struct._calculate_size(field_type, struct_cls)
+        offset = self.offsets()[field]
 
         if num_elements == 1:
-            return self._get_single_element(field_type, offset)
+            return self._get_single_element(field, offset)
         if index is not None:
-            return self._get_single_element(field_type,
-                                            offset + field_size * index)
+            return self._get_single_element(field, offset + field_size * index)
         return [
-            self._get_single_element(field_type, offset + field_size * i)
+            self._get_single_element(field, offset + field_size * i)
             for i in range(num_elements)
         ]
 
@@ -163,20 +181,19 @@ class Struct(ABC):
         Raises:
             ValueError: If the field does not exist.
         """
-        if field not in self.fields:
+        if field not in self.fields():
             raise ValueError(f"Field {field} does not exist.")
-        field_type, num_elements = self.fields[field]
-        field_size = STRUCT_FIELD_TYPE_TO_SIZE[field_type]
-        offset = self.offsets[field]
+        field_type, num_elements, *struct_cls = self.fields()[field]
+        field_size = Struct._calculate_size(field_type, struct_cls)
+        offset = self.offsets()[field]
 
         if num_elements == 1:
-            self._set_single_element(field_type, offset, value)
+            self._set_single_element(field, offset, value)
         elif index is not None:
-            self._set_single_element(field_type, offset + field_size * index,
-                                     value)
+            self._set_single_element(field, offset + field_size * index, value)
         else:
             for i in range(num_elements):
-                self._set_single_element(field_type, offset + field_size * i,
+                self._set_single_element(field, offset + field_size * i,
                                          value[i])
 
     def set_buffer(self, data: bytearray, start: int = None) -> None:
@@ -193,31 +210,83 @@ class Struct(ABC):
             start = 0
         self.buffer[start:start + len(data)] = data
 
-    def _get_single_element(self, field_type: StructFieldType,
-                            offset: int) -> Any:
+    @staticmethod
+    def _calculate_offsets(fields: StructFields,
+                           union: bool) -> tuple[dict[str, int], int]:
+        """Returns a 2-tuple consisting of a dictionary mapping each field name
+        to its byte offset and the total struct size.
+
+        Args:
+            field: Struct fields.
+            union: If true, the struct is a union.
+        """
+        offsets: dict[str, int] = {}
+        offset = 0
+        max_field_size = 0
+        for field, (field_type, num_elements, *struct_cls) in fields.items():
+            offsets[field] = offset
+            field_size = Struct._calculate_size(field_type, struct_cls)
+            max_field_size = max(max_field_size, field_size)
+            if not union:
+                offset += field_size * num_elements
+        size = offset if not union else max_field_size
+        return offsets, size
+
+    @staticmethod
+    def _calculate_size(field_type: StructFieldType,
+                        struct_cls: tuple["Struct"]) -> int:
+        """Returns the size of the given field type.
+
+        Args:
+            field_type: Field type.
+            struct_cls: Nested struct or union.
+        """
+        if field_type == StructFieldType.STRUCT or field_type == StructFieldType.UNION:
+            return struct_cls[0].size()
+        return STRUCT_FIELD_TYPE_TO_SIZE[field_type]
+
+    def _get_single_element(self, field: str, offset: int) -> Any:
         """Returns the single value at the specified offset.
 
         Args:
-            field_type: Field type.
+            field: Field name.
             offset: Byte offset within the buffer.
         """
-        field_size = STRUCT_FIELD_TYPE_TO_SIZE[field_type]
+        field_type, num_elements, *struct_cls = self.fields()[field]
+        field_size = Struct._calculate_size(field_type, struct_cls)
+
+        buffer = self.buffer[offset:offset + field_size]
+        if field_type == StructFieldType.STRUCT or field_type == StructFieldType.UNION:
+            return struct_cls[0](buffer, self.endian)
         endian_string = STRUCT_FIELD_ENDIANNESS_TO_FORMAT_STRING[self.endian]
         format_char = STRUCT_FIELD_TYPE_TO_FORMAT_CHAR[field_type]
-        return struct.unpack(f"{endian_string}{format_char}",
-                             self.buffer[offset:offset + field_size])[0]
+        return struct.unpack(f"{endian_string}{format_char}", buffer)[0]
 
-    def _set_single_element(self, field_type: StructFieldType, offset: int,
-                            value: Any) -> None:
+    def _set_single_element(self, field: str, offset: int, value: Any) -> None:
         """Sets the single value at the specified offset.
 
         Args:
-            field_type: Field type.
+            field: Field name.
             offset: Byte offset within the buffer.
             value: Value to set.
         """
-        field_size = STRUCT_FIELD_TYPE_TO_SIZE[field_type]
-        endian_string = STRUCT_FIELD_ENDIANNESS_TO_FORMAT_STRING[self.endian]
-        format_char = STRUCT_FIELD_TYPE_TO_FORMAT_CHAR[field_type]
-        self.buffer[offset:offset + field_size] = struct.pack(
-            f"{endian_string}{format_char}", value)
+        field_type, num_elements, *struct_cls = self.fields()[field]
+        field_size = Struct._calculate_size(field_type, struct_cls)
+
+        if field_type == StructFieldType.STRUCT or field_type == StructFieldType.UNION:
+            self.buffer[offset:offset + field_size] = value.get_buffer()
+        else:
+            endian_string = STRUCT_FIELD_ENDIANNESS_TO_FORMAT_STRING[
+                self.endian]
+            format_char = STRUCT_FIELD_TYPE_TO_FORMAT_CHAR[field_type]
+            self.buffer[offset:offset + field_size] = struct.pack(
+                f"{endian_string}{format_char}", value)
+
+
+class Union(Struct):
+    """Interface for a C-style union."""
+
+    @classmethod
+    def union(cls) -> bool:
+        """Returns whether the struct is a union."""
+        return True
