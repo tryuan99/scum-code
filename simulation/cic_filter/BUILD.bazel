@@ -2,10 +2,17 @@ load("@pip_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
+py_library(
+    name = "cic_filter_decimator",
+    srcs = ["cic_filter_decimator.py"],
+    deps = [requirement("numpy")],
+)
+
 py_binary(
     name = "cic_filter_main",
     srcs = ["cic_filter_main.py"],
     deps = [
+        ":cic_filter_decimator",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
@@ -17,6 +24,7 @@ py_binary(
     name = "cic_filter_comb_main",
     srcs = ["cic_filter_comb_main.py"],
     deps = [
+        ":cic_filter_decimator",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
