@@ -22,7 +22,7 @@ def _create_comb_filter_diff(coefficients: np.ndarray, R: int) -> np.ndarray:
 
     Args:
         coefficients: The desired filter coefficients without zero padding.
-        R: Decimation factor.
+        R: Downsampling factor.
 
     Returns:
         The length-(R + 1) difference coefficients of the comb filter.
@@ -46,7 +46,7 @@ def compare_crc_filter_combs(fs: float, T: float, R: int) -> None:
     Args:
         fs: Sampling frequency.
         T: Maximum time to simulate.
-        R: Decimation factor.
+        R: Downsampling factor.
     """
     length = int(fs * T)
     delta = np.zeros(length)
@@ -67,7 +67,7 @@ def compare_crc_filter_combs(fs: float, T: float, R: int) -> None:
         # Plot the spectrum.
         combed_fft = np.fft.fft(combed, length)
         combed_fft_abs = np.abs(combed_fft)
-        ax.plot(omega, 20 * np.log10(combed_fft_abs), label=str(coefficients))
+        ax.plot(omega, 20 * np.log10(combed_fft_abs), label=coefficients)
 
     ax.set_xlabel(r"$\omega$ [rad]")
     ax.set_ylabel("FFT magnitude [dB]")
@@ -82,7 +82,7 @@ def plot_comb_filter_spectrum(R: int) -> None:
     """Plots the spectrum of each comb filter.
 
     Args:
-        R: Decimation factor.
+        R: Downsampling factor.
     """
     # Plot the DTFT of the comb filters directly.
     plt.style.use(["science", "grid"])
@@ -94,7 +94,7 @@ def plot_comb_filter_spectrum(R: int) -> None:
         comb_filter = np.cumsum(comb_filter_diff)
         combed_fft = np.fft.fft(comb_filter, FFT_SIZE)
         combed_fft_abs = np.abs(combed_fft)
-        ax.plot(omega, 20 * np.log10(combed_fft_abs), label=str(coefficients))
+        ax.plot(omega, 20 * np.log10(combed_fft_abs), label=coefficients)
 
     ax.set_xlabel(r"$\omega$ [rad]")
     ax.set_ylabel("FFT magnitude [dB]")
@@ -115,6 +115,6 @@ def main(argv):
 if __name__ == "__main__":
     flags.DEFINE_float("fs", 1000000, "Sampling frequency.")
     flags.DEFINE_float("T", 1, "Maximum time to simulate.")
-    flags.DEFINE_integer("R", 1024, "Decimation factor.")
+    flags.DEFINE_integer("R", 1024, "Downsampling factor.")
 
     app.run(main)

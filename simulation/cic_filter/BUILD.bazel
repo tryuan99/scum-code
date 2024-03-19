@@ -10,7 +10,6 @@ py_binary(
         requirement("matplotlib"),
         requirement("numpy"),
         requirement("SciencePlots"),
-        requirement("scipy"),
     ],
 )
 
