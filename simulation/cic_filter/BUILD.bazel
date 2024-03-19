@@ -2,6 +2,17 @@ load("@pip_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
+py_binary(
+    name = "averaging_snr_main",
+    srcs = ["averaging_snr_main.py"],
+    deps = [
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("SciencePlots"),
+    ],
+)
+
 py_library(
     name = "cic_filter_decimator",
     srcs = ["cic_filter_decimator.py"],
