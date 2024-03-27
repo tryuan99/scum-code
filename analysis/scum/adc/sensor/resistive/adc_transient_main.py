@@ -148,7 +148,7 @@ def plot_multiple_transient_adc_data(data: str, sampling_rate: float,
     r_squared_linear = np.zeros(len(iterations))
     r_squared_weighted_linear = np.zeros(len(iterations))
     r_squared_polynomial = np.zeros(len(iterations))
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 3))
     for iteration_index, (_, group) in enumerate(iterations):
         adc_data = ExponentialAdcData(group[adc_output_column], sampling_rate)
         adc_data.disambiguate_msb_9()
@@ -208,7 +208,7 @@ def main(argv):
         "lines.linewidth": 3,
         "lines.markersize": 8,
     })
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 5), sharex=True)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 3), sharex=True)
     nominal_taus = np.array(
         [0.020916, 0.0462, 0.110, 0.234, 0.404, 0.5, 1.058, 2.09, 4.599])
     ax1.loglog(nominal_taus,
@@ -314,12 +314,13 @@ def main(argv):
     ax1.set_title("Mean absolute error of the estimated time constant")
     ax1.set_xlabel(r"Nominal time constant $\tau$ [s]")
     ax1.set_ylabel("Mean absolute error [s]")
-    ax1.legend()
+    # ax1.legend()
     ax2.set_title("Standard error of the estimated time constant")
     ax2.set_xlabel(r"Nominal time constant $\tau$ [s]")
     ax2.set_ylabel("Standard error [s]")
-    ax2.legend()
+    ax2.legend(bbox_to_anchor=(1, 0.85))
     plt.show()
+    return
 
     if FLAGS.multiple:
         plot_multiple_transient_adc_data(FLAGS.data, FLAGS.sampling_rate,

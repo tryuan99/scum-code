@@ -22,6 +22,7 @@ py_binary(
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
+        requirement("SciencePlots"),
     ],
 )
 

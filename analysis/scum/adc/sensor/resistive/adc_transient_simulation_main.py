@@ -272,7 +272,7 @@ def plot_single_transient_adc_data(tau: float, sampling_rate: float) -> None:
     ax1.plot(n,
              polynomial_regression.evaluate(t) + adc_data.min_adc_output,
              label="Polynomial fit")
-    ax1.set_title("Transient ADC output in linear space")
+    ax1.set_title("ADC samples")
     ax1.set_ylabel("ADC output [LSB]")
     ax1.legend()
 
@@ -290,13 +290,13 @@ def plot_single_transient_adc_data(tau: float, sampling_rate: float) -> None:
     ax2.plot(n,
              np.log(polynomial_regression.evaluate(t)),
              label="Polynomial fit")
-    ax2.set_title("Transient ADC output in log space minus offset")
+    ax2.set_title("Log ADC samples minus offset")
     ax2.set_xlabel("ADC sample index")
-    ax2.set_ylabel("Log ADC output minus offset [bits]")
+    ax2.set_ylabel("Log ADC samples minus offset [bits]")
     ax2.legend()
-    ax2.text(
-        610, 6.1, r"\noindent Larger sample variance at \n"
-        r"ewline higher ADC sample indices")
+    # ax2.text(
+    #     610, 6.1, r"\noindent Larger sample variance at \n"
+    #     r"ewline higher ADC sample indices")
     plt.show()
 
     # Analyze the weighted linear regression.
@@ -356,7 +356,8 @@ def plot_transient_adc_data_distribution(tau: float,
     log_adc_output_stddev = np.std(log_adc_output, axis=0)
     log_adc_output_stddev_approximated = SIGMA / EXPONENTIAL_SCALING_FACTOR * np.exp(
         tau_axis[tau_axis_indices])
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 5), sharex=True)
+    fig, (ax2) = plt.subplots(figsize=(4, 3))
+    fig, (ax1) = plt.subplots(figsize=(4, 3))
     ax1.plot(tau_axis[tau_axis_indices],
              log_adc_output_stddev[tau_axis_indices],
              label="Simulated")
@@ -370,7 +371,7 @@ def plot_transient_adc_data_distribution(tau: float,
              ":",
              c="lime",
              label="Theoretical")
-    ax1.set_title("Standard deviation of the log ADC samples")
+    # ax1.set_title("Standard deviation of the log ADC samples")
     ax1.set_xlabel(r"Time [$\tau$]")
     ax1.set_ylabel("Standard deviation")
     ax1.legend()
@@ -381,17 +382,17 @@ def plot_transient_adc_data_distribution(tau: float,
     ax2.plot(tau_axis[tau_axis_indices],
              np.abs(log_adc_output_stddev[tau_axis_indices] -
                     log_adc_output_stddev_theoretical),
-             label="Difference between simulated and theoretical")
+             label=r"$\vert$Sim. - theor.$\vert$")
     ax2.plot(tau_axis[tau_axis_indices],
              np.abs(log_adc_output_stddev_approximated -
                     log_adc_output_stddev_theoretical),
              "--",
              c="orange",
-             label="Difference between approximated and theoretical")
-    ax2.set_title(
-        "Absolute difference in standard deviation of the log ADC samples")
+             label=r"$\vert$Approx. - theor.$\vert$")
+    # ax2.set_title(
+    #     "Difference in standard deviation of the log ADC samples")
     ax2.set_xlabel(r"Time [$\tau$]")
-    ax2.set_ylabel("Difference in standard deviation")
+    ax2.set_ylabel("Difference in std. dev.")
     ax2.legend()
     plt.show()
 
@@ -427,7 +428,7 @@ def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
         slope_estimates_stddevs_weighted_linear = np.zeros(
             NUM_SIMULATIONS_PER_TAU)
 
-        for i in range(NUM_SIMULATIONS_PER_TAU):
+        for i in range(1):
             adc_output = _generate_transient_adc_data(tau, sampling_rate)
             adc_data = ExponentialAdcData(adc_output, sampling_rate)
 
@@ -554,7 +555,7 @@ def plot_multiple_transient_adc_data_over_tau(sampling_rate: float) -> None:
     # Compare the standard deviation of the estimated time constant with a
     # weighted linear regression with its approximation.
     select = tau_stddevs_exponential < 0.007
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 5), sharex=True)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 3), sharex=True)
     # ax1.semilogx(TAUS,
     #              np.abs(tau_means_weighted_linear - TAUS),
     #              label="Simulated",
@@ -653,7 +654,7 @@ def main(argv):
     assert len(argv) == 1
     plt.style.use(["science", "grid"])
     plt.rcParams.update({"font.size": 16, "lines.linewidth": 2})
-    # plot_single_transient_adc_data(FLAGS.tau, FLAGS.sampling_rate)
+    plot_single_transient_adc_data(FLAGS.tau, FLAGS.sampling_rate)
     plt.rcParams.update({"lines.linewidth": 3, "lines.markersize": 8})
     # plot_transient_adc_data_distribution(FLAGS.tau, FLAGS.sampling_rate)
     plot_multiple_transient_adc_data_over_tau(FLAGS.sampling_rate)

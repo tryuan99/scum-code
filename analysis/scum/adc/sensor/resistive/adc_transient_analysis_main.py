@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import scienceplots
 from absl import app, flags, logging
 
 from analysis.scum.adc.sensor.resistive.adc_data import (
@@ -46,6 +47,47 @@ def _generate_transient_adc_data(tau: float,
 
 def plot_log_noise_distribution() -> None:
     """Plots the distribution of the noise of the log ADC samples."""
+    # Plot the noise over an exponential.
+    sigma = 0.1
+    plt.style.use(["science"])
+    plt.rcParams.update({
+        "font.size": 16,
+        "lines.linewidth": 2,
+        "lines.markersize": 8,
+    })
+    fig, ax = plt.subplots(figsize=(4, 3))
+    x = np.linspace(0, 3, 10000)
+    y = np.exp(-x)
+    ax.plot(x, y)
+    noise_ceiling = y + sigma
+    noise_floor = y - sigma
+    ax.fill_between(x, noise_floor, noise_ceiling, alpha=0.4)
+    ax.set_xlabel(f"Time [$\\tau$]")
+    ax.set(yticklabels=[], yticks=[])
+    ax.set_ylabel("ADC sample")
+    plt.show()
+
+    sigma = 0.1
+    plt.style.use(["science"])
+    plt.rcParams.update({
+        "font.size": 16,
+        "lines.linewidth": 2,
+        "lines.markersize": 8,
+    })
+    fig, ax = plt.subplots(figsize=(4, 3))
+    x = np.linspace(0, 3, 10000)
+    y = -x
+    ax.plot(x, y)
+    stddev = np.exp(x) * sigma
+    noise_ceiling = y + stddev
+    noise_floor = y - stddev
+    ax.fill_between(x, noise_floor, noise_ceiling, alpha=0.4)
+    ax.set_xlabel(f"Time [$\\tau$]")
+    ax.set(yticklabels=[], yticks=[])
+    ax.set_ylabel("Log ADC sample")
+    plt.show()
+    return
+
     # Plot the distribution of the noise.
     fig, ax = plt.subplots(figsize=(12, 8))
     x = np.linspace(-0.25, 0.25, 10000)
