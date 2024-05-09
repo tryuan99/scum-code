@@ -6,12 +6,13 @@ from absl import app, flags
 FLAGS = flags.FLAGS
 
 
-def plot_ldo(measured_data: str, simulated_data: str) -> None:
+def plot_ldo(measured_data: str, simulated_data: str, voltage: str) -> None:
     """Plots LDO voltage as a function of its current.
 
     Args:
         measured_data: Measured data filename.
         simulated_data: Simulated data filename.
+        voltage: Voltage name.
     """
     df_measured = pd.read_csv(measured_data, comment="#")
     df_measured[df_measured.columns[0]] *= 1000
@@ -28,7 +29,7 @@ def plot_ldo(measured_data: str, simulated_data: str) -> None:
         "lines.linewidth": 1,
         "lines.markersize": 8,
     })
-    fig, ax = plt.subplots(figsize=(7, 3))
+    fig, ax = plt.subplots(figsize=(6, 4))
 
     # Plot the measured data.
     rows_to_plot_measured = df_measured[
@@ -45,7 +46,7 @@ def plot_ldo(measured_data: str, simulated_data: str) -> None:
                                                    linestyle="--")
 
     plt.xlabel("Load current [mA]")
-    plt.ylabel("Regulated VDD_RF [V]")
+    plt.ylabel(f"Regulated {voltage} [V]")
     plt.legend(["Measured"])
     plt.show()
 
@@ -53,7 +54,12 @@ def plot_ldo(measured_data: str, simulated_data: str) -> None:
 def main(argv):
     assert len(argv) == 1
 
-    plot_ldo(FLAGS.ldo_measured_data, FLAGS.ldo_simulated_data)
+    plot_ldo("tapeout/power/data/ldo_analog_measured_chip13.csv",
+             "tapeout/power/data/ldo_analog_simulated.csv", "VDD_A")
+    plot_ldo("tapeout/power/data/ldo_digital_measured_chip13.csv",
+             "tapeout/power/data/ldo_digital_simulated.csv", "VDD_D")
+    plot_ldo("tapeout/power/data/ldo_rf_measured_chip5.csv",
+             "tapeout/power/data/ldo_rf_simulated.csv", "VDD_RF")
 
 
 if __name__ == "__main__":

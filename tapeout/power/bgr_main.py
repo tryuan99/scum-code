@@ -65,7 +65,7 @@ def main(argv):
         "lines.linewidth": 1,
         "lines.markersize": 8,
     })
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 4))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 
     df_measured = pd.read_csv(FLAGS.bgr_measured_data, comment="#")
     df_simulated = pd.read_csv(FLAGS.bgr_simulated_data, comment="#")

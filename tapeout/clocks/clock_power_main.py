@@ -12,7 +12,7 @@ def main(argv):
         "font.size": 16,
         "lines.markersize": 8,
     })
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 4))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 
     # Data for the CPU clock domain variations.
     cpu_data = pd.DataFrame({

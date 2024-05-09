@@ -25,7 +25,7 @@ def plot_analog_clock_tuning(measured_data: str, simulated_data: str) -> None:
         "lines.linewidth": 3,
         "lines.markersize": 8,
     })
-    fig, ax = plt.subplots(figsize=(12, 3))
+    fig, ax = plt.subplots(figsize=(6, 4))
 
     # Plot the measured data.
     df_measured.plot.line(ax=ax,
