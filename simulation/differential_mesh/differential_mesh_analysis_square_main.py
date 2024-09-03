@@ -49,7 +49,7 @@ def plot_standard_error_sweep(standard_errors: str) -> None:
     ax.plot(df[num_rows_column],
             logarithmic_regression.evaluate(df[num_rows_column]), "--")
     ax.set_xlabel("Square grid dimensions")
-    ax.set_ylabel("Squared standard error")
+    ax.set_ylabel("Norm. squared standard error")
     # plt.show()
 
     # Plot the squared standard error as a function of the grid dimensions on a
@@ -60,7 +60,7 @@ def plot_standard_error_sweep(standard_errors: str) -> None:
     ax2.semilogx(df[num_rows_column],
                  logarithmic_regression.evaluate(df[num_rows_column]), "--")
     ax2.set_xlabel("Square grid dimensions")
-    ax2.set_ylabel("Squared standard error")
+    ax2.set_ylabel("Norm. squared standard error")
     plt.show()
 
 

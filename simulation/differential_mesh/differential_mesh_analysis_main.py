@@ -61,7 +61,7 @@ def plot_standard_error_sweep(standard_errors: str) -> None:
     )
     ax.set_xlabel("Number of rows")
     ax.set_ylabel("Number of columns")
-    ax.set_zlabel("Squared standard error")
+    ax.set_zlabel("Normalized squared standard error")
     ax.view_init(30, -45)
     # plt.colorbar(surf)
     plt.show()
