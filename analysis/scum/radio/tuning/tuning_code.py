@@ -14,7 +14,13 @@ NUM_TUNING_CODE_BITS = 15
 
 
 class TuningCode:
-    """Represents a tuning code consisting of a coarse, mid, and fine code."""
+    """Represents a tuning code consisting of a coarse, mid, and fine code.
+
+    Attributes:
+        coarse: Coarse code.
+        mid: Mid code.
+        fine: Fine code.
+    """
 
     def __init__(
         self,
@@ -23,7 +29,7 @@ class TuningCode:
         fine: int = None,
         *,
         tuning_code: int = None,
-    ):
+    ) -> None:
         if tuning_code is not None:
             (
                 self.coarse,
@@ -35,7 +41,6 @@ class TuningCode:
             self.mid = mid
             self.fine = fine
 
-    @property
     def tuning_code(self) -> int:
         """Tuning code."""
         return self.coarse_mid_fine_to_tuning_code(
