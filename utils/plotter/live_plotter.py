@@ -16,19 +16,23 @@ DEFAULT_ANIMATION_INTERVAL = 100  # milliseconds
 class LivePlotter(ABC):
     """Interface for a live plotter."""
 
-    def __init__(self,
-                 title: str,
-                 xlabel: str,
-                 ylabel: str,
-                 xmax: float,
-                 ymin: float,
-                 ymax: float,
-                 num_traces: int = 1,
-                 secindices: tuple[int] = None,
-                 secylabel: str = None,
-                 secymin: float = None,
-                 secymax: float = None) -> None:
+    def __init__(
+        self,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        xmax: float,
+        ymin: float,
+        ymax: float,
+        num_traces: int = 1,
+        trace_labels: list[str] = None,
+        secindices: list[int] = None,
+        secylabel: str = None,
+        secymin: float = None,
+        secymax: float = None,
+    ) -> None:
         self.num_traces = num_traces
+        self.trace_labels = trace_labels
         self.xmax = xmax
 
         # Prepare the plot.
@@ -53,16 +57,20 @@ class LivePlotter(ABC):
         self.traces = []
         for i in range(num_traces):
             args = {
-                "color": f"C{i}",
-                "label": f"Trace {i + 1}",
+                "color":
+                    f"C{i}",
+                "label": (f"Trace {i + 1}" if self.trace_labels is None else
+                          self.trace_labels[i]),
             }
             if secindices is None or i not in secindices:
                 trace, = self.ax.plot(self.x, self.y[:, i], marker="^", **args)
             else:
-                trace, = self.secax.plot(self.x,
-                                         self.y[:, i],
-                                         marker="s",
-                                         **args)
+                trace, = self.secax.plot(
+                    self.x,
+                    self.y[:, i],
+                    marker="s",
+                    **args,
+                )
             self.traces.append(trace)
         self.ax.legend(handles=self.traces)
 
@@ -79,14 +87,14 @@ class LivePlotter(ABC):
         self._run_animation()
 
     @abstractmethod
-    def next_data(self) -> tuple[float, float | tuple[float]]:
+    def next_data(self) -> tuple[float, float | list[float]]:
         """Returns the next data to plot.
 
         This function blocks until the next data is available.
         """
 
     @abstractmethod
-    def next(self) -> float | tuple[float]:
+    def next(self) -> float | list[float]:
         """Returns the next y-value to plot.
 
         This function blocks until the next value is available.
@@ -122,10 +130,12 @@ class LivePlotter(ABC):
 
     def _run_animation(self) -> None:
         """Runs the animation."""
-        anim = animation.FuncAnimation(self.fig,
-                                       self._update_animation,
-                                       interval=DEFAULT_ANIMATION_INTERVAL,
-                                       blit=True)
+        anim = animation.FuncAnimation(
+            self.fig,
+            self._update_animation,
+            interval=DEFAULT_ANIMATION_INTERVAL,
+            blit=True,
+        )
         plt.show()
 
 
@@ -135,31 +145,37 @@ class DiscreteLivePlotter(LivePlotter):
     The x-axis represents the sample index.
     """
 
-    def __init__(self,
-                 max_num_points: int,
-                 title: str,
-                 xlabel: str,
-                 ylabel: str,
-                 ymin: float,
-                 ymax: float,
-                 num_traces: int = 1,
-                 secindices: tuple[int] = None,
-                 secylabel: str = None,
-                 secymin: float = None,
-                 secymax: float = None) -> None:
-        super().__init__(title,
-                         xlabel,
-                         ylabel,
-                         max_num_points,
-                         ymin,
-                         ymax,
-                         num_traces=num_traces,
-                         secindices=secindices,
-                         secylabel=secylabel,
-                         secymin=secymin,
-                         secymax=secymax)
+    def __init__(
+        self,
+        max_num_points: int,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        ymin: float,
+        ymax: float,
+        num_traces: int = 1,
+        trace_labels: list[str] = None,
+        secindices: list[int] = None,
+        secylabel: str = None,
+        secymin: float = None,
+        secymax: float = None,
+    ) -> None:
+        super().__init__(
+            title,
+            xlabel,
+            ylabel,
+            max_num_points,
+            ymin,
+            ymax,
+            num_traces=num_traces,
+            trace_labels=trace_labels,
+            secindices=secindices,
+            secylabel=secylabel,
+            secymin=secymin,
+            secymax=secymax,
+        )
 
-    def next_data(self) -> tuple[float, float | tuple[float]]:
+    def next_data(self) -> tuple[float, float | list[float]]:
         """Returns the next data to plot.
 
         This function blocks until the next data is available.
@@ -175,32 +191,38 @@ class ContinuousLivePlotter(LivePlotter):
     The x-axis represents the time in seconds.
     """
 
-    def __init__(self,
-                 max_duration: float,
-                 title: str,
-                 xlabel: str,
-                 ylabel: str,
-                 ymin: float,
-                 ymax: float,
-                 num_traces: int = 1,
-                 secindices: tuple[int] = None,
-                 secylabel: str = None,
-                 secymin: float = None,
-                 secymax: float = None) -> None:
-        super().__init__(title,
-                         xlabel,
-                         ylabel,
-                         max_duration,
-                         ymin,
-                         ymax,
-                         num_traces=num_traces,
-                         secindices=secindices,
-                         secylabel=secylabel,
-                         secymin=secymin,
-                         secymax=secymax)
+    def __init__(
+        self,
+        max_duration: float,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        ymin: float,
+        ymax: float,
+        num_traces: int = 1,
+        trace_labels: list[str] = None,
+        secindices: list[int] = None,
+        secylabel: str = None,
+        secymin: float = None,
+        secymax: float = None,
+    ) -> None:
+        super().__init__(
+            title,
+            xlabel,
+            ylabel,
+            max_duration,
+            ymin,
+            ymax,
+            num_traces=num_traces,
+            trace_labels=trace_labels,
+            secindices=secindices,
+            secylabel=secylabel,
+            secymin=secymin,
+            secymax=secymax,
+        )
         self.last_data_time = 0
 
-    def next_data(self) -> tuple[float, float | tuple[float]]:
+    def next_data(self) -> tuple[float, float | list[float]]:
         """Returns the next data to plot.
 
         This function blocks until the next data is available.

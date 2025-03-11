@@ -11,38 +11,44 @@ from utils.serial.serial_interface import SerialInterface
 class SerialLivePlotter(ContinuousLivePlotter):
     """Serial live plotter to plot data from a serial port."""
 
-    def __init__(self,
-                 port: str,
-                 baudrate: int,
-                 max_duration: float,
-                 parse_data: Callable[[str], float | tuple[float]],
-                 title: str,
-                 xlabel: str,
-                 ylabel: str,
-                 ymin: float,
-                 ymax: float,
-                 num_traces: int = 1,
-                 secindices: tuple[int] = None,
-                 secylabel: str = None,
-                 secymin: float = None,
-                 secymax: float = None) -> None:
-        super().__init__(max_duration,
-                         title,
-                         xlabel,
-                         ylabel,
-                         ymin,
-                         ymax,
-                         num_traces=num_traces,
-                         secindices=secindices,
-                         secylabel=secylabel,
-                         secymin=secymin,
-                         secymax=secymax)
+    def __init__(
+        self,
+        port: str,
+        baudrate: int,
+        max_duration: float,
+        parse_data: Callable[[str], float | list[float]],
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        ymin: float,
+        ymax: float,
+        num_traces: int = 1,
+        trace_labels: list[str] = None,
+        secindices: list[int] = None,
+        secylabel: str = None,
+        secymin: float = None,
+        secymax: float = None,
+    ) -> None:
+        super().__init__(
+            max_duration,
+            title,
+            xlabel,
+            ylabel,
+            ymin,
+            ymax,
+            num_traces=num_traces,
+            trace_labels=trace_labels,
+            secindices=secindices,
+            secylabel=secylabel,
+            secymin=secymin,
+            secymax=secymax,
+        )
         self.parse_data = parse_data
 
         # Open the serial port.
         self.serial = SerialInterface(port, baudrate)
 
-    def next(self) -> float | tuple[float]:
+    def next(self) -> float | list[float]:
         """Returns the next y-value to plot.
 
         This function blocks until the next value is available.

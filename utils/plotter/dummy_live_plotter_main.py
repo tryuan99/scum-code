@@ -8,8 +8,10 @@ FLAGS = flags.FLAGS
 def main(argv):
     assert len(argv) == 1
 
-    plotter = dummy_live_plotter.DummyLivePlotter(FLAGS.max_num_points,
-                                                  FLAGS.max_counter)
+    plotter = dummy_live_plotter.DummyLivePlotter(
+        FLAGS.max_num_points,
+        FLAGS.max_counter,
+    )
     plotter.run()
 
 
