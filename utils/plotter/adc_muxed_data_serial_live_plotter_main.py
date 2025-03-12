@@ -34,6 +34,13 @@ def main(argv):
         FLAGS.baudrate,
         FLAGS.max_duration,
         lambda read_data: _parse_adc_data(read_data, FLAGS.num_sensors),
+        trace_labels=[
+            "Decomposition sensor",
+            "Nitrate sensor",
+            "Ammonium sensor",
+            "Thermistor",
+            "Oxygen sensor",
+        ],
         num_traces=FLAGS.num_sensors,
         title="ADC data",
         xlabel="Time [s]",

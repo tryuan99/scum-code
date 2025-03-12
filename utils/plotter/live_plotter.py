@@ -227,7 +227,10 @@ class ContinuousLivePlotter(LivePlotter):
 
         This function blocks until the next data is available.
         """
-        y = self.next()
+        all_zeros = True
+        while all_zeros:
+            y = self.next()
+            all_zeros = np.all(np.array(y) == 0)
         x = np.max(self.x) + time.time() - self.last_data_time
         self.last_data_time = time.time()
         return x, y
