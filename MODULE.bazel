@@ -1,12 +1,36 @@
 module(name = "scum")
 
 bazel_dep(
+    name = "pico-sdk",
+    version = "2.1.1",
+)
+bazel_dep(
+    name = "platforms",
+    version = "0.0.11",
+)
+bazel_dep(
+    name = "rules_cc",
+    version = "0.1.1",
+)
+bazel_dep(
     name = "rules_pkg",
     version = "1.0.1",
 )
 bazel_dep(
     name = "rules_python",
     version = "1.2.0",
+)
+
+# Pico SDK toolchains.
+register_toolchains(
+    "@pico-sdk//bazel/toolchain:linux-x86_64-rp2040",
+    "@pico-sdk//bazel/toolchain:linux-x86_64-rp2350",
+    "@pico-sdk//bazel/toolchain:win-x86_64-rp2040",
+    "@pico-sdk//bazel/toolchain:win-x86_64-rp2350",
+    "@pico-sdk//bazel/toolchain:mac-x86_64-rp2040",
+    "@pico-sdk//bazel/toolchain:mac-x86_64-rp2350",
+    "@pico-sdk//bazel/toolchain:mac-aarch64-rp2040",
+    "@pico-sdk//bazel/toolchain:mac-aarch64-rp2350",
 )
 
 # Configure the Python toolchain.
