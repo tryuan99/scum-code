@@ -6,21 +6,12 @@ serial open timeout of 2 seconds is required. For an Apple USB-C dongle, the
 serial packet size cannot exceed 96 bytes, and no serial open timeout is needed.
 """
 
-import time
-
 import serial
 from absl import logging
 
 # The maximum size in bytes of each packet to be written to the serial port.
 # This value is dongle-dependent.
 SERIAL_PACKET_SIZE = 32
-
-# The timeout between consecutive packet writes.
-SERIAL_PACKET_WRITE_TIMEOUT = 0.005  # seconds
-
-# The timeout in seconds after opening the serial port.
-# This value is dongle-dependent.
-SERIAL_OPEN_TIMEOUT = 2  # seconds
 
 # The timeout in seconds for a read from the serial port.
 SERIAL_READ_TIMEOUT = 5  # seconds
@@ -56,8 +47,6 @@ class SerialInterface:
             write_timeout=write_timeout,
             **kwargs,
         )
-        time.sleep(SERIAL_OPEN_TIMEOUT)
-
         self.verbose = verbose
 
     def write(self, data: bytes) -> None:
@@ -74,10 +63,10 @@ class SerialInterface:
                                      len(data) - num_bytes_written)
             num_bytes_sent = self.serial.write(
                 data[num_bytes_written:num_bytes_written + num_bytes_to_write])
+            self.serial.flush()
             if self.verbose:
                 logging.info("Wrote %d bytes to %s.", num_bytes_sent, self.port)
             num_bytes_written += num_bytes_sent
-            time.sleep(SERIAL_PACKET_WRITE_TIMEOUT)
 
     def read(self, num_bytes: int = None) -> bytes:
         """Reads the data from the serial port.
