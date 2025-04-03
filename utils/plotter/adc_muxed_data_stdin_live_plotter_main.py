@@ -70,7 +70,7 @@ def main(argv):
         xlabel="Time [s]",
         ylabel="ADC output [LSB]",
         ymin=0,
-        ymax=512,
+        ymax=600,
     )
     plotter.run()
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     flags.DEFINE_string("address", None, "Source address.")
     flags.DEFINE_integer(
         "max_duration",
-        60,
+        1000,
         "Maximum duration to plot in seconds.",
         lower_bound=0,
     )
