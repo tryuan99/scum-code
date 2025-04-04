@@ -1,0 +1,14 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "scum_bootloader_main",
+    srcs = ["scum_bootloader_main.c"],
+    target_compatible_with = select({
+        "@pico-sdk//bazel/constraint:rp2040": [],
+        "@pico-sdk//bazel/constraint:rp2350": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = ["@pico-sdk//src/rp2_common/pico_stdlib"],
+)
