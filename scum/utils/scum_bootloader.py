@@ -1,4 +1,4 @@
-"""The nRF bootloader flashes a binary onto SCuM and boots it using the 3-wire bus."""
+"""The SCuM bootloader flashes a binary onto SCuM and boots it using the 3-wire bus."""
 
 import random
 
@@ -6,22 +6,30 @@ from absl import logging
 
 from utils.serial.serial_interface import SerialInterface
 
-# Baud rate of the nRF board.
-NRF_BAUDRATE = 460800
+# Serial port baud rate.
+SCUM_BOOTLOADER_BAUDRATE = 460800
 
 # Binary size in bytes to be flashed onto SCuM.
 SCUM_BINARY_SIZE = 64 * 1024
 
 
-class NrfBootloader:
-    """SCuM bootloader using the nRF board."""
+class ScumBootloader:
+    """SCuM bootloader.
 
-    def __init__(self, port: str):
-        # Open the serial port to the nRF board.
-        self.serial = SerialInterface(port, NRF_BAUDRATE)
+    Attributes:
+        serial: Serial interface.
+    """
+
+    def __init__(
+        self,
+        port: str,
+        baudrate: int = SCUM_BOOTLOADER_BAUDRATE,
+    ) -> None:
+        # Open the serial port.
+        self.serial = SerialInterface(port, baudrate)
 
     def bootload(self, binary: str, use_random_padding: bool) -> None:
-        """Bootloads SCuM using the nRF board.
+        """Bootloads SCuM.
 
         Args:
             binary: Binary image to flash onto SCuM.
@@ -36,10 +44,12 @@ class NrfBootloader:
         else:
             data += bytes(SCUM_BINARY_SIZE - len(data))
 
-        # Boot SCuM via the nRF board.
-        logging.info("Bootloading SCuM via the nRF board.")
+        # Boot SCuM.
+        logging.info("Bootloading SCuM.")
         self.serial.write(data)
         # Read the response that the SRAM load is complete.
         logging.info("Firmware load response: %s", self.serial.read())
         # Read the response that the 3-wire bus bootload is complete.
         logging.info("3WB bootload response: %s", self.serial.read())
+        # Read the response that the clock calibration is complete.
+        logging.info("Clock calibration response: %s", self.serial.read())
