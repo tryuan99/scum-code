@@ -28,8 +28,8 @@
 // USB read timeout in microseconds.
 #define USB_READ_TIMEOUT_US 1000
 
-// Hard reset sleep time in milliseconds.
-#define HARD_RESET_SLEEP_TIME_MS 14
+// Hard reset sleep time in microseconds.
+#define HARD_RESET_SLEEP_TIME_US 14000
 
 // Toggle sleep time in microseconds.
 #define TOGGLE_SLEEP_TIME_US 1
@@ -70,9 +70,16 @@ static inline void scum_bootloader_gpio_init() {
   gpio_set_dir(SCUM_DATA_PIN, GPIO_OUT);
   gpio_init(SCUM_ENABLE_PIN);
   gpio_set_dir(SCUM_ENABLE_PIN, GPIO_OUT);
+
   // The hard reset pin is set to high-Z.
   gpio_init(SCUM_HRESET_PIN);
   gpio_set_dir(SCUM_HRESET_PIN, GPIO_IN);
+
+  // Disable all pull-up and pull-down resistors.
+  gpio_disable_pulls(SCUM_CLOCK_PIN);
+  gpio_disable_pulls(SCUM_DATA_PIN);
+  gpio_disable_pulls(SCUM_ENABLE_PIN);
+  gpio_disable_pulls(SCUM_HRESET_PIN);
 }
 
 // Initialize the LED.
@@ -125,12 +132,14 @@ int main(int argc, char** argv) {
         gpio_put(SCUM_CLOCK_PIN, false);
         gpio_put(SCUM_DATA_PIN, false);
         gpio_put(SCUM_ENABLE_PIN, false);
+
         // Execute a hard reset.
-        gpio_put(SCUM_HRESET_PIN, false);
         gpio_set_dir(SCUM_HRESET_PIN, GPIO_OUT);
-        sleep_ms(HARD_RESET_SLEEP_TIME_MS);
+        gpio_put(SCUM_HRESET_PIN, false);
+        sleep_us(HARD_RESET_SLEEP_TIME_US);
         gpio_set_dir(SCUM_HRESET_PIN, GPIO_IN);
-        sleep_ms(HARD_RESET_SLEEP_TIME_MS);
+        sleep_us(HARD_RESET_SLEEP_TIME_US);
+
         g_scum_bootloader_state = STATE_WRITING_BINARY;
         break;
       }
@@ -141,7 +150,7 @@ int main(int argc, char** argv) {
             // Output the data.
             gpio_put(SCUM_DATA_PIN,
                      ((g_scum_bootloader_binary[i] >> j) & 0x1) == 0x1);
-            // Toggle the enable pin.
+            // Toggle the enable pin after 32 bits.
             sleep_us(TOGGLE_SLEEP_TIME_US);
             gpio_put(SCUM_ENABLE_PIN, ((i + 1) % 4 == 0) && (j == 7));
             // Toggle the clock pin.
