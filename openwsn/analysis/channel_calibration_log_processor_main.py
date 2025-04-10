@@ -1,3 +1,4 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import scienceplots
@@ -13,6 +14,7 @@ FLAGS = flags.FLAGS
 def plot_channel_histogram(
     successes: list[ChannelCalibrationTxRxSuccess],
     label: str,
+    ax: matplotlib.axes.Axes,
 ) -> None:
     """Plots a histogram of the channels.
 
@@ -22,21 +24,24 @@ def plot_channel_histogram(
     """
     # Plot a histogram of the channels.
     channels = [success.channel for success in successes]
-    plt.style.use(["science", "grid"])
-    fig, ax = plt.subplots(figsize=(12, 6))
     bins = np.arange(
         CHANNEL_CALIBRATION_MIN_CHANNEL - 0.5,
         CHANNEL_CALIBRATION_MAX_CHANNEL + 1,
     )
-    counts, bins, patches = ax.hist(channels, bins=bins)
+    counts, bins, patches = ax.hist(
+        channels,
+        bins=bins,
+        color="C1" if label == "RX" else "C0",
+        rwidth=0.8,
+    )
     ax.bar_label(
         patches,
         labels=[int(count) for count in counts],
         label_type="edge",
     )
-    ax.set_title(f"Channel histogram of the {label} successes")
-    ax.set_xlabel("Channel")
-    plt.show()
+    ax.set_title(f"{label} successes")
+    ax.set_xlabel("IEEE 802.15.4 channel")
+    ax.set_ylabel("Count")
 
 
 def plot_success_timeline(
@@ -51,7 +56,7 @@ def plot_success_timeline(
     """
     # Plot a timeline of the TX and RX successes.
     plt.style.use(["science", "grid"])
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(12, 4))
     for index, (successes, label) in enumerate([
         (rx_successes, "RX"),
         (tx_successes, "TX"),
@@ -60,14 +65,14 @@ def plot_success_timeline(
         y = [success.channel for success in successes]
         ax.scatter(
             x,
-            y,
+            np.array(y) + (index * 2 - 1) * 0.05,
             c=f"C{index + 1}",
             alpha=0.25,
             label=label,
         )
     ax.set_title("Channel calibration timeline")
     ax.set_xlabel("Elapsed time [s]")
-    ax.set_ylabel("Channel")
+    ax.set_ylabel("IEEE 802.15.4 channel")
     ax.legend()
     plt.show()
 
@@ -76,8 +81,11 @@ def main(argv):
     assert len(argv) == 1
 
     log_processor = ChannelCalibrationLogProcessor(FLAGS.log)
-    plot_channel_histogram(log_processor.tx_successes, "TX")
-    plot_channel_histogram(log_processor.rx_successes, "RX")
+    plt.style.use(["science", "grid"])
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+    plot_channel_histogram(log_processor.tx_successes, "TX", ax1)
+    plot_channel_histogram(log_processor.rx_successes, "RX", ax2)
+    plt.show()
     plot_success_timeline(
         log_processor.tx_successes,
         log_processor.rx_successes,

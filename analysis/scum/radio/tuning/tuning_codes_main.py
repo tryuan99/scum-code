@@ -50,24 +50,25 @@ def plot_tx_rx_tuning_codes(df: pd.DataFrame) -> None:
 
     # Plot the TX and RX tuning codes.
     plt.style.use(["science", "grid"])
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(6, 2.5))
     for index, (tx_rx, tx_rx_group) in enumerate(df.groupby(tx_rx_column)):
-        tx_rx_group.plot.scatter(
-            tuning_code_column,
-            channel_column,
-            ax=ax,
+        ax.scatter(
+            tx_rx_group[tuning_code_column],
+            tx_rx_group[channel_column] + 0.1 * index,
             c=f"C{index}",
-            alpha=0.5,
+            s=100,
+            marker="^" if index == 0 else "v",
+            alpha=0.25,
             label=tx_rx,
-            legend=True,
         )
     ax.set_title("TX and RX tuning codes")
     ax.xaxis.set_major_formatter(FuncFormatter(_tuning_code_formatter))
+    ax.legend()
     plt.show()
 
     # Plot the difference between the TX and RX tuning codes.
     plt.style.use(["science", "grid"])
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(6, 2.5))
     for (channel, channel_group) in df.groupby(channel_column):
         tx = channel_group.groupby(tx_rx_column).get_group(TX_LABEL)
         rx = channel_group.groupby(tx_rx_column).get_group(RX_LABEL)
@@ -78,12 +79,12 @@ def plot_tx_rx_tuning_codes(df: pd.DataFrame) -> None:
             tx_rx_differences,
         )
     ax.axhline(
-        TuningCode(0, -1, 31).tuning_code(),
+        -TuningCode(0, 1, 31).tuning_code(),
         color="red",
         linestyle="--",
     )
     ax.axhline(
-        TuningCode(0, -1, 0).tuning_code(),
+        -TuningCode(0, 1, 0).tuning_code(),
         color="red",
         linestyle="--",
     )
@@ -113,11 +114,12 @@ def plot_rx_tuning_code_extrapolation(
     df_rx = df[df[tx_rx_column] == "RX"]
 
     # Extrapolate the preceding RX channel.
-    fig, ax = plt.subplots(figsize=(12, 6))
+    plt.style.use(["science", "grid"])
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 1.5), sharey=True)
     df_rx.plot.scatter(
         tuning_code_column,
         channel_column,
-        ax=ax,
+        ax=ax1,
         c="C0",
         alpha=0.8,
     )
@@ -125,7 +127,7 @@ def plot_rx_tuning_code_extrapolation(
         channel_data = df_rx[df_rx[channel_column] == channel]
         min_mid_code = channel_data[mid_column].min()
         max_mid_code = channel_data[mid_column].max()
-        ax.axvline(
+        ax1.axvline(
             TuningCode(
                 channel_data[coarse_column].min(),
                 min_mid_code - num_mid_codes_between_channels,
@@ -135,7 +137,7 @@ def plot_rx_tuning_code_extrapolation(
             linestyle="--",
             alpha=0.5,
         )
-        ax.axvline(
+        ax1.axvline(
             TuningCode(
                 channel_data[coarse_column].max(),
                 max_mid_code - num_mid_codes_between_channels,
@@ -145,16 +147,14 @@ def plot_rx_tuning_code_extrapolation(
             linestyle="--",
             alpha=0.5,
         )
-    ax.set_title("Extrapolating the preceding RX channel")
-    ax.xaxis.set_major_formatter(FuncFormatter(_tuning_code_formatter))
-    plt.show()
+    ax1.set_title("Preceding RX channel")
+    ax1.xaxis.set_major_formatter(FuncFormatter(_tuning_code_formatter))
 
     # Extrapolate the succeeding RX channel.
-    fig, ax = plt.subplots(figsize=(12, 6))
     df_rx.plot.scatter(
         tuning_code_column,
         channel_column,
-        ax=ax,
+        ax=ax2,
         c="C0",
         alpha=0.8,
     )
@@ -162,7 +162,7 @@ def plot_rx_tuning_code_extrapolation(
         channel_data = df_rx[df_rx[channel_column] == channel]
         min_mid_code = channel_data[mid_column].min()
         max_mid_code = channel_data[mid_column].max()
-        ax.axvline(
+        ax2.axvline(
             TuningCode(
                 channel_data[coarse_column].min(),
                 min_mid_code + num_mid_codes_between_channels,
@@ -172,7 +172,7 @@ def plot_rx_tuning_code_extrapolation(
             linestyle="--",
             alpha=0.5,
         )
-        ax.axvline(
+        ax2.axvline(
             TuningCode(
                 channel_data[coarse_column].max(),
                 max_mid_code + num_mid_codes_between_channels,
@@ -182,8 +182,8 @@ def plot_rx_tuning_code_extrapolation(
             linestyle="--",
             alpha=0.5,
         )
-    ax.set_title("Extrapolating the succeeding RX channel")
-    ax.xaxis.set_major_formatter(FuncFormatter(_tuning_code_formatter))
+    ax2.set_title("Succeeding RX channel")
+    ax2.xaxis.set_major_formatter(FuncFormatter(_tuning_code_formatter))
     plt.show()
 
 

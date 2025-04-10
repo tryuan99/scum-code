@@ -132,7 +132,7 @@ class EventPlotter:
             color="C0",
         )
         axes[0].set_ylim([-200, 200])
-        axes[0].set_ylabel("Time correction [µs]")
+        axes[0].set_ylabel("Time\ncorrection [µs]")
 
         # Plot the RX tuning code.
         rx_tuning_code_timestamps, rx_tuning_codes = self.get_rx_tuning_codes()
