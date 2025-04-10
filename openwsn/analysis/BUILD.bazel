@@ -1,0 +1,28 @@
+load("@pypi//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "event_plotter",
+    srcs = ["event_plotter.py"],
+    deps = [
+        "//analysis/scum/radio/tuning:tuning_code",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+        requirement("SciencePlots"),
+    ],
+)
+
+py_binary(
+    name = "event_plotter_main",
+    srcs = ["event_plotter_main.py"],
+    data = ["//openwsn/analysis/logs:channel_calibration_logs"],
+    deps = [
+        ":event_plotter",
+        requirement("absl-py"),
+        requirement("pandas"),
+    ],
+)

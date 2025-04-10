@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "channel_calibration_logs",
+    srcs = ["single_channel_calibration.csv"],
+)
