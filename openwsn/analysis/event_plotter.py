@@ -67,7 +67,7 @@ class EventPlotter:
                 TIME_CORRECTION_REGEX_PATTERN).squeeze())
         axes[0].plot(time_correction_timestamps, time_corrections, color="C0")
         axes[0].set_ylim([-200, 200])
-        axes[0].set_ylabel("Time correction [µs]")
+        axes[0].set_ylabel("Time\ncorrection [µs]")
 
         # Plot the RX tuning code.
         rx_tuning_code_rows = (self.logs.str.contains(TUNING_CODE_REGEX_PATTERN)
