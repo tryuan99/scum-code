@@ -28,12 +28,18 @@ class ScumBootloader:
         # Open the serial port.
         self.serial = SerialInterface(port, baudrate)
 
-    def bootload(self, binary: str, use_random_padding: bool) -> None:
+    def bootload(
+        self,
+        binary: str,
+        use_random_padding: bool,
+        start_serial_monitor: bool,
+    ) -> None:
         """Bootloads SCuM.
 
         Args:
             binary: Binary image to flash onto SCuM.
             use_random_padding: If true, pad the binary with random bytes.
+            start_serial_monitor: If true, start a serial monitor.
         """
         with open(binary, "rb") as f:
             data = f.read(SCUM_BINARY_SIZE)
@@ -53,3 +59,12 @@ class ScumBootloader:
         logging.info("3WB bootload response: %s", self.serial.read())
         # Read the response that the clock calibration is complete.
         logging.info("Clock calibration response: %s", self.serial.read())
+
+        # Start a serial monitor.
+        if start_serial_monitor:
+            while True:
+                read_data = self.serial.read()
+                try:
+                    logging.info(read_data.decode().strip())
+                except:
+                    logging.info(read_data)

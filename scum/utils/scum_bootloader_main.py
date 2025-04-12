@@ -9,7 +9,11 @@ def main(argv):
     assert len(argv) == 1
 
     bootloader = scum_bootloader.ScumBootloader(FLAGS.port, FLAGS.baudrate)
-    bootloader.bootload(FLAGS.binary, FLAGS.use_random_padding)
+    bootloader.bootload(
+        FLAGS.binary,
+        FLAGS.use_random_padding,
+        FLAGS.start_serial_monitor,
+    )
 
 
 if __name__ == "__main__":
@@ -19,6 +23,8 @@ if __name__ == "__main__":
     flags.DEFINE_string("binary", None, "Binary image to flash onto SCuM.")
     flags.DEFINE_boolean("use_random_padding", False,
                          "If true, pad the binary with random bytes.")
+    flags.DEFINE_boolean("start_serial_monitor", True,
+                         "If true, start a serial monitor after bootloading.")
     flags.mark_flag_as_required("binary")
 
     app.run(main)

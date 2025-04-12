@@ -13,9 +13,13 @@ cc_binary(
     }),
     deps = [
         "@pico-sdk//src/common/pico_time",
+        "@pico-sdk//src/common/pico_util",
         "@pico-sdk//src/rp2_common:pico_platform",
         "@pico-sdk//src/rp2_common/hardware_gpio",
+        "@pico-sdk//src/rp2_common/hardware_uart",
+        "@pico-sdk//src/rp2_common/pico_multicore",
         "@pico-sdk//src/rp2_common/pico_stdio",
+        "@pico-sdk//src/rp2_common/pico_stdio_uart",
         "@pico-sdk//src/rp2_common/pico_stdio_usb",
     ],
 )

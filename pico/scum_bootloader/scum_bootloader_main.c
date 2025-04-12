@@ -4,10 +4,14 @@
 #include <stdlib.h>
 
 #include "hardware/gpio.h"
+#include "hardware/uart.h"
 #include "pico/error.h"
+#include "pico/multicore.h"
 #include "pico/stdio.h"
+#include "pico/stdio_uart.h"
 #include "pico/stdio_usb.h"
 #include "pico/time.h"
+#include "pico/util/queue.h"
 
 // SCuM binary size in bytes.
 // SCuM has a program memory size of 64 KiB.
@@ -18,6 +22,12 @@
 #define SCUM_DATA_PIN 7
 #define SCUM_ENABLE_PIN 12
 #define SCUM_HRESET_PIN 21
+
+// UART configuration for SCuM.
+#define SCUM_UART_INSTANCE uart0
+#define SCUM_UART_RX_PIN 1
+#define SCUM_UART_BAUD_RATE 19200
+#define SCUM_UART_BUFFER_SIZE 512
 
 // USB read timeout in microseconds.
 #define SCUM_USB_READ_TIMEOUT_US 1000
@@ -41,10 +51,12 @@
 typedef enum {
   STATE_INVALID = -1,
   STATE_INIT,
+  STATE_IDLE,
   STATE_RECEIVE_BINARY,
   STATE_HARD_RESET,
   STATE_WRITE_BINARY,
   STATE_CALIBRATION,
+  STATE_UART_MONITOR,
 } scum_bootloader_state_e;
 
 // OK response.
@@ -64,6 +76,9 @@ static repeating_timer_t g_scum_calibration_timer;
 
 // Calibration number of pulses.
 static uint32_t g_scum_calibration_num_pulses = 0;
+
+// UART buffer.
+static queue_t g_scum_uart_buffer;
 
 // Initialize the GPIOs.
 static inline void scum_bootloader_gpio_init() {
@@ -118,25 +133,62 @@ static bool scum_calibration_timer_callback(repeating_timer_t* timer) {
   return g_scum_calibration_num_pulses < SCUM_CALIBRATION_NUM_PULSES;
 }
 
+// SCuM UART reader.
+static void scum_uart_reader() {
+  while (true) {
+    if (uart_is_readable(SCUM_UART_INSTANCE)) {
+      char data = uart_getc(SCUM_UART_INSTANCE);
+      queue_try_add(&g_scum_uart_buffer, &data);
+    }
+  }
+}
+
 int main(int argc, char** argv) {
+  // Initialize UART.
+  stdio_uart_init_full(SCUM_UART_INSTANCE, SCUM_UART_BAUD_RATE, /*tx_pin=*/-1,
+                       /*rx_pin=*/SCUM_UART_RX_PIN);
+
   // Initialize USB.
   stdio_usb_init();
+
+  // Limit input and output to USB only.
+  stdio_filter_driver(&stdio_usb);
 
   // Initialize GPIOs and the LED.
   scum_bootloader_gpio_init();
   scum_bootloader_led_init();
 
-  g_scum_bootloader_state = STATE_RECEIVE_BINARY;
+  // Initialize the UART buffer.
+  queue_init(&g_scum_uart_buffer, sizeof(char), SCUM_UART_BUFFER_SIZE);
+
+  g_scum_bootloader_state = STATE_IDLE;
   while (true) {
     switch (g_scum_bootloader_state) {
-      case STATE_RECEIVE_BINARY: {
+      case STATE_IDLE: {
+        // Print out any UART from SCuM.
+        if (!queue_is_empty(&g_scum_uart_buffer)) {
+          char data = 0;
+          while (queue_try_remove(&g_scum_uart_buffer, &data)) {
+            printf("%c", data);
+          }
+        }
+
+        // Check if a new SCuM binary is being received.
         if (scum_bootloader_receive_byte(
                 &g_scum_bootloader_binary[g_scum_bootloader_binary_size])) {
           ++g_scum_bootloader_binary_size;
-          if (g_scum_bootloader_binary_size == SCUM_BINARY_SIZE) {
-            g_scum_bootloader_binary_size = 0;
-            g_scum_bootloader_state = STATE_HARD_RESET;
-          }
+          multicore_reset_core1();
+          g_scum_bootloader_state = STATE_RECEIVE_BINARY;
+        }
+      }
+      case STATE_RECEIVE_BINARY: {
+        if (g_scum_bootloader_binary_size == SCUM_BINARY_SIZE) {
+          g_scum_bootloader_binary_size = 0;
+          g_scum_bootloader_state = STATE_HARD_RESET;
+        } else if (scum_bootloader_receive_byte(
+                       &g_scum_bootloader_binary
+                           [g_scum_bootloader_binary_size])) {
+          ++g_scum_bootloader_binary_size;
         }
         break;
       }
@@ -194,8 +246,13 @@ int main(int argc, char** argv) {
         }
         printf(RESPONSE_OK);
         g_scum_calibration_num_pulses = 0;
-        g_scum_bootloader_state = STATE_RECEIVE_BINARY;
+        g_scum_bootloader_state = STATE_UART_MONITOR;
         break;
+      }
+      case STATE_UART_MONITOR: {
+        // Launch the UART reader on core 1.
+        multicore_launch_core1(scum_uart_reader);
+        g_scum_bootloader_state = STATE_IDLE;
       }
       default: {
         break;
