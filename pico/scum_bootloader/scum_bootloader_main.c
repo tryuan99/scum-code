@@ -20,13 +20,13 @@
 #define SCUM_HRESET_PIN 21
 
 // USB read timeout in microseconds.
-#define USB_READ_TIMEOUT_US 1000
+#define SCUM_USB_READ_TIMEOUT_US 1000
 
 // Hard reset sleep time in microseconds.
-#define HARD_RESET_SLEEP_TIME_US 15000
+#define SCUM_HARD_RESET_SLEEP_TIME_US 15000
 
 // Toggle sleep time in microseconds.
-#define TOGGLE_SLEEP_TIME_US 1
+#define SCUM_TOGGLE_SLEEP_TIME_US 1
 
 // Calibration number of pulses.
 #define SCUM_CALIBRATION_NUM_PULSES 30
@@ -41,10 +41,10 @@
 typedef enum {
   STATE_INVALID = -1,
   STATE_INIT,
-  STATE_RECEIVING_BINARY,
+  STATE_RECEIVE_BINARY,
   STATE_HARD_RESET,
-  STATE_WRITING_BINARY,
-  STATE_CALIBRATING,
+  STATE_WRITE_BINARY,
+  STATE_CALIBRATION,
 } scum_bootloader_state_e;
 
 // OK response.
@@ -60,10 +60,10 @@ static uint8_t g_scum_bootloader_binary[SCUM_BINARY_SIZE];
 static size_t g_scum_bootloader_binary_size = 0;
 
 // Calibration timer.
-static repeating_timer_t g_scum_bootloader_calibration_timer;
+static repeating_timer_t g_scum_calibration_timer;
 
 // Calibration number of pulses.
-static uint32_t g_scum_bootloader_calibration_num_pulses = 0;
+static uint32_t g_scum_calibration_num_pulses = 0;
 
 // Initialize the GPIOs.
 static inline void scum_bootloader_gpio_init() {
@@ -93,7 +93,7 @@ static inline void scum_bootloader_led_init() {
 
 // Receive a byte of the binary over USB.
 static inline bool scum_bootloader_receive_byte(uint8_t* data) {
-  int received_byte = stdio_getchar_timeout_us(USB_READ_TIMEOUT_US);
+  int received_byte = stdio_getchar_timeout_us(SCUM_USB_READ_TIMEOUT_US);
   if (received_byte == PICO_ERROR_TIMEOUT) {
     return false;
   }
@@ -102,35 +102,34 @@ static inline bool scum_bootloader_receive_byte(uint8_t* data) {
 }
 
 // Calibration active time alarm callback.
-static int64_t scum_bootloader_calibration_active_time_alarm_callback(
-    const alarm_id_t id, void* user_data) {
+static int64_t scum_calibration_active_time_alarm_callback(const alarm_id_t id,
+                                                           void* user_data) {
   gpio_put(SCUM_CLOCK_PIN, false);
   return 0;
 }
 
 // Calibration timer callback.
-static bool scum_bootloader_calibration_timer_callback(
-    repeating_timer_t* timer) {
+static bool scum_calibration_timer_callback(repeating_timer_t* timer) {
   gpio_put(SCUM_CLOCK_PIN, true);
   add_alarm_in_us(SCUM_CALIBRATION_CLOCK_ACTIVE_TIME_US,
-                  scum_bootloader_calibration_active_time_alarm_callback,
+                  scum_calibration_active_time_alarm_callback,
                   /*user_data=*/NULL, /*fire_if_past=*/true);
-  ++g_scum_bootloader_calibration_num_pulses;
-  return g_scum_bootloader_calibration_num_pulses < SCUM_CALIBRATION_NUM_PULSES;
+  ++g_scum_calibration_num_pulses;
+  return g_scum_calibration_num_pulses < SCUM_CALIBRATION_NUM_PULSES;
 }
 
 int main(int argc, char** argv) {
   // Initialize USB.
   stdio_usb_init();
 
-  // Initialize GPIOs and LEDs.
+  // Initialize GPIOs and the LED.
   scum_bootloader_gpio_init();
   scum_bootloader_led_init();
 
-  g_scum_bootloader_state = STATE_RECEIVING_BINARY;
+  g_scum_bootloader_state = STATE_RECEIVE_BINARY;
   while (true) {
     switch (g_scum_bootloader_state) {
-      case STATE_RECEIVING_BINARY: {
+      case STATE_RECEIVE_BINARY: {
         if (scum_bootloader_receive_byte(
                 &g_scum_bootloader_binary[g_scum_bootloader_binary_size])) {
           ++g_scum_bootloader_binary_size;
@@ -150,14 +149,14 @@ int main(int argc, char** argv) {
         // Execute a hard reset.
         gpio_set_dir(SCUM_HRESET_PIN, GPIO_OUT);
         gpio_put(SCUM_HRESET_PIN, false);
-        sleep_us(HARD_RESET_SLEEP_TIME_US);
+        sleep_us(SCUM_HARD_RESET_SLEEP_TIME_US);
         gpio_set_dir(SCUM_HRESET_PIN, GPIO_IN);
-        sleep_us(HARD_RESET_SLEEP_TIME_US);
+        sleep_us(SCUM_HARD_RESET_SLEEP_TIME_US);
 
-        g_scum_bootloader_state = STATE_WRITING_BINARY;
+        g_scum_bootloader_state = STATE_WRITE_BINARY;
         break;
       }
-      case STATE_WRITING_BINARY: {
+      case STATE_WRITE_BINARY: {
         gpio_put(PICO_DEFAULT_LED_PIN, true);
         for (size_t i = 0; i < SCUM_BINARY_SIZE; ++i) {
           for (uint8_t j = 0; j < 8; ++j) {
@@ -165,38 +164,37 @@ int main(int argc, char** argv) {
             gpio_put(SCUM_DATA_PIN,
                      ((g_scum_bootloader_binary[i] >> j) & 0x1) == 0x1);
             // Toggle the enable pin after 32 bits.
-            sleep_us(TOGGLE_SLEEP_TIME_US);
+            sleep_us(SCUM_TOGGLE_SLEEP_TIME_US);
             gpio_put(SCUM_ENABLE_PIN, ((i + 1) % 4 == 0) && (j == 7));
             // Toggle the clock pin.
-            sleep_us(TOGGLE_SLEEP_TIME_US);
+            sleep_us(SCUM_TOGGLE_SLEEP_TIME_US);
             gpio_put(SCUM_CLOCK_PIN, true);
-            sleep_us(TOGGLE_SLEEP_TIME_US);
+            sleep_us(SCUM_TOGGLE_SLEEP_TIME_US);
             gpio_put(SCUM_CLOCK_PIN, false);
-            sleep_us(TOGGLE_SLEEP_TIME_US);
+            sleep_us(SCUM_TOGGLE_SLEEP_TIME_US);
           }
         }
         printf(RESPONSE_OK);
         gpio_put(PICO_DEFAULT_LED_PIN, false);
-        g_scum_bootloader_state = STATE_CALIBRATING;
+        g_scum_bootloader_state = STATE_CALIBRATION;
         break;
       }
-      case STATE_CALIBRATING: {
+      case STATE_CALIBRATION: {
         if (!add_repeating_timer_ms(SCUM_CALIBRATION_CLOCK_PERIOD_MS,
-                                    scum_bootloader_calibration_timer_callback,
+                                    scum_calibration_timer_callback,
                                     /*user_data=*/NULL,
-                                    &g_scum_bootloader_calibration_timer)) {
+                                    &g_scum_calibration_timer)) {
           printf("Failed to create the calibration timer.\n");
           return EXIT_FAILURE;
         }
-        while (g_scum_bootloader_calibration_num_pulses <
-               SCUM_CALIBRATION_NUM_PULSES) {
+        while (g_scum_calibration_num_pulses < SCUM_CALIBRATION_NUM_PULSES) {
           // TODO(titan): Use a condition variable once it is implemented in the
           // pico_sync library.
           sleep_us(SCUM_CALIBRATION_CLOCK_ACTIVE_TIME_US);
         }
         printf(RESPONSE_OK);
-        g_scum_bootloader_calibration_num_pulses = 0;
-        g_scum_bootloader_state = STATE_RECEIVING_BINARY;
+        g_scum_calibration_num_pulses = 0;
+        g_scum_bootloader_state = STATE_RECEIVE_BINARY;
         break;
       }
       default: {
