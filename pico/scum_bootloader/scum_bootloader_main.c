@@ -13,26 +13,29 @@
 // SCuM has a program memory size of 64 KiB.
 #define SCUM_BINARY_SIZE (1 << 16)
 
-// GPIO pins to SCuM.
+// 3WB pins to SCuM.
 #define SCUM_CLOCK_PIN 2
-#define SCUM_DATA_PIN 3
-#define SCUM_ENABLE_PIN 4
-#define SCUM_HRESET_PIN 5
-
-// Calibration clock period in milliseconds.
-#define SCUM_CALIBRATION_CLOCK_PERIOD_MS 100
-
-// Calibration number of pulses.
-#define SCUM_CALIBRATION_NUM_PULSES 30
+#define SCUM_DATA_PIN 7
+#define SCUM_ENABLE_PIN 12
+#define SCUM_HRESET_PIN 21
 
 // USB read timeout in microseconds.
 #define USB_READ_TIMEOUT_US 1000
 
 // Hard reset sleep time in microseconds.
-#define HARD_RESET_SLEEP_TIME_US 14000
+#define HARD_RESET_SLEEP_TIME_US 15000
 
 // Toggle sleep time in microseconds.
 #define TOGGLE_SLEEP_TIME_US 1
+
+// Calibration number of pulses.
+#define SCUM_CALIBRATION_NUM_PULSES 30
+
+// Calibration clock period in milliseconds.
+#define SCUM_CALIBRATION_CLOCK_PERIOD_MS 100
+
+// Calibration clock active time in microseconds.
+#define SCUM_CALIBRATION_CLOCK_ACTIVE_TIME_US 20
 
 // SCuM bootloading state enumeration.
 typedef enum {
@@ -89,31 +92,42 @@ static inline void scum_bootloader_led_init() {
 }
 
 // Receive a byte of the binary over USB.
-static inline bool scum_bootloader_receive_byte(uint8_t* rx_byte) {
-  int read_byte = stdio_getchar_timeout_us(USB_READ_TIMEOUT_US);
-  if (read_byte == PICO_ERROR_TIMEOUT) {
+static inline bool scum_bootloader_receive_byte(uint8_t* data) {
+  int received_byte = stdio_getchar_timeout_us(USB_READ_TIMEOUT_US);
+  if (received_byte == PICO_ERROR_TIMEOUT) {
     return false;
   }
-  *rx_byte = (uint8_t)(read_byte & 0xFF);
+  *data = (uint8_t)(received_byte & 0xFF);
   return true;
+}
+
+// Calibration active time alarm callback.
+static int64_t scum_bootloader_calibration_active_time_alarm_callback(
+    const alarm_id_t id, void* user_data) {
+  gpio_put(SCUM_CLOCK_PIN, false);
+  return 0;
 }
 
 // Calibration timer callback.
 static bool scum_bootloader_calibration_timer_callback(
     repeating_timer_t* timer) {
-  bool clock_state = gpio_get(SCUM_CLOCK_PIN);
-  gpio_put(SCUM_CLOCK_PIN, !clock_state);
-  if (clock_state) {
-    ++g_scum_bootloader_calibration_num_pulses;
-  }
+  gpio_put(SCUM_CLOCK_PIN, true);
+  add_alarm_in_us(SCUM_CALIBRATION_CLOCK_ACTIVE_TIME_US,
+                  scum_bootloader_calibration_active_time_alarm_callback,
+                  /*user_data=*/NULL, /*fire_if_past=*/true);
+  ++g_scum_bootloader_calibration_num_pulses;
+  return g_scum_bootloader_calibration_num_pulses < SCUM_CALIBRATION_NUM_PULSES;
 }
 
 int main(int argc, char** argv) {
+  // Initialize USB.
   stdio_usb_init();
+
+  // Initialize GPIOs and LEDs.
   scum_bootloader_gpio_init();
   scum_bootloader_led_init();
-  g_scum_bootloader_state = STATE_RECEIVING_BINARY;
 
+  g_scum_bootloader_state = STATE_RECEIVING_BINARY;
   while (true) {
     switch (g_scum_bootloader_state) {
       case STATE_RECEIVING_BINARY: {
@@ -167,7 +181,7 @@ int main(int argc, char** argv) {
         break;
       }
       case STATE_CALIBRATING: {
-        if (!add_repeating_timer_ms(SCUM_CALIBRATION_CLOCK_PERIOD_MS / 2,
+        if (!add_repeating_timer_ms(SCUM_CALIBRATION_CLOCK_PERIOD_MS,
                                     scum_bootloader_calibration_timer_callback,
                                     /*user_data=*/NULL,
                                     &g_scum_bootloader_calibration_timer)) {
@@ -175,9 +189,10 @@ int main(int argc, char** argv) {
           return EXIT_FAILURE;
         }
         while (g_scum_bootloader_calibration_num_pulses <
-               SCUM_CALIBRATION_NUM_PULSES) {}
-        if (!cancel_repeating_timer(&g_scum_bootloader_calibration_timer)) {
-          printf("Failed to cancel the calibration timer.\n");
+               SCUM_CALIBRATION_NUM_PULSES) {
+          // TODO(titan): Use a condition variable once it is implemented in the
+          // pico_sync library.
+          sleep_us(SCUM_CALIBRATION_CLOCK_ACTIVE_TIME_US);
         }
         printf(RESPONSE_OK);
         g_scum_bootloader_calibration_num_pulses = 0;
