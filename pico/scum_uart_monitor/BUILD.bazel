@@ -3,13 +3,19 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "scum_bootloader_main",
-    srcs = ["scum_bootloader_main.c"],
+    name = "scum_uart_monitor_main",
+    srcs = ["scum_uart_monitor_main.c"],
     defines = ["PICO_STDIO_DEFAULT_CRLF=0"],
     target_compatible_with = select({
         "@pico-sdk//bazel/constraint:rp2040": [],
         "@pico-sdk//bazel/constraint:rp2350": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    deps = ["@pico-sdk//src/rp2_common/pico_stdlib"],
+    deps = [
+        "@pico-sdk//src/rp2_common:pico_platform",
+        "@pico-sdk//src/rp2_common/hardware_gpio",
+        "@pico-sdk//src/rp2_common/pico_stdio",
+        "@pico-sdk//src/rp2_common/pico_stdio_uart",
+        "@pico-sdk//src/rp2_common/pico_stdio_usb",
+    ],
 )
