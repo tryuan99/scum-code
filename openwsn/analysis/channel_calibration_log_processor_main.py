@@ -3,7 +3,7 @@ import numpy as np
 import scienceplots
 from absl import app, flags
 
-from analysis.scum.radio.tuning.channel_calibration_log_processor import (
+from openwsn.analysis.channel_calibration_log_processor import (
     CHANNEL_CALIBRATION_MAX_CHANNEL, CHANNEL_CALIBRATION_MIN_CHANNEL,
     ChannelCalibrationLogProcessor, ChannelCalibrationTxRxSuccess)
 
@@ -75,7 +75,7 @@ def plot_success_timeline(
 def main(argv):
     assert len(argv) == 1
 
-    log_processor = ChannelCalibrationLogProcessor(FLAGS.log_file)
+    log_processor = ChannelCalibrationLogProcessor(FLAGS.log)
     plot_channel_histogram(log_processor.tx_successes, "TX")
     plot_channel_histogram(log_processor.rx_successes, "RX")
     plot_success_timeline(
@@ -85,7 +85,7 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    flags.DEFINE_string("log_file", None, "Channel calibration log file.")
-    flags.mark_flag_as_required("log_file")
+    flags.DEFINE_string("log", None, "Channel calibration log.")
+    flags.mark_flag_as_required("log")
 
     app.run(main)

@@ -1,6 +1,15 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "channel_calibration_logs",
+    name = "single_channel_calibration_logs",
     srcs = ["single_channel_calibration.csv"],
+)
+
+filegroup(
+    name = "multi_channel_calibration_logs",
+    srcs = [
+        "multi_channel_calibration_home.txt",
+        "multi_channel_calibration_swarm_1.txt",
+        "multi_channel_calibration_swarm_2.txt",
+    ],
 )

@@ -1,23 +1,7 @@
 load("@pypi//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 package(default_visibility = ["//visibility:public"])
-
-py_library(
-    name = "channel_calibration_log_processor",
-    srcs = ["channel_calibration_log_processor.py"],
-)
-
-py_binary(
-    name = "channel_calibration_log_processor_main",
-    srcs = ["channel_calibration_log_processor_main.py"],
-    deps = [
-        ":channel_calibration_log_processor",
-        requirement("absl-py"),
-        requirement("matplotlib"),
-        requirement("numpy"),
-        requirement("SciencePlots"),
-    ],
-)
 
 py_library(
     name = "tuning_code",
