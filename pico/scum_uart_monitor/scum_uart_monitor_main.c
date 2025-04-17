@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
   // Initialize UART.
   stdio_uart_init_full(SCUM_UART_INSTANCE, SCUM_UART_BAUD_RATE, /*tx_pin=*/-1,
                        /*rx_pin=*/SCUM_UART_RX_PIN);
+  gpio_disable_pulls(SCUM_UART_RX_PIN);
 
   // Initialize USB.
   stdio_usb_init();
