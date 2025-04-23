@@ -16,7 +16,7 @@ int uart_out(int ch) {
   return ch;
 }
 
-int uart_in() {
+int uart_in(void) {
   unsigned char* UARTPtr = (unsigned char*)APB_UART_BASE;
   char ch = *UARTPtr;
   uart_out(ch);

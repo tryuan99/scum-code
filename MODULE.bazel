@@ -20,6 +20,18 @@ bazel_dep(
     name = "rules_python",
     version = "1.2.0",
 )
+bazel_dep(
+    name = "toolchains_arm_gnu",
+    version = "1.0.4",
+)
+
+# ARM GNU toolchains.
+arm_toolchain = use_extension("@toolchains_arm_gnu//:extensions.bzl", "arm_toolchain")
+arm_toolchain.arm_none_eabi()
+use_repo(arm_toolchain, "arm_none_eabi")
+
+# Custom toolchains.
+register_toolchains("//tools:all")
 
 # Pico SDK toolchains.
 register_toolchains(

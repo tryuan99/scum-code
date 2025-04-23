@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+constraint_setting(
+    name = "chip",
+)
+
+constraint_value(
+    name = "scum3c",
+    constraint_setting = ":chip",
+)
+
+platform(
+    name = "scum",
+    constraint_values = [
+        ":scum3c",
+        "@platforms//cpu:armv6-m",
+        "@platforms//os:none",
+    ],
+)

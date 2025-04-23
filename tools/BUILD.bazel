@@ -1,0 +1,29 @@
+load("@arm_none_eabi//toolchain:toolchain.bzl", "arm_none_eabi_toolchain")
+
+package(default_visibility = ["//visibility:public"])
+
+arm_none_eabi_toolchain(
+    name = "scum_toolchain",
+    copts = [
+        "-mcpu=cortex-m0",
+        "-mthumb",
+        "-std=c17",
+        "-pedantic",
+        "-Wall",
+        "-Werror",
+        "-Wstrict-prototypes",
+        "-fdata-sections",
+        "-ffunction-sections",
+        "-fomit-frame-pointer",
+        "-fshort-wchar",
+    ],
+    linkopts = [
+        "-specs=nano.specs",
+        "-Wl,--gc-sections",
+        "-Wl,--print-memory-usage",
+        "-Wl,--no-wchar-size-warning",
+    ],
+    target_compatible_with = [
+        "//platform:scum3c",
+    ],
+)
