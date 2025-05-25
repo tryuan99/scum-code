@@ -99,6 +99,12 @@ static inline void scum_bootloader_gpio_init() {
   gpio_disable_pulls(SCUM_DATA_PIN);
   gpio_disable_pulls(SCUM_ENABLE_PIN);
   gpio_disable_pulls(SCUM_HRESET_PIN);
+
+  // Decrease the drive strengths of the GPIOs.
+  gpio_set_drive_strength(SCUM_CLOCK_PIN, GPIO_DRIVE_STRENGTH_2MA);
+  gpio_set_drive_strength(SCUM_DATA_PIN, GPIO_DRIVE_STRENGTH_2MA);
+  gpio_set_drive_strength(SCUM_ENABLE_PIN, GPIO_DRIVE_STRENGTH_2MA);
+  gpio_set_drive_strength(SCUM_HRESET_PIN, GPIO_DRIVE_STRENGTH_2MA);
 }
 
 // Initialize the LED.
