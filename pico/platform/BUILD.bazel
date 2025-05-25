@@ -11,9 +11,29 @@ platform(
 )
 
 platform(
+    name = "pico_w",
+    flags = [
+        "--@pico-sdk//bazel/config:PICO_BOARD=pico_w",
+        "--@pico-sdk//bazel/config:PICO_STDIO_UART",
+        "--@pico-sdk//bazel/config:PICO_STDIO_USB",
+    ],
+    parents = ["@pico-sdk//bazel/platform:rp2040"],
+)
+
+platform(
     name = "pico2",
     flags = [
         "--@pico-sdk//bazel/config:PICO_BOARD=pico2",
+        "--@pico-sdk//bazel/config:PICO_STDIO_UART",
+        "--@pico-sdk//bazel/config:PICO_STDIO_USB",
+    ],
+    parents = ["@pico-sdk//bazel/platform:rp2350"],
+)
+
+platform(
+    name = "pico2_w",
+    flags = [
+        "--@pico-sdk//bazel/config:PICO_BOARD=pico2_w",
         "--@pico-sdk//bazel/config:PICO_STDIO_UART",
         "--@pico-sdk//bazel/config:PICO_STDIO_USB",
     ],

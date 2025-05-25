@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "hardware/gpio.h"
+#include "pico/defs.h"
 #include "pico/error.h"
 #include "pico/stdio.h"
 #include "pico/stdio_uart.h"
@@ -19,8 +20,8 @@
 
 // Initialize the LED.
 static inline void scum_uart_led_init() {
-  gpio_init(PICO_DEFAULT_LED_PIN);
-  gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+  gpio_init(PICO_LED_PIN);
+  gpio_set_dir(PICO_LED_PIN, GPIO_OUT);
 }
 
 // Receive a byte over UART from SCuM.
@@ -48,9 +49,9 @@ int main(int argc, char** argv) {
   uint8_t data = 0;
   while (true) {
     if (scum_uart_receive_byte(&data)) {
-      gpio_put(PICO_DEFAULT_LED_PIN, true);
+      gpio_put(PICO_LED_PIN, true);
       printf("%c", data);
-      gpio_put(PICO_DEFAULT_LED_PIN, false);
+      gpio_put(PICO_LED_PIN, false);
     }
   }
 

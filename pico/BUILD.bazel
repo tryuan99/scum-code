@@ -1,4 +1,21 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "defs",
+    hdrs = ["defs.h"],
+    defines = select({
+        "@pico-sdk//bazel/constraint:is_pico_w": ["PICO_W_ENABLED"],
+        "@pico-sdk//bazel/constraint:is_pico2_w": ["PICO_W_ENABLED"],
+        "//conditions:default": [],
+    }),
+    target_compatible_with = select({
+        "@pico-sdk//bazel/constraint:rp2040": [],
+        "@pico-sdk//bazel/constraint:rp2350": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
 
 sh_binary(
     name = "load_uf2",

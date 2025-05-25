@@ -12,6 +12,7 @@ cc_binary(
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [
+        "//pico:defs",
         "@pico-sdk//src/rp2_common:pico_platform",
         "@pico-sdk//src/rp2_common/hardware_gpio",
         "@pico-sdk//src/rp2_common/pico_stdio",

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "hardware/gpio.h"
+#include "pico/defs.h"
 #include "pico/error.h"
 #include "pico/stdio.h"
 #include "pico/stdio_usb.h"
@@ -13,8 +14,8 @@
 
 // Initialize the LED.
 static inline void usb_echo_led_init() {
-  gpio_init(PICO_DEFAULT_LED_PIN);
-  gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+  gpio_init(PICO_LED_PIN);
+  gpio_set_dir(PICO_LED_PIN, GPIO_OUT);
 }
 
 // Receive a byte over USB.
@@ -34,9 +35,9 @@ int main(int argc, char** argv) {
   uint8_t rx_byte = 0;
   while (true) {
     if (usb_echo_receive_byte(&rx_byte)) {
-      gpio_put(PICO_DEFAULT_LED_PIN, true);
+      gpio_put(PICO_LED_PIN, true);
       printf("%c", rx_byte);
-      gpio_put(PICO_DEFAULT_LED_PIN, false);
+      gpio_put(PICO_LED_PIN, false);
     }
   }
 

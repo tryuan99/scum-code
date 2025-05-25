@@ -5,6 +5,7 @@
 
 #include "hardware/gpio.h"
 #include "hardware/uart.h"
+#include "pico/defs.h"
 #include "pico/error.h"
 #include "pico/multicore.h"
 #include "pico/stdio.h"
@@ -102,8 +103,8 @@ static inline void scum_bootloader_gpio_init() {
 
 // Initialize the LED.
 static inline void scum_bootloader_led_init() {
-  gpio_init(PICO_DEFAULT_LED_PIN);
-  gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+  gpio_init(PICO_LED_PIN);
+  gpio_set_dir(PICO_LED_PIN, GPIO_OUT);
 }
 
 // Receive a byte of the binary over USB.
@@ -210,7 +211,7 @@ int main(int argc, char** argv) {
         break;
       }
       case STATE_WRITE_BINARY: {
-        gpio_put(PICO_DEFAULT_LED_PIN, true);
+        gpio_put(PICO_LED_PIN, true);
         for (size_t i = 0; i < SCUM_BINARY_SIZE; ++i) {
           for (uint8_t j = 0; j < 8; ++j) {
             // Output the data.
@@ -228,7 +229,7 @@ int main(int argc, char** argv) {
           }
         }
         printf(RESPONSE_OK);
-        gpio_put(PICO_DEFAULT_LED_PIN, false);
+        gpio_put(PICO_LED_PIN, false);
         g_scum_bootloader_state = STATE_CALIBRATION;
         break;
       }
