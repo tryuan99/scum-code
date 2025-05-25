@@ -19,9 +19,9 @@
 
 // 3WB pins to SCuM.
 #define SCUM_CLOCK_PIN 2
-#define SCUM_DATA_PIN 7
-#define SCUM_ENABLE_PIN 12
-#define SCUM_HRESET_PIN 21
+#define SCUM_DATA_PIN 3
+#define SCUM_ENABLE_PIN 4
+#define SCUM_HRESET_PIN 5
 
 // UART configuration for SCuM.
 #define SCUM_UART_INSTANCE uart0
