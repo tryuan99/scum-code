@@ -53,15 +53,4 @@ int http_client_request_async(async_context_t* context,
 int http_client_request_sync(async_context_t* context,
                              http_client_request_t* request);
 
-// An HTTP headers callback function that prints the headers.
-err_t http_client_headers_print_callback(httpc_state_t* connection, void* arg,
-                                         struct pbuf* headers,
-                                         uint16_t headers_length,
-                                         uint32_t content_length);
-
-// An HTTP receive callback function that prints the HTTP body.
-err_t http_client_receive_print_callback(void* arg,
-                                         struct altcp_pcb* connection,
-                                         struct pbuf* packet, err_t err);
-
 #endif  // #ifndef PICO_WIFI_HTTP_H_

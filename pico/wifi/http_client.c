@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "lwip/altcp.h"
+#include "lwip/apps/http_client.h"
 #include "pico/async_context.h"
 
 // Default HTTP port.
@@ -82,24 +83,4 @@ int http_client_request_sync(async_context_t* context,
                                    HTTP_CLIENT_RESPONSE_POLL_PERIOD_MS);
   }
   return (int)request->result;
-}
-
-err_t http_client_headers_print_callback(
-    __unused httpc_state_t* connection, __unused void* arg,
-    struct pbuf* headers, const uint16_t headers_length,
-    __unused const uint32_t content_length) {
-  for (uint16_t i = 0; i < headers->tot_len && i < headers_length; ++i) {
-    printf("%c", pbuf_get_at(headers, i));
-  }
-  return ERR_OK;
-}
-
-err_t http_client_receive_print_callback(__unused void* arg,
-                                         __unused struct altcp_pcb* connection,
-                                         struct pbuf* packet,
-                                         const err_t error) {
-  for (uint16_t i = 0; i < packet->tot_len; ++i) {
-    printf("%c", pbuf_get_at(packet, i));
-  }
-  return ERR_OK;
 }

@@ -5,6 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "wifi_scan_main",
     srcs = ["wifi_scan_main.c"],
+    defines = ["PICO_STDIO_DEFAULT_CRLF=0"],
     target_compatible_with = select({
         "@pico-sdk//bazel/constraint:rp2040": [],
         "@pico-sdk//bazel/constraint:rp2350": [],
