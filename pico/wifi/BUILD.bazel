@@ -1,0 +1,32 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "env",
+    hdrs = ["env.h"],
+    deps = ["@pico-sdk//src/rp2_common/pico_cyw43_driver"],
+)
+
+cc_library(
+    name = "http_client",
+    srcs = ["http_client.c"],
+    hdrs = ["http_client.h"],
+    deps = [
+        "@pico-sdk//src/rp2_common/pico_async_context",
+        "@pico-sdk//src/rp2_common/pico_lwip",
+        "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_http",
+    ],
+)
+
+cc_library(
+    name = "lwipopts",
+    hdrs = ["lwipopts.h"],
+    includes = ["."],
+    deps = [":lwip_config"],
+)
+
+cc_library(
+    name = "lwip_config",
+    hdrs = ["lwip_config.h"],
+)

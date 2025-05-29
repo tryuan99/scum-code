@@ -14,6 +14,7 @@ platform(
     name = "pico_w",
     flags = [
         "--@pico-sdk//bazel/config:PICO_BOARD=pico_w",
+        "--@pico-sdk//bazel/config:PICO_LWIP_CONFIG=//pico/wifi:lwipopts",
         "--@pico-sdk//bazel/config:PICO_STDIO_UART",
         "--@pico-sdk//bazel/config:PICO_STDIO_USB",
     ],
@@ -34,6 +35,7 @@ platform(
     name = "pico2_w",
     flags = [
         "--@pico-sdk//bazel/config:PICO_BOARD=pico2_w",
+        "--@pico-sdk//bazel/config:PICO_LWIP_CONFIG=//pico/wifi:lwipopts",
         "--@pico-sdk//bazel/config:PICO_STDIO_UART",
         "--@pico-sdk//bazel/config:PICO_STDIO_USB",
     ],

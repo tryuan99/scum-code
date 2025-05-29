@@ -33,6 +33,11 @@ use_repo(arm_toolchain, "arm_none_eabi")
 # Custom toolchains.
 register_toolchains("//tools:all")
 
+single_version_override(
+    module_name = "pico-sdk",
+    patches = ["//third_party:pico-sdk.patch"],
+)
+
 # Pico SDK toolchains.
 register_toolchains(
     "@pico-sdk//bazel/toolchain:linux-x86_64-rp2040",
