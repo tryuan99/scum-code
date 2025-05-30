@@ -6,7 +6,7 @@
 #include "pico/stdlib.h"
 
 // LED delay in milliseconds.
-#define LED_DELAY_MS 250  // milliseconds
+#define LED_DELAY_MS 250
 
 // Initialize the LED.
 static inline void led_init() {

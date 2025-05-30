@@ -9,19 +9,19 @@
 #include "pico/wifi/http_client.h"
 
 // WiFi connect timeout in milliseconds.
-#define WIFI_CONNECT_TIMEOUT_MS 10000  // milliseconds
+#define WIFI_CONNECT_TIMEOUT_MS 10000
 
 #define HOSTNAME "people.eecs.berkeley.edu"
 #define URL "/~titan/hello_world.bin"
 
 // HTTP body size.
-size_t _sizeg_http_body_size = 0;
+static size_t g_http_body_size = 0;
 
 // HTTP headers callback function that prints the headers.
-err_t http_headers_print_callback(httpc_state_t* connection, void* arg,
-                                  struct pbuf* headers,
-                                  const uint16_t headers_length,
-                                  const uint32_t content_length) {
+static err_t http_headers_print_callback(httpc_state_t* connection, void* arg,
+                                         struct pbuf* headers,
+                                         const uint16_t headers_length,
+                                         const uint32_t content_length) {
   printf("Headers:\n");
   for (size_t i = 0; i < headers->tot_len && i < headers_length; ++i) {
     printf("%c", pbuf_get_at(headers, i));
@@ -30,13 +30,15 @@ err_t http_headers_print_callback(httpc_state_t* connection, void* arg,
 }
 
 // HTTP receive callback function that prints the HTTP body.
-err_t http_receive_print_callback(void* arg, struct altcp_pcb* connection,
-                                  struct pbuf* packet, const err_t error) {
+static err_t http_receive_print_callback(void* arg,
+                                         struct altcp_pcb* connection,
+                                         struct pbuf* packet,
+                                         const err_t error) {
   printf("Body:\n");
   for (size_t i = 0; i < packet->tot_len; ++i) {
     printf("%c", pbuf_get_at(packet, i));
   }
-  _sizeg_http_body_size += packet->tot_len;
+  g_http_body_size += packet->tot_len;
   printf("\n");
   return ERR_OK;
 }
@@ -62,7 +64,7 @@ int main(int argc, char** argv) {
   request.receive_callback = http_receive_print_callback;
   const int error =
       http_client_request_sync(cyw43_arch_async_context(), &request);
-  printf("Received %u bytes in the HTML body.\n", _sizeg_http_body_size);
+  printf("Received %u bytes in the HTML body.\n", g_http_body_size);
   if (error != 0) {
     printf("HTTP request failed with error %d.\n", error);
   }

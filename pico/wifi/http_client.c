@@ -12,7 +12,7 @@
 #define HTTP_PORT 80
 
 // HTTP response poll period in milliseconds.
-#define HTTP_CLIENT_RESPONSE_POLL_PERIOD_MS 100  // milliseconds
+#define HTTP_CLIENT_RESPONSE_POLL_PERIOD_MS 100
 
 // Wrapper for the HTTP headers callback function.
 static err_t http_client_headers_callback_wrapper(

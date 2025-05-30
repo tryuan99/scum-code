@@ -9,28 +9,30 @@
 #include "pico/wifi/http_client.h"
 
 // WiFi connect timeout in milliseconds.
-#define WIFI_CONNECT_TIMEOUT_MS 10000  // milliseconds
+#define WIFI_CONNECT_TIMEOUT_MS 10000
 
 // WiFi maximum size of the HTTP body in bytes.
-#define WIFI_MAX_HTTP_BODY_SIZE (1 << 16)  // bytes
+#define WIFI_MAX_HTTP_BODY_SIZE (1 << 16)
 
 #define HOSTNAME "people.eecs.berkeley.edu"
 #define URL "/~titan/hello_world.bin"
 
 // HTTP body buffer.
-uint8_t g_http_body_buffer[WIFI_MAX_HTTP_BODY_SIZE];
+static uint8_t g_http_body_buffer[WIFI_MAX_HTTP_BODY_SIZE];
 
 // HTTP body buffer size.
-size_t g_http_body_buffer_size = 0;
+static size_t g_http_body_buffer_size = 0;
 
 // HTTP receive callback function that saves the HTTP body.
-err_t http_receive_save_callback(void* arg, struct altcp_pcb* connection,
-                                 struct pbuf* packet, const err_t error) {
-  for (size_t i = 0;
-       i < packet->tot_len && g_http_body_buffer_size < WIFI_MAX_HTTP_BODY_SIZE;
-       ++i, ++g_http_body_buffer_size) {
-    g_http_body_buffer[g_http_body_buffer_size] = pbuf_get_at(packet, i);
-  }
+static err_t http_receive_save_callback(void* arg, struct altcp_pcb* connection,
+                                        struct pbuf* packet,
+                                        const err_t error) {
+  const uint16_t size =
+      (g_http_body_buffer_size + packet->tot_len > WIFI_MAX_HTTP_BODY_SIZE)
+          ? (WIFI_MAX_HTTP_BODY_SIZE - g_http_body_buffer_size)
+          : packet->tot_len;
+  g_http_body_buffer_size += pbuf_copy_partial(
+      packet, &g_http_body_buffer[g_http_body_buffer_size], size, /*offset=*/0);
   return ERR_OK;
 }
 
