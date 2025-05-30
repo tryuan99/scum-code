@@ -1,0 +1,32 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "scum_wifi_bootloader_main",
+    srcs = ["scum_wifi_bootloader_main.c"],
+    defines = ["PICO_STDIO_DEFAULT_CRLF=0"],
+    target_compatible_with = select({
+        "@pico-sdk//bazel/constraint:rp2040": [],
+        "@pico-sdk//bazel/constraint:rp2350": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "//pico:defs",
+        "//pico/wifi:env",
+        "//pico/wifi:http_client",
+        "//pico/wifi:lwipopts",
+        "@pico-sdk//src/common/pico_time",
+        "@pico-sdk//src/common/pico_util",
+        "@pico-sdk//src/rp2_common:pico_platform",
+        "@pico-sdk//src/rp2_common/hardware_gpio",
+        "@pico-sdk//src/rp2_common/hardware_uart",
+        "@pico-sdk//src/rp2_common/pico_cyw43_arch",
+        "@pico-sdk//src/rp2_common/pico_lwip",
+        "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_http",
+        "@pico-sdk//src/rp2_common/pico_multicore",
+        "@pico-sdk//src/rp2_common/pico_stdio",
+        "@pico-sdk//src/rp2_common/pico_stdio_uart",
+        "@pico-sdk//src/rp2_common/pico_stdio_usb",
+    ],
+)
