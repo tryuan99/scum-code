@@ -32,11 +32,15 @@ static err_t http_client_receive_callback_wrapper(void* arg,
                                                   struct pbuf* packet,
                                                   const err_t error) {
   http_client_request_t* request = (http_client_request_t*)arg;
+  err_t status = ERR_OK;
   if (request->receive_callback) {
-    return request->receive_callback(request->callback_arg, connection, packet,
-                                     error);
+    status = request->receive_callback(request->callback_arg, connection,
+                                       packet, error);
   }
-  return ERR_OK;
+  // The packet buffer must be freed within the callback function.
+  // See https://forums.raspberrypi.com/viewtopic.php?t=385648.
+  pbuf_free(packet);
+  return status;
 }
 
 // Wrapper for the HTTP result callback function.
