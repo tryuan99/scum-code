@@ -53,12 +53,6 @@ class ScumBootloader:
         # Boot SCuM.
         logging.info("Bootloading SCuM.")
         self.serial.write(data)
-        # Read the response that the SRAM load is complete.
-        logging.info("Firmware load response: %s", self.serial.read())
-        # Read the response that the 3-wire bus bootload is complete.
-        logging.info("3WB bootload response: %s", self.serial.read())
-        # Read the response that the clock calibration is complete.
-        logging.info("Clock calibration response: %s", self.serial.read())
 
         # Start a serial monitor.
         if start_serial_monitor:
