@@ -38,6 +38,7 @@ cc_binary(
         "//pico/wifi:http_client",
         "//pico/wifi:lwipopts",
         "@pico-sdk//src/common/pico_time",
+        "@pico-sdk//src/rp2_common:pico_platform",
         "@pico-sdk//src/rp2_common/pico_cyw43_arch",
         "@pico-sdk//src/rp2_common/pico_lwip",
         "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_http",

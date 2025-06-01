@@ -8,6 +8,7 @@
 #include "lwip/apps/http_client.h"
 #include "pico/cyw43_arch.h"
 #include "pico/defs.h"
+#include "pico/error.h"
 #include "pico/scum/bootloader.h"
 #include "pico/scum/uart.h"
 #include "pico/stdio.h"
@@ -154,10 +155,12 @@ int main(int argc, char** argv) {
   cyw43_arch_enable_sta_mode();
 
   // Connect to the WiFi network.
-  if (cyw43_arch_wifi_connect_timeout_ms(
-          WIFI_SSID, WIFI_PASSWORD, WIFI_ENCRYPTION, WIFI_CONNECT_TIMEOUT_MS)) {
-    printf("Failed to connect to WiFi.\n");
-    return EXIT_FAILURE;
+  int error = cyw43_arch_wifi_connect_timeout_ms(
+      WIFI_SSID, WIFI_PASSWORD, WIFI_ENCRYPTION, WIFI_CONNECT_TIMEOUT_MS);
+  while (error != PICO_OK) {
+    printf("Failed to connect to WiFi with error %d.\n", error);
+    error = cyw43_arch_wifi_connect_timeout_ms(
+        WIFI_SSID, WIFI_PASSWORD, WIFI_ENCRYPTION, WIFI_CONNECT_TIMEOUT_MS);
   }
   printf("Connected to WiFi network %s.\n", WIFI_SSID);
 
