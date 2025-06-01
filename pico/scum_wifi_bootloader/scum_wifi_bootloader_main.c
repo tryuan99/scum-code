@@ -382,6 +382,7 @@ int main(int argc, char** argv) {
         // Launch the UART reader on core 1.
         multicore_launch_core1(scum_uart_reader);
         g_scum_bootloader_state = STATE_IDLE;
+        break;
       }
       default: {
         break;
