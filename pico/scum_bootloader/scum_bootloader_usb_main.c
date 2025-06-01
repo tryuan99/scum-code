@@ -18,7 +18,7 @@ typedef enum {
   STATE_INIT,
   STATE_IDLE,
   STATE_RECEIVE_BINARY,
-  STATE_BOOTLOADING,
+  STATE_BOOTLOAD,
   STATE_DONE,
 } scum_bootloader_usb_state_e;
 
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
           scum_bootloader_run(&g_scum_bootloader_usb_binary,
                               scum_bootloader_usb_complete_callback);
           g_scum_bootloader_usb_binary_size = 0;
-          g_scum_bootloader_usb_state = STATE_BOOTLOADING;
+          g_scum_bootloader_usb_state = STATE_BOOTLOAD;
         } else if (scum_bootloader_usb_receive_byte(
                        &g_scum_bootloader_usb_binary
                             .data[g_scum_bootloader_usb_binary_size])) {
@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
         }
         break;
       }
-      case STATE_BOOTLOADING: {
+      case STATE_BOOTLOAD: {
         scum_bootloader_loop();
         break;
       }

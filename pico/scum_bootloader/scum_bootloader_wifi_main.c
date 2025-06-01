@@ -37,7 +37,7 @@ typedef enum {
   STATE_IDLE,
   STATE_CHECK_FOR_NEW_BINARY,
   STATE_DOWNLOAD_BINARY,
-  STATE_BOOTLOADING,
+  STATE_BOOTLOAD,
   STATE_DONE,
 } scum_bootloader_wifi_state_e;
 
@@ -213,11 +213,11 @@ int main(int argc, char** argv) {
         } else {
           scum_bootloader_run(&g_scum_bootloader_wifi_binary,
                               scum_bootloader_wifi_complete_callback);
-          g_scum_bootloader_wifi_state = STATE_BOOTLOADING;
+          g_scum_bootloader_wifi_state = STATE_BOOTLOAD;
         }
         break;
       }
-      case STATE_BOOTLOADING: {
+      case STATE_BOOTLOAD: {
         scum_bootloader_loop();
         break;
       }
