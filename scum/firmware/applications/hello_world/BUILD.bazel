@@ -5,6 +5,9 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "hello_world_main",
     srcs = ["hello_world_main.c"],
+    additional_linker_inputs = ["//scum/firmware/build:scum_linker_files"],
+    defines = ["NDEBUG"],
+    linkopts = ["-T$(location //scum/firmware/build:scum_linker_files)"],
     target_compatible_with = select({
         "//platform:scum3c": [],
         "//conditions:default": ["@platforms//:incompatible"],

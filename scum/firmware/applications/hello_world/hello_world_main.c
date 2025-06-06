@@ -1,28 +1,25 @@
-#include <stdbool.h>
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 
-void uart_rx_isr(void) {}
-void adc_isr(void) {}
-void radio_isr(void) {}
-void rftimer_isr(void) {}
-void ext_gpio3_activehigh_debounced_isr(void) {}
-void ext_gpio8_activehigh_isr(void) {}
-void ext_gpio9_activelow_isr(void) {}
-void ext_gpio10_activelow_isr(void) {}
-void rawchips_startval_isr(void) {}
-void rawchips_32_isr(void) {}
-void optical_32_isr(void) {}
-void optical_sfd_isr(void) {}
+#include "scum/firmware/common/helpers.h"
+
+// Number of for loop cycles between Hello World messages.
+// 700000 for loop cycles roughly correspond to 1 second.
+#define NUM_CYCLES_BETWEEN_TX (1000000UL)
 
 int main(void) {
-  uint32_t i = 0;
+  puts("\nWelcome to SCuM!\n");
+  uint32_t g_tx_counter = 0;
 
-  printf("Initializing...\n");
+  while (1) {
+    printf("Hello World! %lu\n", g_tx_counter++);
 
-  while (true) {
-    printf("Hello World!\n");
-    for (i = 0; i < 1000000; ++i) {}
+    // Configure the cmake build with -DCMAKE_BUILD_TYPE=Debug to trigger this
+    // assert which will print the line and file and then cause a hard fault.
+    // The default build type is MinSizeRel, which will not trigger this assert.
+    assert(g_tx_counter < 10);
+
+    busy_wait_cycles(NUM_CYCLES_BETWEEN_TX);
   }
 }

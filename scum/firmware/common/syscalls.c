@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
+#include "scum/firmware/common/scum.h"
+
 extern int _end;
 
 void* _sbrk(int incr) {
@@ -57,7 +59,6 @@ int _read(int file, char* ptr, int len) {
 
   for (; len > 0; --len) {
     *ptr++ = SCUM_UART->DATA;
-    // TODO: proper read input
     read++;
   }
   return read;

@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "scum_linker",
-    srcs = ["scum_linker.sct"],
+    name = "scum_linker_files",
+    srcs = ["scum.ld"],
 )

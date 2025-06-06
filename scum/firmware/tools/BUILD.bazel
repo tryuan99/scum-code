@@ -8,7 +8,6 @@ arm_none_eabi_toolchain(
         "-mcpu=cortex-m0",
         "-mthumb",
         "-std=c17",
-        "-pedantic",
         "-Wall",
         "-Werror",
         "-Wstrict-prototypes",
@@ -18,6 +17,10 @@ arm_none_eabi_toolchain(
         "-fshort-wchar",
     ],
     linkopts = [
+        "-mcpu=cortex-m0",
+        "-mthumb",
+        "-std=c17",
+        "-Os",
         "-specs=nano.specs",
         "-Wl,--gc-sections",
         "-Wl,--print-memory-usage",

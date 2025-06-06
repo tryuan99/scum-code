@@ -3,37 +3,45 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "cm0dsasm",
-    srcs = ["cm0dsasm.s"],
+    name = "scum_lib_alwayslink",
+    srcs = [
+        "startup.c",
+        "syscalls.c",
+    ],
+    hdrs = [
+        "scm3c_hw_interface.h",
+        "scum.h",
+    ],
     target_compatible_with = select({
         "//platform:scum3c": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
+    deps = ["//scum/firmware/cmsis"],
+    alwayslink = True,
 )
 
 cc_library(
-    name = "retarget",
-    srcs = ["retarget.c"],
+    name = "scum_lib",
+    srcs = glob(
+        ["*.c"],
+        exclude = [
+            "syscalls.c",
+            "startup.c",
+        ],
+    ),
+    hdrs = glob(["*.h"]),
     target_compatible_with = select({
         "//platform:scum3c": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-)
-
-cc_library(
-    name = "syscalls",
-    srcs = ["syscalls.c"],
-    target_compatible_with = select({
-        "//platform:scum3c": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    deps = ["//scum/firmware/cmsis"],
 )
 
 cc_library(
     name = "scum",
     deps = [
-        ":cm0dsasm",
-        ":retarget",
-        ":syscalls",
+        # The alwayslink library must be linked first to resolve the symbols.
+        ":scum_lib_alwayslink",
+        ":scum_lib",
     ],
 )
