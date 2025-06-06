@@ -6,7 +6,14 @@ cc_binary(
     name = "hello_world_main",
     srcs = ["hello_world_main.c"],
     additional_linker_inputs = ["//scum/firmware/build:scum_linker_files"],
-    defines = ["NDEBUG"],
+    defines = [
+        "MODULE_OPTICAL",
+        "MODULE_GPIO",
+        "MODULE_INIT",
+        "MODULE_SCM3C_HW_INTERFACE",
+        "MODULE_SYS",
+        "MODULE_UART",
+    ],
     linkopts = ["-T$(location //scum/firmware/build:scum_linker_files)"],
     target_compatible_with = select({
         "//platform:scum3c": [],
