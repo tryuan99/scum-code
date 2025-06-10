@@ -17,10 +17,10 @@ typedef struct {
 } scum_binary_t;
 
 // SCuM bootloading complete callback function type.
-typedef void (*scum_bootloader_complete_function_t)();
+typedef void (*scum_bootloader_complete_function_t)(void);
 
 // Initialize the SCuM bootloader.
-void scum_bootloader_init();
+void scum_bootloader_init(void);
 
 // Bootload SCuM with the given binary. The complete callback function will be
 // called after bootloading is complete.
@@ -29,6 +29,6 @@ void scum_bootloader_run(const scum_binary_t* binary,
 
 // Run the SCuM bootloader loop. This function should be called from within a
 // while loop.
-void scum_bootloader_loop();
+void scum_bootloader_loop(void);
 
 #endif  // PICO_SCUM_BOOTLOADER_H_

@@ -42,7 +42,7 @@ static inline bool scum_bootloader_usb_receive_byte(uint8_t* data) {
 }
 
 // SCuM bootloading complete callback function.
-static void scum_bootloader_usb_complete_callback() {
+static void scum_bootloader_usb_complete_callback(void) {
   g_scum_bootloader_usb_state = STATE_DONE;
 }
 

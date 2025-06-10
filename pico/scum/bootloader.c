@@ -56,7 +56,7 @@ static uint32_t g_scum_calibration_num_pulses = 0;
 scum_bootloader_complete_function_t g_scum_bootloader_complete_callback;
 
 // Initialize the GPIOs.
-static inline void scum_bootloader_gpio_init() {
+static inline void scum_bootloader_gpio_init(void) {
   gpio_init(SCUM_CLOCK_PIN);
   gpio_set_dir(SCUM_CLOCK_PIN, GPIO_OUT);
   gpio_init(SCUM_DATA_PIN);
@@ -82,7 +82,7 @@ static inline void scum_bootloader_gpio_init() {
 }
 
 // Initialize the LED.
-static inline void scum_bootloader_led_init() {
+static inline void scum_bootloader_led_init(void) {
   gpio_init(PICO_LED_PIN);
   gpio_set_dir(PICO_LED_PIN, GPIO_OUT);
 }
@@ -104,7 +104,7 @@ static bool scum_calibration_timer_callback(repeating_timer_t* timer) {
   return g_scum_calibration_num_pulses < SCUM_CALIBRATION_NUM_PULSES;
 }
 
-void scum_bootloader_init() {
+void scum_bootloader_init(void) {
   // Initialize the GPIOs and the LED.
   scum_bootloader_gpio_init();
   scum_bootloader_led_init();
@@ -120,7 +120,7 @@ void scum_bootloader_run(
   }
 }
 
-void scum_bootloader_loop() {
+void scum_bootloader_loop(void) {
   if (g_scum_binary == NULL) {
     g_scum_bootloader_state = STATE_IDLE;
   }

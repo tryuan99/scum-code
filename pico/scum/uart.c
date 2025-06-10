@@ -18,7 +18,7 @@
 static queue_t g_scum_uart_buffer;
 
 // SCuM UART reader.
-static void scum_uart_reader() {
+static void scum_uart_reader(void) {
   while (true) {
     if (uart_is_readable(SCUM_UART_INSTANCE)) {
       char data = uart_getc(SCUM_UART_INSTANCE);
@@ -27,7 +27,7 @@ static void scum_uart_reader() {
   }
 }
 
-void scum_uart_init() {
+void scum_uart_init(void) {
   // Initialize the UART pins.
   stdio_uart_init_full(SCUM_UART_INSTANCE, SCUM_UART_BAUD_RATE, /*tx_pin=*/-1,
                        /*rx_pin=*/SCUM_UART_RX_PIN);
@@ -37,11 +37,11 @@ void scum_uart_init() {
   queue_init(&g_scum_uart_buffer, sizeof(char), SCUM_UART_BUFFER_SIZE);
 }
 
-void scum_uart_start() { multicore_launch_core1(scum_uart_reader); }
+void scum_uart_start(void) { multicore_launch_core1(scum_uart_reader); }
 
-void scum_uart_stop() { multicore_reset_core1(); }
+void scum_uart_stop(void) { multicore_reset_core1(); }
 
-void scum_uart_print() {
+void scum_uart_print(void) {
   if (!queue_is_empty(&g_scum_uart_buffer)) {
     char data = 0;
     while (queue_try_remove(&g_scum_uart_buffer, &data)) {

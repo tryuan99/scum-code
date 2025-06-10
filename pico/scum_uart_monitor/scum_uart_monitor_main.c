@@ -19,7 +19,7 @@
 #define SCUM_UART_READ_TIMEOUT_US 100
 
 // Initialize the LED.
-static inline void scum_uart_led_init() {
+static inline void scum_uart_led_init(void) {
   gpio_init(PICO_LED_PIN);
   gpio_set_dir(PICO_LED_PIN, GPIO_OUT);
 }

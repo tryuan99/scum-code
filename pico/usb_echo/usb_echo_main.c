@@ -13,7 +13,7 @@
 #define USB_READ_TIMEOUT_US 1000
 
 // Initialize the LED.
-static inline void usb_echo_led_init() {
+static inline void usb_echo_led_init(void) {
   gpio_init(PICO_LED_PIN);
   gpio_set_dir(PICO_LED_PIN, GPIO_OUT);
 }

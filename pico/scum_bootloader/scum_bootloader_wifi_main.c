@@ -105,7 +105,7 @@ static err_t scum_bootloader_wifi_http_receive_binary_callback(
 }
 
 // Return whether a new SCuM binary exists.
-static bool scum_bootloader_wifi_has_new_binary() {
+static bool scum_bootloader_wifi_has_new_binary(void) {
   // Copy the last modified time of the SCuM binary.
   char old_binary_last_modified[SCUM_BINARY_LAST_MODIFIED_SIZE];
   memset(old_binary_last_modified, 0,
@@ -133,7 +133,7 @@ static bool scum_bootloader_wifi_has_new_binary() {
 }
 
 // SCuM bootloading complete callback function.
-static void scum_bootloader_wifi_complete_callback() {
+static void scum_bootloader_wifi_complete_callback(void) {
   g_scum_bootloader_wifi_state = STATE_DONE;
 }
 
