@@ -1,6 +1,14 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "scum_linker_files",
     srcs = ["scum.ld"],
+)
+
+cc_library(
+    name = "scum_linker",
+    additional_linker_inputs = [":scum_linker_files"],
+    linkopts = ["-T$(location :scum_linker_files)"],
 )

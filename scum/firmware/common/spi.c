@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "scum/firmware/common/helpers.h"
 #include "scum/firmware/common/scum.h"
+#include "scum/firmware/common/utils.h"
 
 #define CS_PIN 15
 #define CLK_PIN 14
@@ -46,7 +46,7 @@ void spi_chip_select(void) {
   SCUM_GPIO_OUTPUT &= ~(1 << CS_PIN);
   SCUM_GPIO_OUTPUT &= ~(1 << DATA_PIN);
 
-  busy_wait_cycles(50);
+  utils_busy_wait_cycles(/*cycles=*/50);
 }
 
 void spi_chip_deselect(void) {
@@ -56,9 +56,9 @@ void spi_chip_deselect(void) {
 
 void initialize_imu(void) {
   write_imu_register(0x06, 0x41);
-  busy_wait_cycles(50000);
+  utils_busy_wait_cycles(/*cycles=*/50000);
   write_imu_register(0x06, 0x01);
-  busy_wait_cycles(50000);
+  utils_busy_wait_cycles(/*cycles=*/50000);
 }
 
 unsigned int read_acc_x(void) {

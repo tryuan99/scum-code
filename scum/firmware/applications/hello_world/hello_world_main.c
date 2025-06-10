@@ -1,25 +1,18 @@
-#include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
-#include "scum/firmware/common/helpers.h"
+#include "scum/firmware/common/utils.h"
 
-// Number of for loop cycles between Hello World messages.
+// Number of for loop cycles between messages.
 // 700000 for loop cycles roughly correspond to 1 second.
-#define NUM_CYCLES_BETWEEN_TX (1000000UL)
+#define NUM_CYCLES_BETWEEN_PRINT 1000000
 
-int main(void) {
-  puts("\nWelcome to SCuM!\n");
-  uint32_t g_tx_counter = 0;
+int main(int argc, char** argv) {
+  uint32_t i = 0;
 
-  while (1) {
-    printf("Hello World! %lu\n", g_tx_counter++);
-
-    // Configure the cmake build with -DCMAKE_BUILD_TYPE=Debug to trigger this
-    // assert which will print the line and file and then cause a hard fault.
-    // The default build type is MinSizeRel, which will not trigger this assert.
-    assert(g_tx_counter < 10);
-
-    busy_wait_cycles(NUM_CYCLES_BETWEEN_TX);
+  while (true) {
+    printf("Hello World! %lu\n", ++i);
+    utils_busy_wait_cycles(NUM_CYCLES_BETWEEN_PRINT);
   }
 }

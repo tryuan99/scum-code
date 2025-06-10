@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "scum/firmware/common/helpers.h"
 #include "scum/firmware/common/optical.h"
 #include "scum/firmware/common/radio.h"
 #include "scum/firmware/common/rftimer.h"
 #include "scum/firmware/common/scum.h"
 #include "scum/firmware/common/scum_defs.h"
+#include "scum/firmware/common/utils.h"
 
 //=========================== definition ======================================
 
@@ -953,7 +953,7 @@ void set_sys_clk_secondary_freq(unsigned int coarse, unsigned int fine) {
   }
 }
 
-void initialize_mote() {
+void initialize_mote(void) {
   scm3c_hw_interface_init();
 #if defined(MODULE_OPTICAL)
   optical_init();
@@ -1077,7 +1077,7 @@ unsigned int estimate_temperature_2M_32k() {
   SCUM_ANALOG_CFG_REG_0 = 0x3FFF;
 
   // Count for some arbitrary amount of time
-  busy_wait_cycles(50000);
+  utils_busy_wait_cycles(/*cycles=*/50000);
 
   // Disable all counters
   SCUM_ANALOG_CFG_REG_0 = 0x007F;

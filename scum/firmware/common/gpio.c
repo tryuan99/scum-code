@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include "scum/firmware/common/optical.h"
 #include "scum/firmware/common/scum.h"
 
 void gpio_set_high(const gpio_e gpio) { SCUM_GPIO_INPUT |= (1 << gpio); }

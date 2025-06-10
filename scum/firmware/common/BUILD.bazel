@@ -3,21 +3,156 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "scum",
-    srcs = glob(["*.c"]),
-    hdrs = glob(["*.h"]),
+    name = "adc",
+    srcs = ["adc.c"],
+    hdrs = ["adc.h"],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [":headers"],
+)
+
+cc_library(
+    name = "common",
+    srcs = [
+        "optical.c",
+        "radio.c",
+        "rftimer.c",
+        "scm3c_hw_interface.c",
+        "startup.c",
+        "syscalls.c",
+    ],
+    hdrs = [
+        "optical.h",
+        "radio.h",
+        "rftimer.h",
+        "scm3c_hw_interface.h",
+    ],
     defines = [
         "MODULE_OPTICAL",
-        "MODULE_GPIO",
-        "MODULE_INIT",
-        "MODULE_SCM3C_HW_INTERFACE",
-        "MODULE_SYS",
-        "MODULE_UART",
+        "MODULE_RADIO",
+        "MODULE_RFTIMER",
+    ],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        ":gpio",
+        ":headers",
+        ":utils",
+        "//scum/firmware/build:scum_linker",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "gpio",
+    srcs = ["gpio.c"],
+    hdrs = ["gpio.h"],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [":headers"],
+)
+
+cc_library(
+    name = "headers",
+    hdrs = [
+        "scum.h",
+        "scum_defs.h",
     ],
     target_compatible_with = select({
         "//platform:scum3c": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = ["//scum/firmware/cmsis"],
-    alwayslink = True,
+)
+
+cc_library(
+    name = "ieee_802_15_4",
+    srcs = ["ieee_802_15_4.c"],
+    hdrs = ["ieee_802_15_4.h"],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
+
+cc_library(
+    name = "matrix",
+    srcs = ["matrix.c"],
+    hdrs = ["matrix.h"],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
+
+cc_library(
+    name = "ring_buffer",
+    srcs = ["ring_buffer.c"],
+    hdrs = ["ring_buffer.h"],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
+
+cc_library(
+    name = "spi",
+    srcs = ["spi.c"],
+    hdrs = ["spi.h"],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        ":headers",
+        ":utils",
+    ],
+)
+
+cc_library(
+    name = "systicks",
+    srcs = ["systicks.c"],
+    hdrs = ["systicks.h"],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [":headers"],
+)
+
+cc_library(
+    name = "tuning",
+    srcs = ["tuning.c"],
+    hdrs = ["tuning.h"],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [":common"],
+)
+
+cc_library(
+    name = "uart",
+    srcs = ["uart.c"],
+    hdrs = ["uart.h"],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [":headers"],
+)
+
+cc_library(
+    name = "utils",
+    hdrs = ["utils.h"],
+    target_compatible_with = select({
+        "//platform:scum3c": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )

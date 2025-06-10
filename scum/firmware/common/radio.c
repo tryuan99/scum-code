@@ -7,10 +7,10 @@
 #include <string.h>
 
 #include "scum/firmware/common/gpio.h"
-#include "scum/firmware/common/helpers.h"
 #include "scum/firmware/common/rftimer.h"
 #include "scum/firmware/common/scm3c_hw_interface.h"
 #include "scum/firmware/common/scum.h"
+#include "scum/firmware/common/utils.h"
 
 // raw_chip interrupt related
 unsigned int chips[100];
@@ -716,7 +716,7 @@ uint32_t build_RX_channel_table(uint32_t channel_11_LC_code) {
     SCUM_ANALOG_CFG_REG_0 = 0x3FFF;
 
     // Count for some arbitrary amount of time
-    busy_wait_cycles(16000);
+    utils_busy_wait_cycles(/*cycles=*/16000);
 
     // Disable all counters
     SCUM_ANALOG_CFG_REG_0 = 0x007F;
@@ -781,7 +781,7 @@ void build_TX_channel_table(unsigned int channel_11_LC_code,
     SCUM_ANALOG_CFG_REG_0 = 0x3FFF;
 
     // Count for some arbitrary amount of time
-    busy_wait_cycles(16000);
+    utils_busy_wait_cycles(/*cycles=*/16000);
 
     // Disable all counters
     SCUM_ANALOG_CFG_REG_0 = 0x007F;
@@ -976,7 +976,7 @@ void RAWCHIPS_32_Handler(void) {
     chip_index = 0;
 
     // Wait for print to complete
-    busy_wait_cycles(10000);
+    utils_busy_wait_cycles(/*cycles=*/10000);
 
     // Execute soft reset
     *(volatile unsigned int*)(0xE000ED0C) = 0x05FA0004;

@@ -22,8 +22,6 @@ static uart_tx_callback_t g_uart_tx_callback = NULL;
 // UART RX callback function.
 static uart_rx_callback_t g_uart_rx_callback = NULL;
 
-static uart_rx_cb_t g_uart_rx_cb = NULL;
-
 // UART XON/XOFF escaping. If true, the current data character is being escaped
 // and has to be transmitted after the escape character.
 static bool g_uart_xon_xoff_escaping = false;
@@ -78,23 +76,9 @@ void uart_write(char data) {
 
 char uart_read(void) { return SCUM_UART->DATA; }
 
-void uart_init(uart_rx_cb_t cb) {
-  // Set the RX callback.
-  g_uart_rx_cb = cb;
-
-  // Enable the RX interrupt if cb is not NULL.
-  if (cb) {
-    NVIC_EnableIRQ(UART_IRQn);
-  }
-}
-
 // UART RX interrupt service routine.
 void UART_Handler(void) {
   if (g_uart_rx_callback) {
     g_uart_rx_callback(SCUM_UART->DATA);
-  }
-
-  if (g_uart_rx_cb) {
-    g_uart_rx_cb(SCUM_UART->DATA);
   }
 }
