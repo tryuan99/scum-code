@@ -56,7 +56,7 @@ def plot_success_timeline(
     """
     # Plot a timeline of the TX and RX successes.
     plt.style.use(["science", "grid"])
-    fig, ax = plt.subplots(figsize=(12, 4))
+    fig, ax = plt.subplots(figsize=(20, 4))
     for index, (successes, label) in enumerate([
         (rx_successes, "RX"),
         (tx_successes, "TX"),
@@ -70,7 +70,18 @@ def plot_success_timeline(
             alpha=0.25,
             label=label,
         )
-    ax.set_title("Channel calibration timeline")
+        first_x, first_y = [], []
+        for channel in set(y):
+            first_index = y.index(channel)
+            first_x.append(x[first_index])
+            first_y.append(y[first_index])
+        ax.scatter(
+            first_x,
+            first_y,
+            c=["blue", "red"][index],
+            label=f"Channel {label} done",
+            marker="*",
+        )
     ax.set_xlabel("Elapsed time [s]")
     ax.set_ylabel("IEEE 802.15.4 channel")
     ax.legend()
@@ -82,7 +93,7 @@ def main(argv):
 
     log_processor = ChannelCalibrationLogProcessor(FLAGS.log)
     plt.style.use(["science", "grid"])
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 4))
     plot_channel_histogram(log_processor.tx_successes, "TX", ax1)
     plot_channel_histogram(log_processor.rx_successes, "RX", ax2)
     plt.show()
