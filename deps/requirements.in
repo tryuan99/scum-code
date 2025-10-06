@@ -2,10 +2,10 @@ absl-py==2.3.1
 matplotlib==3.10.0
 networkx==3.5
 numpy==2.2.0
-protobuf==6.31.1
+protobuf==6.32.1
 pandas==2.2.3
 pyserial==3.5
-regex==2024.11.6
+regex==2025.9.18
 SciencePlots==2.1.1
 scikit-rf==1.8.0
 scipy==1.15.3
