@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
   // Initialize SCuM's UART.
   scum_uart_init();
 
-  // Initialize the SCuM bootloader..
+  // Initialize the SCuM bootloader.
   scum_bootloader_init();
 
   g_scum_bootloader_usb_state = STATE_IDLE;
