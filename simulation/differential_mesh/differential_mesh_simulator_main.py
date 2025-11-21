@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scienceplots
 from absl import app, flags, logging
 
+import utils.visualization.mpl_config
 from simulation.differential_mesh.differential_mesh_graph_factory import \
     DifferentialMeshGraphFactory
 from simulation.differential_mesh.differential_mesh_simulator import \
@@ -71,7 +71,6 @@ def simulate_standard_error(solver: DifferentialMeshSolver, num_rows: int,
                                                num_cols)
 
     # Plot the simulated and calculated standard error across the grid.
-    plt.style.use("science")
     fig, ax = plt.subplots(
         figsize=(12, 8),
         subplot_kw={"projection": "3d"},
@@ -132,7 +131,6 @@ def simulate_standard_error_sweep(solver: DifferentialMeshSolver,
                 logging.info("(%d, %d) %f", num_rows, num_cols, corner_stderr)
 
     # Plot the standard error as a function of the grid dimensions.
-    plt.style.use("science")
     fig, ax = plt.subplots(
         figsize=(12, 8),
         subplot_kw={"projection": "3d"},

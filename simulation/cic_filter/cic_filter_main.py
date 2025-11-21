@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scienceplots
 from absl import app, flags
 
+import utils.visualization.mpl_config
 from simulation.cic_filter.cic_filter_decimator import CicFilterDecimator
 
 FLAGS = flags.FLAGS
@@ -23,7 +23,6 @@ def plot_cic_filter_output(signal: np.ndarray, R: int, N: int) -> None:
     response = cic_filter_decimator.filter(signal)
 
     # Plot the signal.
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.stem(response)
     ax.set_xlabel("Sample")

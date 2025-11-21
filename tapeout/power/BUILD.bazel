@@ -1,4 +1,5 @@
 load("@pypi//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,10 +8,10 @@ py_binary(
     srcs = ["bgr_main.py"],
     data = ["//tapeout/power/data:bgr_data"],
     deps = [
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("pandas"),
-        requirement("SciencePlots"),
     ],
 )
 
@@ -19,10 +20,10 @@ py_binary(
     srcs = ["iref_main.py"],
     data = ["//tapeout/power/data:iref_data"],
     deps = [
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("pandas"),
-        requirement("SciencePlots"),
     ],
 )
 
@@ -31,9 +32,9 @@ py_binary(
     srcs = ["ldo_main.py"],
     data = ["//tapeout/power/data:ldo_data"],
     deps = [
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("pandas"),
-        requirement("SciencePlots"),
     ],
 )

@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scienceplots
 import scipy.stats
 from absl import app, flags, logging
+
+import utils.visualization.mpl_config
 
 FLAGS = flags.FLAGS
 
@@ -21,7 +22,6 @@ def plot_rx_if_data(data: str) -> None:
 
     # Plot the IF estimates over time.
     if_estimates = df[if_estimates_column]
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 6))
     if_estimates.plot(ax=ax)
     ax.set_title("IF estimates of received 802.15.4 packets")
@@ -30,7 +30,6 @@ def plot_rx_if_data(data: str) -> None:
     plt.show()
 
     # Plot a histogram of the IF estimates.
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 6))
     minimum_if_estimate = if_estimates.min()
     maximum_if_estimate = if_estimates.max()

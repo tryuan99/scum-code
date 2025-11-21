@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scienceplots
 from absl import app, flags, logging
 
+import utils.visualization.mpl_config
 from simulation.differential_mesh.differential_mesh_graph_factory import \
     DifferentialMeshGraphFactory
 from utils.visualization.color_maps import COLOR_MAPS
@@ -32,7 +32,6 @@ def plot_standard_error(num_rows: int, num_cols: int) -> None:
         node_stderrs[row, col] = stderr
 
     # Plot the standard error across the grid.
-    plt.style.use("science")
     fig, ax = plt.subplots(
         figsize=(12, 8),
         subplot_kw={"projection": "3d"},

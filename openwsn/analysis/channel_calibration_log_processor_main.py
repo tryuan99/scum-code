@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scienceplots
 from absl import app, flags
 
+import utils.visualization.mpl_config
 from openwsn.analysis.channel_calibration_log_processor import (
     CHANNEL_CALIBRATION_MAX_CHANNEL, CHANNEL_CALIBRATION_MIN_CHANNEL,
     ChannelCalibrationLogProcessor, ChannelCalibrationTxRxSuccess)
@@ -22,7 +22,6 @@ def plot_channel_histogram(
     """
     # Plot a histogram of the channels.
     channels = [success.channel for success in successes]
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 6))
     bins = np.arange(
         CHANNEL_CALIBRATION_MIN_CHANNEL - 0.5,
@@ -50,7 +49,6 @@ def plot_success_timeline(
         rx_successes: List of RX successes.
     """
     # Plot a timeline of the TX and RX successes.
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 6))
     for index, (successes, label) in enumerate([
         (rx_successes, "RX"),

@@ -1,4 +1,5 @@
 load("@pypi//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -6,10 +7,10 @@ py_binary(
     name = "averaging_snr_main",
     srcs = ["averaging_snr_main.py"],
     deps = [
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
-        requirement("SciencePlots"),
     ],
 )
 
@@ -24,10 +25,10 @@ py_binary(
     srcs = ["cic_filter_main.py"],
     deps = [
         ":cic_filter_decimator",
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
-        requirement("SciencePlots"),
     ],
 )
 
@@ -36,10 +37,10 @@ py_binary(
     srcs = ["cic_filter_comb_main.py"],
     deps = [
         ":cic_filter_decimator",
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
-        requirement("SciencePlots"),
     ],
 )
 
@@ -47,9 +48,9 @@ py_binary(
     name = "fir_windowing_main",
     srcs = ["fir_windowing_main.py"],
     deps = [
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
-        requirement("SciencePlots"),
     ],
 )

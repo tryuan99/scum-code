@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import scienceplots
 from absl import app, flags, logging
 
+import utils.visualization.mpl_config
 from analysis.scum.adc.adc_config import ADC_CONFIGS, AdcConfig
 
 FLAGS = flags.FLAGS
@@ -22,7 +22,6 @@ def plot_muxed_adc_data(data: str, adc_config: AdcConfig) -> None:
     logging.info(df.describe())
 
     # Plot the muxed ADC samples.
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
     df.plot(ax=ax)
     secax = ax.secondary_yaxis("right",

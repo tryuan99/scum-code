@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import scienceplots
 from absl import app, flags
+
+import utils.visualization.mpl_config
 
 FLAGS = flags.FLAGS
 
@@ -19,7 +20,6 @@ def plot_bgr(measured_data: str, simulated_data: str) -> None:
     df_measured = pd.read_csv(measured_data, comment="#")
     df_simulated = pd.read_csv(simulated_data, comment="#")
 
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
 
     # Plot the measured data.
@@ -44,7 +44,6 @@ def plot_bgr_voltage_control(measured_data: str, simulated_data: str) -> None:
     df_measured = pd.read_csv(measured_data, comment="#")
     df_simulated = pd.read_csv(simulated_data, comment="#")
 
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
 
     # Plot the measured data.

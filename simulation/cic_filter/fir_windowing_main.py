@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scienceplots
 from absl import app, flags, logging
+
+import utils.visualization.mpl_config
 
 FLAGS = flags.FLAGS
 
@@ -36,7 +37,6 @@ def plot_windows(fir_length: int, fft_length: int) -> None:
         fir_length: FIR filter length.
         fft_length: FFT length.
     """
-    plt.style.use(["science", "grid"])
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10))
     omega = np.linspace(-np.pi, np.pi, fft_length, endpoint=False)
     for name, window in WINDOWS.items():
@@ -75,7 +75,6 @@ def plot_fir_with_windowing(corner_frequency: float, fir_length: int,
     sinc = np.real(np.fft.fftshift(np.fft.ifft(sinc_fft)))
 
     # Plot the spectrum after applying different windows.
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
     omega = np.linspace(0, 2 * np.pi, fft_length, endpoint=False)
     for name, window in WINDOWS.items():

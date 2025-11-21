@@ -5,9 +5,9 @@ import re
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scienceplots
 from matplotlib.ticker import FuncFormatter
 
+import utils.visualization.mpl_config
 from analysis.scum.radio.tuning.tuning_code import TuningCode
 
 # Time correction regex pattern.
@@ -140,10 +140,10 @@ class EventPlotter:
 
     def _get_timestamps_from_indices(self, row_indices: pd.Series) -> pd.Series:
         """Get the timestamps from the row indices.
-        
+
         Args:
             row_indices: Row indices
-        
+
         Returns:
             The timestamps since the beginning of the log in seconds.
         """
@@ -152,10 +152,10 @@ class EventPlotter:
     def _calculate_timestamps(self, timestamps: pd.Series) -> pd.Series:
         """Subtract the start time from the timestamps to find the timestamps
         since the beginning of the log.
-        
+
         Args:
             timestamps: Timestamps.
-        
+
         Returns:
             The formatted timestamps.
         """

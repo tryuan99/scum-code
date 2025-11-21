@@ -15,10 +15,10 @@ py_binary(
     data = ["//analysis/scum/radio/tuning/data:tuning_codes_data"],
     deps = [
         ":tuning_code",
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
         requirement("pandas"),
-        requirement("SciencePlots"),
     ],
 )

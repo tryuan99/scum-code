@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scienceplots
 from absl import app, flags, logging
 
+import utils.visualization.mpl_config
 from simulation.differential_mesh.differential_mesh_graph_factory import \
     DifferentialMeshGraphFactory
 from simulation.differential_mesh.differential_mesh_solver import (
@@ -72,7 +72,6 @@ def plot_num_iterations(num_iterations_per_grid: str) -> None:
                 logging.info("(%d, %d) %f", num_rows, num_cols, mean_iterations)
 
     # Plot the number of iterations as a function of the grid dimensions.
-    plt.style.use("science")
     fig, ax = plt.subplots(
         figsize=(12, 8),
         subplot_kw={"projection": "3d"},

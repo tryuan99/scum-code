@@ -8,9 +8,9 @@ py_library(
     name = "live_plotter",
     srcs = ["live_plotter.py"],
     deps = [
+        "//utils/visualization:mpl_config",
         requirement("matplotlib"),
         requirement("numpy"),
-        requirement("SciencePlots"),
     ],
 )
 

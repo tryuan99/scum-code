@@ -1,4 +1,5 @@
 load("@pypi//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,11 +8,11 @@ py_binary(
     srcs = ["analog_clock_main.py"],
     data = ["//tapeout/clocks/data:analog_clock_data"],
     deps = [
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("pandas"),
         requirement("scipy"),
-        requirement("SciencePlots"),
     ],
 )
 
@@ -20,9 +21,9 @@ py_binary(
     srcs = ["digital_clock_spectrum_main.py"],
     data = ["//tapeout/clocks/data:digital_clock_spectrum_data"],
     deps = [
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("pandas"),
-        requirement("SciencePlots"),
     ],
 )

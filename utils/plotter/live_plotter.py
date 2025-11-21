@@ -6,8 +6,9 @@ from threading import Lock, Thread
 
 import matplotlib.pyplot as plt
 import numpy as np
-import scienceplots
 from matplotlib import animation, artist
+
+import utils.visualization.mpl_config
 
 # Default animation interval in milliseconds.
 DEFAULT_ANIMATION_INTERVAL = 100  # milliseconds
@@ -36,7 +37,6 @@ class LivePlotter(ABC):
         self.xmax = xmax
 
         # Prepare the plot.
-        plt.style.use(["science", "grid"])
         self.fig, self.ax = plt.subplots(figsize=(12, 8))
         self.ax.set_title(title)
         self.ax.set_xlabel(xlabel)

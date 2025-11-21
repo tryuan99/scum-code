@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import scienceplots
 from absl import app, flags, logging
 
+import utils.visualization.mpl_config
 from analysis.scum.adc.adc_config import ADC_CONFIGS, AdcConfig
 
 FLAGS = flags.FLAGS
@@ -33,7 +33,6 @@ def plot_muxed_adc_data(data: str, adc_config: AdcConfig) -> None:
         df[column] = df[column].apply(pd.eval)
 
     # Plot the muxed ADC readouts and time constants.
-    plt.style.use(["science", "grid"])
     fig, ax1 = plt.subplots(figsize=(12, 8))
     ax2 = ax1.twinx()
     df[adc_output_columns].plot(ax=ax1, color="C0", style=["-.", ":"])
