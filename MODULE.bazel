@@ -22,7 +22,12 @@ bazel_dep(
 )
 bazel_dep(
     name = "toolchains_arm_gnu",
-    version = "1.1.0",
+    version = "1.2.0",
+)
+git_override(
+    module_name = "toolchains_arm_gnu",
+    remote = "https://github.com/hexdae/toolchains_arm_gnu.git",
+    tag = "v1.2.0",
 )
 
 # ARM GNU toolchains.
