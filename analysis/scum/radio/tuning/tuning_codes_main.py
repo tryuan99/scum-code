@@ -111,7 +111,6 @@ def plot_rx_tuning_code_extrapolation(
     df_rx = df[df[tx_rx_column] == "RX"]
 
     # Extrapolate the preceding RX channel.
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 6))
     df_rx.plot.scatter(
         tuning_code_column,
@@ -149,7 +148,6 @@ def plot_rx_tuning_code_extrapolation(
     plt.show()
 
     # Extrapolate the succeeding RX channel.
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 6))
     df_rx.plot.scatter(
         tuning_code_column,

@@ -50,7 +50,6 @@ class EventPlotter:
          - RX tuning code
          - Successful receives and successful and missed acknowledgments
         """
-        plt.style.use(["science", "grid"])
         fig, axes = plt.subplots(
             3,
             1,

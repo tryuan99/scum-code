@@ -34,7 +34,6 @@ def plot_cic_filter_output(signal: np.ndarray, R: int, N: int) -> None:
         response, fft_length)
 
     # Plot the spectrum.
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.plot(omega, 20 * np.log10(response_fft_abs))
     ax.set_xlabel(r"$\omega$ [rad]")
@@ -66,7 +65,6 @@ def plot_cic_filter_comb_filter(signal: np.ndarray, R: int, N: int) -> None:
             response_standard, fft_length))
 
     # Plot the signal.
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.stem(response)
     ax.set_xlabel("Sample")
@@ -74,7 +72,6 @@ def plot_cic_filter_comb_filter(signal: np.ndarray, R: int, N: int) -> None:
     plt.show()
 
     # Plot the spectrum.
-    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.plot(omega,
             20 * np.log10(response_fft_abs / np.max(response_fft_abs)),
