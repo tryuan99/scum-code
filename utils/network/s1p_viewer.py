@@ -2,9 +2,8 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import scienceplots
 import skrf as rf
-
-import utils.visualization.mpl_config
 
 
 class S1PViewer:
@@ -30,6 +29,7 @@ class S1PViewer:
 
     def plot_s11_magnitude(self) -> None:
         """Plots the S11 magnitude."""
+        plt.style.use(["science", "grid"])
         fig, ax = plt.subplots(figsize=(12, 8))
         self.network.plot_s_db10(ax=ax, label="S11 magnitude")
         ax.set_title("S11 magnitude")
@@ -40,6 +40,7 @@ class S1PViewer:
 
     def plot_z(self) -> None:
         """Plots the real and imaginary components of the Z parameters."""
+        plt.style.use(["science", "grid"])
         fig, ax = plt.subplots(figsize=(12, 8))
         self.network.plot_z_re(ax=ax, label="Real component")
         self.network.plot_z_im(ax=ax, label="Imaginary component")

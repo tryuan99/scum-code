@@ -3,9 +3,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scienceplots
 from matplotlib.ticker import FuncFormatter
 
-import utils.visualization.mpl_config
 from analysis.scum.radio.tuning.tuning_code import TuningCode
 from openwsn.analysis.event_plotter import EventPlotter
 
@@ -32,6 +32,7 @@ class MultiEventPlotter:
          - RX tuning code
          - Successful receives and successful and missed acknowledgments
         """
+        plt.style.use(["science", "grid"])
         fig, axes = plt.subplots(
             1 + len(self.event_plotters),
             1,

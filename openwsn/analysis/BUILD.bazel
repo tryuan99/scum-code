@@ -14,10 +14,10 @@ py_binary(
     data = ["//openwsn/analysis/logs:multi_channel_calibration_logs"],
     deps = [
         ":channel_calibration_log_processor",
-        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
+        requirement("SciencePlots"),
     ],
 )
 
@@ -26,11 +26,11 @@ py_library(
     srcs = ["event_plotter.py"],
     deps = [
         "//analysis/scum/radio/tuning:tuning_code",
-        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
         requirement("pandas"),
+        requirement("SciencePlots"),
     ],
 )
 
@@ -51,11 +51,11 @@ py_library(
     deps = [
         ":event_plotter",
         "//analysis/scum/radio/tuning:tuning_code",
-        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
         requirement("pandas"),
+        requirement("SciencePlots"),
     ],
 )
 

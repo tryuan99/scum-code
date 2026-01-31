@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import scienceplots
 from absl import app, flags
-
-import utils.visualization.mpl_config
 
 FLAGS = flags.FLAGS
 
@@ -16,6 +15,7 @@ def plot_lo_spectrum(measured_data: str) -> None:
     df_measured = pd.read_csv(measured_data, comment="#")
     frequency_column, power_column = df_measured.columns
 
+    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
 
     # Plot the measured data.

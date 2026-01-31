@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import scienceplots
 from absl import app, flags
-
-import utils.visualization.mpl_config
 
 FLAGS = flags.FLAGS
 
@@ -21,6 +20,7 @@ def plot_ldo(measured_data: str, simulated_data: str) -> None:
     max_current_to_plot = min(df_measured[current_column_measured].max(),
                               df_simulated[current_column_simulated].max())
 
+    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
 
     # Plot the measured data.

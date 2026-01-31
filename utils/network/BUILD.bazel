@@ -1,5 +1,4 @@
 load("@pypi//:requirements.bzl", "requirement")
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,10 +6,10 @@ py_library(
     name = "s1p_viewer",
     srcs = ["s1p_viewer.py"],
     deps = [
-        "//utils/visualization:mpl_config",
         requirement("matplotlib"),
         requirement("numpy"),
         requirement("scikit-rf"),
+        requirement("SciencePlots"),
     ],
 )
 

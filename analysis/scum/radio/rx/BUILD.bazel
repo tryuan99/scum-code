@@ -1,5 +1,4 @@
 load("@pypi//:requirements.bzl", "requirement")
-load("@rules_python//python:defs.bzl", "py_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -8,11 +7,11 @@ py_binary(
     srcs = ["rx_if_main.py"],
     data = ["//analysis/scum/radio/rx/data:rx_if_data"],
     deps = [
-        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("numpy"),
         requirement("pandas"),
         requirement("scipy"),
+        requirement("SciencePlots"),
     ],
 )

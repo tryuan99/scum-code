@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import scienceplots
 from absl import app, flags
 
-import utils.visualization.mpl_config
 from simulation.cic_filter.cic_filter_decimator import CicFilterDecimator
 
 FLAGS = flags.FLAGS
@@ -44,6 +44,7 @@ def compare_crc_filter_combs(length: int, R: int) -> None:
     delta = np.zeros(length)
     delta[0] = 1
 
+    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
 
     for coefficients in FILTERS:
@@ -75,6 +76,7 @@ def plot_comb_filter_spectrum(length: int, R: int) -> None:
         R: Downsampling factor.
     """
     # Plot the spectrum of each comb filter.
+    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
 
     for coefficients in FILTERS:

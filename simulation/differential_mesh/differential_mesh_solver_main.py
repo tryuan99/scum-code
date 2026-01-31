@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
+import scienceplots
 from absl import app, flags, logging
 
-import utils.visualization.mpl_config
 from simulation.differential_mesh.differential_mesh_graph_factory import \
     DifferentialMeshGraphFactory
 from simulation.differential_mesh.differential_mesh_solver import (
@@ -54,6 +54,7 @@ def solve_differential_mesh_grid(solver_cls: DifferentialMeshSolver,
     logging.info("MSE = %f", solver.calculate_mean_squared_error())
 
     # Draw the grid.
+    plt.style.use("science")
     grid.draw()
 
 

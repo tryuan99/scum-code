@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import scienceplots
 from absl import app, flags
-
-import utils.visualization.mpl_config
 
 FLAGS = flags.FLAGS
 
@@ -40,6 +39,7 @@ def plot_averaging_snr(R: int) -> None:
         snr[num_averaging_stages] = _calculate_averaging_snr(response)
 
     # Plot the SNR.
+    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.plot(snr)
     ax.set_xlabel("Number of averaging stages")

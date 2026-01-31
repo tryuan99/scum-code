@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scienceplots
 from absl import app, flags, logging
 from matplotlib.ticker import FuncFormatter
 
-import utils.visualization.mpl_config
 from analysis.scum.radio.tuning.tuning_code import TuningCode
 
 FLAGS = flags.FLAGS
@@ -49,6 +49,7 @@ def plot_tx_rx_tuning_codes(df: pd.DataFrame) -> None:
     ) = df.columns
 
     # Plot the TX and RX tuning codes.
+    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 6))
     for index, (tx_rx, tx_rx_group) in enumerate(df.groupby(tx_rx_column)):
         tx_rx_group.plot.scatter(
@@ -65,6 +66,7 @@ def plot_tx_rx_tuning_codes(df: pd.DataFrame) -> None:
     plt.show()
 
     # Plot the difference between the TX and RX tuning codes.
+    plt.style.use(["science", "grid"])
     fig, ax = plt.subplots(figsize=(12, 6))
     for (channel, channel_group) in df.groupby(channel_column):
         tx = channel_group.groupby(tx_rx_column).get_group(TX_LABEL)

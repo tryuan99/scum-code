@@ -1,5 +1,4 @@
 load("@pypi//:requirements.bzl", "requirement")
-load("@rules_python//python:defs.bzl", "py_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -9,9 +8,9 @@ py_binary(
     data = ["//analysis/scum/adc/mux/data:adc_mux_data"],
     deps = [
         "//analysis/scum/adc:adc_config",
-        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
+        requirement("SciencePlots"),
         requirement("pandas"),
     ],
 )
@@ -22,9 +21,9 @@ py_binary(
     data = ["//analysis/scum/adc/mux/data:adc_mux_data_all_types"],
     deps = [
         "//analysis/scum/adc:adc_config",
-        "//utils/visualization:mpl_config",
         requirement("absl-py"),
         requirement("matplotlib"),
         requirement("pandas"),
+        requirement("SciencePlots"),
     ],
 )
