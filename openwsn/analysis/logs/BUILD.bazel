@@ -7,9 +7,5 @@ filegroup(
 
 filegroup(
     name = "multi_channel_calibration_logs",
-    srcs = [
-        "multi_channel_calibration_home.txt",
-        "multi_channel_calibration_swarm_1.txt",
-        "multi_channel_calibration_swarm_2.txt",
-    ],
+    srcs = glob(["multi_channel_calibration*.txt"]),
 )
