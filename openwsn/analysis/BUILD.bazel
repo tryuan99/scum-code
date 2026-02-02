@@ -44,3 +44,28 @@ py_binary(
         requirement("pandas"),
     ],
 )
+
+py_library(
+    name = "multi_event_plotter",
+    srcs = ["multi_event_plotter.py"],
+    deps = [
+        ":event_plotter",
+        "//analysis/scum/radio/tuning:tuning_code",
+        "//utils/visualization:mpl_config",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+        requirement("pandas"),
+    ],
+)
+
+py_binary(
+    name = "multi_event_plotter_main",
+    srcs = ["multi_event_plotter_main.py"],
+    data = ["//openwsn/analysis/logs:single_channel_calibration_logs"],
+    deps = [
+        ":multi_event_plotter",
+        requirement("absl-py"),
+        requirement("pandas"),
+    ],
+)

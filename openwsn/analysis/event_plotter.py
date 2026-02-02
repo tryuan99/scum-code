@@ -1,4 +1,4 @@
-"""The event plotter plots events during the OpenWSN network over time."""
+"""The event plotter plots events from a single device within the OpenWSN network over time."""
 
 import re
 
@@ -42,6 +42,71 @@ class EventPlotter:
         self.logs = df[log_column]
         self.start_time = self.timestamps.min()
 
+    def get_time_correction(self) -> tuple[pd.Series, pd.Series]:
+        """Get the time correction events.
+
+        Returns:
+            A tuple consisting of the time correction timestamps and the time
+            correction data.
+        """
+        time_correction_rows = self.logs.str.startswith("*")
+        time_correction_timestamps = (
+            self._get_timestamps_from_indices(time_correction_rows))
+        time_corrections = pd.to_numeric(
+            self.logs[time_correction_rows].str.extract(
+                TIME_CORRECTION_REGEX_PATTERN).squeeze())
+        return time_correction_timestamps, time_corrections
+
+    def get_rx_tuning_codes(self) -> tuple[pd.Series, pd.DataFrame]:
+        """Get the RX tuning codes.
+
+        Returns:
+            A tuple consisting of the RX tuning code timestamps and RX tuning
+            codes in separate coarse, mid, and fine columns.
+        """
+        rx_tuning_code_rows = (self.logs.str.contains(TUNING_CODE_REGEX_PATTERN)
+                               & self.logs.str.contains(RX_REGEX_PATTERN))
+        rx_tuning_code_timestamps = (
+            self._get_timestamps_from_indices(rx_tuning_code_rows))
+        rx_tuning_codes = self.logs[rx_tuning_code_rows].str.extract(
+            TUNING_CODE_REGEX_PATTERN).apply(pd.to_numeric)
+        return rx_tuning_code_timestamps, rx_tuning_codes
+
+    def get_successful_rx_timestamps(self) -> pd.Series:
+        """Get the successful RX timestamps.
+
+        Returns:
+            A series containing the successful RX timestamps.
+        """
+        successful_rx_rows = (
+            self.logs.str.contains(SUCCESSFUL_RX_REGEX_PATTERN))
+        successful_rx_timestamps = (
+            self._get_timestamps_from_indices(successful_rx_rows))
+        return successful_rx_timestamps
+
+    def get_successful_ack_timestamps(self) -> pd.Series:
+        """Get the successful acknowledgment timestamps.
+
+        Returns:
+            A series containing the successful acknowledgment timestamps.
+        """
+        successful_ack_rows = (
+            self.logs.str.contains(SUCCESSFUL_ACK_REGEX_PATTERN))
+        successful_ack_timestamps = (
+            self._get_timestamps_from_indices(successful_ack_rows))
+        return successful_ack_timestamps
+
+    def get_missed_ack_timestamps(self) -> pd.Series:
+        """Get the missed acknowledgment timestamps.
+
+        Returns:
+            A series containing the missed acknowledgment timestamps.
+        """
+        missed_ack_rows = self.logs.str.contains(MISSED_ACK_REGEX_PATTERN)
+        missed_ack_timestamps = (
+            self._get_timestamps_from_indices(missed_ack_rows))
+        return missed_ack_timestamps
+
     def plot_timeline(self) -> None:
         """Plots a timeline of the events.
 
@@ -58,23 +123,18 @@ class EventPlotter:
         )
 
         # Plot the time correction in us.
-        time_correction_rows = self.logs.str.startswith("*")
-        time_correction_timestamps = (
-            self._get_timestamps_from_indices(time_correction_rows))
-        time_corrections = pd.to_numeric(
-            self.logs[time_correction_rows].str.extract(
-                TIME_CORRECTION_REGEX_PATTERN).squeeze())
-        axes[0].plot(time_correction_timestamps, time_corrections, color="C0")
+        time_correction_timestamps, time_corrections = self.get_time_correction(
+        )
+        axes[0].plot(
+            time_correction_timestamps.dt.total_seconds(),
+            time_corrections,
+            color="C0",
+        )
         axes[0].set_ylim([-200, 200])
         axes[0].set_ylabel("Time correction [µs]")
 
         # Plot the RX tuning code.
-        rx_tuning_code_rows = (self.logs.str.contains(TUNING_CODE_REGEX_PATTERN)
-                               & self.logs.str.contains(RX_REGEX_PATTERN))
-        rx_tuning_code_timestamps = (
-            self._get_timestamps_from_indices(rx_tuning_code_rows))
-        rx_tuning_codes = self.logs[rx_tuning_code_rows].str.extract(
-            TUNING_CODE_REGEX_PATTERN).apply(pd.to_numeric)
+        rx_tuning_code_timestamps, rx_tuning_codes = self.get_rx_tuning_codes()
         coarse_column, mid_column, fine_column = rx_tuning_codes.columns
         tuning_codes = TuningCode.coarse_mid_fine_to_tuning_code(
             rx_tuning_codes[coarse_column], rx_tuning_codes[mid_column],
@@ -91,49 +151,43 @@ class EventPlotter:
             tuning_code_timestamps,
             pd.Series([self._calculate_timestamps(self.timestamps.max())]),
         ])
-        axes[1].plot(tuning_code_timestamps, tuning_codes, color="C0")
+        axes[1].plot(
+            tuning_code_timestamps.dt.total_seconds(),
+            tuning_codes,
+            color="C0",
+        )
         axes[1].yaxis.set_major_formatter(
             FuncFormatter(self._format_tuning_code))
         axes[1].set_ylabel("RX tuning code")
 
         # Plot successful receives.
-        successful_rx_rows = (
-            self.logs.str.contains(SUCCESSFUL_RX_REGEX_PATTERN))
-        successful_rx_timestamps = (
-            self._get_timestamps_from_indices(successful_rx_rows))
+        successful_rx_timestamps = self.get_successful_rx_timestamps()
         axes[2].scatter(
-            successful_rx_timestamps,
-            pd.Series([1]).repeat(len(successful_rx_timestamps)),
+            successful_rx_timestamps.dt.total_seconds(),
+            np.repeat(1, len(successful_rx_timestamps)),
             label="Successful RX",
             color="C0",
         )
 
         # Plot successful and missed acknowledgments.
-        successful_ack_rows = (
-            self.logs.str.contains(SUCCESSFUL_ACK_REGEX_PATTERN))
-        successful_ack_timestamps = (
-            self._get_timestamps_from_indices(successful_ack_rows))
+        successful_ack_timestamps = self.get_successful_ack_timestamps()
         axes[2].scatter(
-            successful_ack_timestamps,
-            pd.Series([0]).repeat(len(successful_ack_timestamps)),
+            successful_ack_timestamps.dt.total_seconds(),
+            np.repeat(0, len(successful_ack_timestamps)),
             label="Successful acknowledgments",
             color="C1",
         )
-        missed_ack_rows = self.logs.str.contains(MISSED_ACK_REGEX_PATTERN)
-        missed_ack_timestamps = self._get_timestamps_from_indices(
-            missed_ack_rows)
+        missed_ack_timestamps = self.get_missed_ack_timestamps()
         axes[2].scatter(
-            missed_ack_timestamps,
-            pd.Series([-1]).repeat(len(missed_ack_timestamps)),
+            missed_ack_timestamps.dt.total_seconds(),
+            np.repeat(-1, len(missed_ack_timestamps)),
             label="Missed acknowledgments",
             color="C2",
         )
         axes[2].set_yticks([])
         axes[2].set_ylim([-1.5, 1.5])
-        axes[2].set_ylabel("TX/RX")
+        axes[2].set_ylabel("TX/RX events")
         axes[2].legend()
-
-        axes[2].xaxis.set_major_formatter(self._format_timestamp)
         plt.xlabel("Time [s]")
         plt.show()
 
@@ -161,19 +215,6 @@ class EventPlotter:
         return timestamps - self.start_time
 
     @staticmethod
-    def _format_timestamp(x: float, position: float) -> str:
-        """Formats the timestamp tick labels.
-
-        Args:
-            x: Tick value.
-            position: Position.
-
-        Returns:
-            The timestamp string.
-        """
-        return f"{int(x / 1e9)}"
-
-    @staticmethod
     def _format_tuning_code(y: float, position: float) -> str:
         """Formats the tuning code tick labels.
 
@@ -185,6 +226,4 @@ class EventPlotter:
             The string containing the coarse, mid, and fine codes.
         """
         tuning_code = TuningCode.tuning_code_to_coarse_mid_fine(int(np.abs(y)))
-        if y < 0:
-            return rf"$-{tuning_code}$"
-        return rf"${tuning_code}$"
+        return f"{tuning_code}"
