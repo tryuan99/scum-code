@@ -10,15 +10,19 @@ bazel_dep(
 )
 bazel_dep(
     name = "rules_cc",
-    version = "0.2.9",
+    version = "0.2.17",
 )
 bazel_dep(
     name = "rules_pkg",
-    version = "1.1.0",
+    version = "1.2.0",
 )
 bazel_dep(
     name = "rules_python",
-    version = "1.6.3",
+    version = "1.9.0",
+)
+bazel_dep(
+    name = "rules_shell",
+    version = "0.7.1",
 )
 bazel_dep(
     name = "toolchains_arm_gnu",
@@ -43,7 +47,7 @@ single_version_override(
     patches = ["//third_party:pico-sdk.patch"],
 )
 
-# Pico SDK toolchains.
+# Configure Pico SDK toolchains.
 register_toolchains(
     "@pico-sdk//bazel/toolchain:linux-x86_64-rp2040",
     "@pico-sdk//bazel/toolchain:linux-x86_64-rp2350",
