@@ -28,6 +28,13 @@ bazel_dep(
     name = "toolchains_arm_gnu",
     version = "1.2.0",
 )
+
+single_version_override(
+    module_name = "pico-sdk",
+    patch_strip = 1,
+    patches = ["//third_party/pico_sdk:pico_sdk.patch"],
+)
+
 git_override(
     module_name = "toolchains_arm_gnu",
     remote = "https://github.com/hexdae/toolchains_arm_gnu.git",
@@ -41,11 +48,6 @@ use_repo(arm_toolchain, "arm_none_eabi")
 
 # Custom toolchains.
 register_toolchains("//scum/firmware/tools:all")
-
-single_version_override(
-    module_name = "pico-sdk",
-    patches = ["//third_party:pico-sdk.patch"],
-)
 
 # Configure Pico SDK toolchains.
 register_toolchains(
