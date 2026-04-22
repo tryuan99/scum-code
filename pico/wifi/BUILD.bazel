@@ -5,6 +5,11 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "env",
     hdrs = ["env.h"],
+    target_compatible_with = select({
+        "@pico-sdk//bazel/constraint:rp2040": [],
+        "@pico-sdk//bazel/constraint:rp2350": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = ["@pico-sdk//src/rp2_common/pico_cyw43_driver"],
 )
 
@@ -12,6 +17,11 @@ cc_library(
     name = "http_client",
     srcs = ["http_client.c"],
     hdrs = ["http_client.h"],
+    target_compatible_with = select({
+        "@pico-sdk//bazel/constraint:rp2040": [],
+        "@pico-sdk//bazel/constraint:rp2350": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "@pico-sdk//src/rp2_common/pico_async_context",
         "@pico-sdk//src/rp2_common/pico_lwip",
@@ -23,10 +33,20 @@ cc_library(
     name = "lwipopts",
     hdrs = ["lwipopts.h"],
     includes = ["."],
+    target_compatible_with = select({
+        "@pico-sdk//bazel/constraint:rp2040": [],
+        "@pico-sdk//bazel/constraint:rp2350": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [":lwip_config"],
 )
 
 cc_library(
     name = "lwip_config",
     hdrs = ["lwip_config.h"],
+    target_compatible_with = select({
+        "@pico-sdk//bazel/constraint:rp2040": [],
+        "@pico-sdk//bazel/constraint:rp2350": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )
