@@ -4,11 +4,9 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 package(default_visibility = ["//visibility:public"])
 
 py_library(
-    name = "s1p_viewer",
-    srcs = ["s1p_viewer.py"],
+    name = "sparam_viewer",
+    srcs = ["sparam_viewer.py"],
     deps = [
-        "//utils/visualization:mpl_config",
-        requirement("matplotlib"),
         requirement("numpy"),
         requirement("scikit-rf"),
     ],
@@ -18,7 +16,22 @@ py_binary(
     name = "s1p_viewer_main",
     srcs = ["s1p_viewer_main.py"],
     deps = [
-        ":s1p_viewer",
+        ":sparam_viewer",
+        "//utils/visualization:mpl_config",
         requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
+    ],
+)
+
+py_binary(
+    name = "s2p_viewer_main",
+    srcs = ["s2p_viewer_main.py"],
+    deps = [
+        ":sparam_viewer",
+        "//utils/visualization:mpl_config",
+        requirement("absl-py"),
+        requirement("matplotlib"),
+        requirement("numpy"),
     ],
 )
